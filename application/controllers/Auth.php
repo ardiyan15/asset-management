@@ -105,11 +105,8 @@ class Auth extends CI_Controller
             'matches' => 'password dont match!',
             'min_length' => 'Password to short!'
         ]);
-        // $this->form_validation->set_rules('role', 'Department', 'required', [
-        //     'required' => 'please choose your department'
-        // ]);
-        $this->form_validation->set_rules('password2', 'Password', 'required|trim|matches[password1]');
 
+        $this->form_validation->set_rules('password2', 'Password', 'required|trim|matches[password1]');
 
         if ($this->form_validation->run() == false) {
             $data['title'] = 'User Registration';
@@ -157,7 +154,7 @@ class Auth extends CI_Controller
         $config['protocol']  = 'smtp';
         $config['smtp_host'] = 'ssl://smtp.googlemail.com';
         $config['smtp_user'] = 'ardhiyan15@gmail.com';
-        $config['smtp_pass'] = 'fingerstyle';
+        $config['smtp_pass'] = 'veteran768015';
         $config['smtp_port'] = 465;
         $config['mailtype']  = 'html';
         $config['charset']   = 'utf-8';
@@ -171,7 +168,8 @@ class Auth extends CI_Controller
         if ($type == 'verify') {
             $this->email->to('ardhiyan02@gmail.com');
         } else {
-            $this->email->to($this->input->post('email'));
+            // $this->email->to($this->input->post('email'));
+            $this->email->to('ardhiyan15@gmail.com');
         }
 
         if ($type == 'verify') {
@@ -179,7 +177,7 @@ class Auth extends CI_Controller
             $this->email->message("<b>" . $this->input->post('fullname') . "</b>" . ' Has been register account, Pleas click this link to verify new account : <a href="' . base_url() . 'auth/verify?email=' . $this->input->post('email') . '&token=' . urlencode($token) . '"> Activate </a> ');
         } else if ($type == 'forgot') {
             $this->email->subject('Reset Password');
-            $this->email->message("<b>" . $this->input->post('name') . "</b>" . ' Has been register account, Pleas click this link to reset your password : <a href="' . base_url() . 'auth/resetPassword?email=' . $this->input->post('email') . '&token=' . urlencode($token) . '"> Reset Password </a> ');
+            $this->email->message("<b>" . $this->input->post('email') . "</b>" . ' Has been register account, Pleas click this link to reset your password : <a href="' . base_url() . 'auth/resetPassword?email=' . $this->input->post('email') . '&token=' . urlencode($token) . '"> Reset Password </a> ');
         }
 
         if ($this->email->send()) {
@@ -268,7 +266,7 @@ class Auth extends CI_Controller
                 $user_token = [
                     'email' => $email,
                     'token' => $token,
-                    'date_created' => time()
+                    // 'date_created' => time()
                 ];
 
                 $this->Assets->create_user_token($user_token);
@@ -349,7 +347,7 @@ class Auth extends CI_Controller
             $this->session->unset_userdata('reset_email');
 
             $this->session->set_flashdata(
-                'message',
+                'message',  
                 '<div class="alert alert-success" role="alert">
                     Password has been changed, please login.
                 </div>'

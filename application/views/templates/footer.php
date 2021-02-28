@@ -47,10 +47,18 @@
                     });
                 </script>
                 <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js" integrity="sha256-pasqAKBDmFT4eHoN2ndd6lN370kFiGUFyTiUHWhU7k8=" crossorigin="anonymous"></script>
+                <script src="http://cdn.datatables.net/1.10.23/js/jquery.dataTables.min.js"></script>
                 <script src="<?= base_url('assets/') ?>js/sweetalert2.all.min.js"></script>
-
                 <script src="<?= base_url('assets/') ?>js/myscript1.js"></script>
-
-                </body>
-
-                </html>
+                <script>
+                    $(document).ready( function () {
+                        $('#table-asset').DataTable({
+                            "columnDefs": [
+                                {"searchable": false, "targets": 0}
+                            ]
+                        });
+                    });
+                    console.log('test')
+                </script>
+            </body>
+        </html>

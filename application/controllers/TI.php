@@ -56,7 +56,6 @@ class TI extends CI_Controller
         'message',
         'ti_success'
       );
-      // $this->_sendEmail($fullname, 'success', $email);
       redirect('asset');
     } else {
       $this->session->set_flashdata(
@@ -89,42 +88,4 @@ class TI extends CI_Controller
       redirect('asset');
     }
   }
-
-
-  // private function _sendEmail($fullname, $type, $email)
-  // {
-  //   $config = array();
-  //   $config['protocol']  = 'smtp';
-  //   $config['smtp_host'] = 'ssl://smtp.googlemail.com';
-  //   $config['smtp_user'] = 'ardhiyan15@gmail.com';
-  //   $config['smtp_pass'] = 'fingerstyle';
-  //   $config['smtp_port'] = 465;
-  //   $config['mailtype']  = 'html';
-  //   $config['charset']   = 'utf-8';
-  //   $this->email->initialize($config);
-  //   $this->email->set_newline("\r\n");
-
-  //   $this->load->library('email', $config);
-
-  //   $this->email->from('ardhiyan15@gmail.com', 'Ardiyan Agus Prayogo');
-
-  //   if ($type == 'success') {
-  //     $this->email->to($email);
-  //   } else {
-  //     $this->email->to($this->input->post('email'));
-  //   }
-
-  //   if ($type == 'success') {
-  //     $this->email->subject('Take In Asset');
-  //     $this->email->message("<b>" . $fullname . "</b>" . ' 
-  //     has received the asset you sent');
-  //   }
-
-  //   if ($this->email->send()) {
-  //     return true;
-  //   } else {
-  //     echo $this->email->print_debugger();
-  //     die;
-  //   }
-  // }
 }

@@ -14,11 +14,11 @@ class Assets_model extends CI_Model
         return $this->db->get_where('user', ['email' => $email])->row_array();
     }
 
-    public function menu_model($loc, $limit, $start)
+    public function menu_model($loc)
     {
         if ($loc == 'IT') {
             $this->db->order_by('id_asset', 'DESC');
-            return $this->db->get('asset', $limit, $start)->result_array();
+            return $this->db->get('asset')->result_array();
         } else {
             // $this->db->select('asset.* , location.code');
             // $this->db->join('location', 'asset.location_id = location.id_location');
@@ -27,7 +27,7 @@ class Assets_model extends CI_Model
             // $query = $this->db->get();
             // return $query->result_array();
             $this->db->where('asset_location', $loc);
-            return $this->db->get('asset', $limit, $start)->result_array();
+            return $this->db->get('asset')->result_array();
         }
     }
 

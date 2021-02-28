@@ -8,7 +8,7 @@ class Admin extends CI_Controller
     {
         parent::__construct();
         $this->load->model('Assets_model', 'Assets');
-        is_logged_in();
+        // is_logged_in();
     }
 
     public function index()
@@ -20,11 +20,8 @@ class Admin extends CI_Controller
             redirect('auth');
         }
         $data['user'] = $this->Assets->login_model($this->session->userdata('email'));
-
         $data['order'] = $this->input->post('order');
-
         $data['assets'] = $this->Assets->count_asset($data['order']);
-
         $data['store'] = $this->Assets->get_all_store_location();
 
         $this->load->view('templates/header', $data);

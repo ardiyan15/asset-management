@@ -8,6 +8,7 @@ class Asset extends CI_Controller
   {
     parent::__construct();
     $this->load->model('Assets_model', 'Assets');
+    is_logged_in();
   }
 
   public function index()
@@ -19,48 +20,49 @@ class Asset extends CI_Controller
     if ($this->input->post('keyword')) {
       $data['assets'] = $this->Assets->search_data_model($data['user']['user_code']);
     } else {
-      $config['base_url'] = base_url('asset/index'); //base url
-      $config['total_rows'] = $this->Assets->get_total_row($data['user']['user_code']); //total row
-      $config['per_page'] = 10;  //show record per halaman
+    $data['assets'] = $this->Assets->menu_model($data['user']['user_code']);
+      // $config['base_url'] = base_url('asset/index'); //base url
+      // $config['total_rows'] = $this->Assets->get_total_row($data['user']['user_code']); //total row
+      // $config['per_page'] = 10;  //show record per halaman
 
-      $config['full_tag_open'] = '<nav><ul class ="pagination">';
-      $config['full_tag_close'] = '</ul></nav>';
+      // $config['full_tag_open'] = '<nav><ul class ="pagination">';
+      // $config['full_tag_close'] = '</ul></nav>';
 
-      $config['first_link'] = 'First';
-      $config['first_tag_open'] = '<li class="page-item">';
-      $config['first_tag_close'] = '</li>';
+      // $config['first_link'] = 'First';
+      // $config['first_tag_open'] = '<li class="page-item">';
+      // $config['first_tag_close'] = '</li>';
 
-      $config['last_link'] = 'Last';
-      $config['last_tag_open'] = '<li class="page-item">';
-      $config['last_tag_close'] = '</li>';
+      // $config['last_link'] = 'Last';
+      // $config['last_tag_open'] = '<li class="page-item">';
+      // $config['last_tag_close'] = '</li>';
 
-      $config['next_link'] = '&raquo';
-      $config['next_tag_open'] = '<li class="page-item">';
-      $config['next_tag_close'] = '</li>';
+      // $config['next_link'] = '&raquo';
+      // $config['next_tag_open'] = '<li class="page-item">';
+      // $config['next_tag_close'] = '</li>';
 
-      $config['prev_link'] = '&laquo';
-      $config['prev_tag_open'] = '<li class="page-item">';
-      $config['prev_tag_close'] = '</li>';
+      // $config['prev_link'] = '&laquo';
+      // $config['prev_tag_open'] = '<li class="page-item">';
+      // $config['prev_tag_close'] = '</li>';
 
-      $config['cur_tag_open'] = '<li class="page-item active"><a class="page-link" href="#">';
-      $config['cur_tag_close'] = '</a></li>';
+      // $config['cur_tag_open'] = '<li class="page-item active"><a class="page-link" href="#">';
+      // $config['cur_tag_close'] = '</a></li>';
 
-      $config['num_tag_open'] = '<li class="page-item">';
-      $config['num_tag_close'] = '</li>';
+      // $config['num_tag_open'] = '<li class="page-item">';
+      // $config['num_tag_close'] = '</li>';
 
-      $config['attributes'] = array('class' => 'page-link');
+      // $config['attributes'] = array('class' => 'page-link');
 
-      $this->pagination->initialize($config);
-      $data['start'] = $this->uri->segment(3);
+      // $this->pagination->initialize($config);
+      // $data['start'] = $this->uri->segment(3);
       // $data['page'] = $this->Assets->menu_model($data['user']['user_code'], $config['per_page'], $data['start']);
-      $data['assets'] = $this->Assets->menu_model($data['user']['user_code'], $config['per_page'], $data['start']);
+      // $data['assets'] = $this->Assets->menu_model($data['user']['user_code'], $config['per_page'], $data['start']);
     }
 
     $data['title'] = 'List Assets';
     $result['error'] = "Data Not Found!";
-    $data['pagination'] = $this->pagination->create_links();
+    // $data['pagination'] = $this->pagination->create_links();
 
-    $data['store'] = $this->Assets->get_all_store_location();
+    // $data['store'] = $this->Assets->get_all_store_location();
 
     if ($this->input->post('keyword')) {
       $data['total_asset'] = $this->Assets->search_data_model($data['user']['user_code']);
