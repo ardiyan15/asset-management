@@ -17,15 +17,12 @@ class Assets_model extends CI_Model
     public function menu_model($loc)
     {
         if ($loc == 'IT') {
+            $this->db->select('*');
+            $this->db->from('asset');
+            $this->db->join('rooms', 'rooms.id = asset.asset_location');
             $this->db->order_by('id_asset', 'DESC');
-            return $this->db->get('asset')->result_array();
+            return $this->db->get()->result_array();
         } else {
-            // $this->db->select('asset.* , location.code');
-            // $this->db->join('location', 'asset.location_id = location.id_location');
-            // $this->db->from('asset');
-            // $this->db->where('code', $loc);
-            // $query = $this->db->get();
-            // return $query->result_array();
             $this->db->where('asset_location', $loc);
             return $this->db->get('asset')->result_array();
         }
@@ -221,7 +218,10 @@ class Assets_model extends CI_Model
     public function get_total_row($loc)
     {
         if ($loc == 'IT') {
-            return $this->db->get('asset')->num_rows();
+            $this->db->select('*');
+            $this->db->from('asset');
+            $this->db->join('rooms', 'rooms.id = asset.asset_location');
+            return $this->db->get()->num_rows();
         } else {
             return $this->db->get_where('asset', ['asset_location' => $loc])->num_rows();
         }
@@ -340,5 +340,33 @@ class Assets_model extends CI_Model
         $this->db->or_like('fullname', $keyword);
         $this->db->or_like('email', $keyword);
         return $this->db->get('user')->result_array();
+    }
+
+    public function get_name_location($room_id)
+    {
+        $this->db->select('rooms.name');
+        $this->db->from('rooms');
+        $this->db->where('id', $room_id);
+        return $this->db->get()->row_array();
+    }
+
+    public function get_code_location($location)
+    {
+        // var_dump($location);
+        $this->db->select('buildings.name');
+        $this->db->from('rooms');
+        $this->db->join('buildings', 'rooms.building_id = buildings.id');
+        $this->db->where('rooms.name', $location);
+        // $this->db->order_by('buildings.id', 'DESC');
+        return $this->db->get()->result_array();
+    }
+
+    public function get_last_asset_serial_number()
+    {
+        $this->db->select('serial_number');
+        $this->db->from('asset');
+        $this->db->order_by('id_asset', 'DESC');
+        $this->db->limit(1);
+        return $this->db->get()->result_array();
     }
 }

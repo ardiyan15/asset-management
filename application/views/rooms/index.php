@@ -1,7 +1,6 @@
 <div class="container-fluid">
 
-
-    <!-- Untuk Memunculkan pop up sweetalert -->
+     <!-- Untuk Memunculkan pop up sweetalert -->
     <div class="flash-data" data-flashdata="<?= $this->session->flashdata('message'); ?>"></div>
 
 
@@ -11,20 +10,19 @@
         <div class="row row-cols-4">
             <?php foreach ($buildings as $building) : ?>
                 <div class="col-sm-4 mt-3">
-            <a href="<?= base_url('admin/list_rooms/'). $building['id'] ?>">
-                    <div class="card">
-                        <div class="card-body">
-                            <h5 class="card-title"><?= $building['name']; ?></h5>
-                            <a href="" class="btn btn-default btn-sm" data-toggle="modal" data-target="#editStrLocation<?= $building['id']; ?>"> <i class="fas fa-edit"></i> Edit </a>
-                            <?php if ($building['status'] == 1) : ?>
-                                <a href="<?= base_url('admin/deactivateStr/') . $building['id']; ?>" class="btn btn-sm deactStr-button"> <i class=" fas fa-times"></i> List Room's </a>
-                            <?php else : ?>
-                                <a href="<?= base_url('admin/activateStr/') . $building['id']; ?>" class="btn actvt-button"> <i class="fas fa-check"></i>Activate</a>
-                            <?php endif; ?>
+                    <a href="<?= base_url('admin/list_rooms/'). $building['id'] ?>">
+                        <div class="card">
+                            <div class="card-body">
+                                <h5 class="card-title"><?= $building['name']; ?></h5>
+                                <a href="" class="btn btn-default btn-sm" data-toggle="modal" data-target="#editStrLocation<?= $building['id']; ?>"> <i class="fas fa-edit"></i> Edit </a>
+                                <?php if ($building['status'] == 1) : ?>
+                                    <a href="<?= base_url('admin/deactivateStr/') . $building['id']; ?>" class="btn btn-sm deactStr-button"> <i class=" fas fa-times"></i> List Room's </a>
+                                <?php else : ?>
+                                    <a href="<?= base_url('admin/activateStr/') . $building['id']; ?>" class="btn actvt-button"> <i class="fas fa-check"></i>Activate</a>
+                                <?php endif; ?>
+                            </div>
                         </div>
-                    </div>
-                </a>
-
+                    </a>
                 </div>
             <?php endforeach; ?>
         </div>

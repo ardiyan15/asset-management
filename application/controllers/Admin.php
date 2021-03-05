@@ -8,6 +8,8 @@ class Admin extends CI_Controller
     {
         parent::__construct();
         $this->load->model('Assets_model', 'Assets');
+        $this->load->model('Buildings_model', 'Buildings');
+        $this->load->model('Rooms_model', 'Rooms');
         // is_logged_in();
     }
 
@@ -130,17 +132,16 @@ class Admin extends CI_Controller
         }
     }
 
-    public function store_location()
+    public function buildings()
     {
-        $data['title'] = 'List User';
         $session = $this->session->userdata('email');
         if ($session === null) {
             redirect('auth');
         }
         $data['user'] = $this->Assets->login_model($this->session->userdata('email'));
 
-        $data['title'] = "Store Location";
-        $data['strLocations'] = $this->Assets->get_all_store_location();
+        $data['title'] = "Room Location";
+        $data['buildings'] = $this->Buildings->get_all_buildings();
 
         $this->load->view('templates/header', $data);
         $this->load->view('templates/sidebar', $data);
@@ -244,5 +245,24 @@ class Admin extends CI_Controller
     public function filter_asset()
     {
         $this->Assets->get_filter_asset();
+    }
+
+    public function list_rooms()
+    {
+        $session = $this->session->userdata('email');
+        if ($session === null) {
+            redirect('auth');
+        }
+        $data['user'] = $this->Assets->login_model($this->session->userdata('email'));
+        
+        $building_id = $this->uri->segment(3);
+        $data['title'] = "Room Location";
+        $data['buildings'] = $this->Rooms->get_all_rooms_by_building_id($building_id);
+
+        $this->load->view('templates/header', $data);
+        $this->load->view('templates/sidebar', $data);
+        $this->load->view('templates/topbar', $data);
+        $this->load->view('rooms/index', $data);
+        $this->load->view('templates/footer');
     }
 }

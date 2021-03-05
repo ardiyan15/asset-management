@@ -62,7 +62,6 @@ class User extends CI_Controller
             }
             $this->Assets->update_profile_model($name, $email, $newImage);
 
-
             $this->session->set_flashdata(
                 'message',
                 '<div class="alert alert-success" role="alert">

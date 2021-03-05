@@ -8,68 +8,31 @@ class Asset extends CI_Controller
   {
     parent::__construct();
     $this->load->model('Assets_model', 'Assets');
-    is_logged_in();
+    $this->load->model('Rooms_model', 'Rooms');
+    $this->load->model('Buildings_model', 'Buildings');
+    // is_logged_in();
   }
 
   public function index()
   {
-    $this->load->library('pagination');
-
     $data['user'] = $this->Assets->login_model($this->session->userdata('email'));
-
     if ($this->input->post('keyword')) {
       $data['assets'] = $this->Assets->search_data_model($data['user']['user_code']);
     } else {
-    $data['assets'] = $this->Assets->menu_model($data['user']['user_code']);
-      // $config['base_url'] = base_url('asset/index'); //base url
-      // $config['total_rows'] = $this->Assets->get_total_row($data['user']['user_code']); //total row
-      // $config['per_page'] = 10;  //show record per halaman
+      $data['assets'] = $this->Assets->menu_model($data['user']['user_code']);
+    }
 
-      // $config['full_tag_open'] = '<nav><ul class ="pagination">';
-      // $config['full_tag_close'] = '</ul></nav>';
-
-      // $config['first_link'] = 'First';
-      // $config['first_tag_open'] = '<li class="page-item">';
-      // $config['first_tag_close'] = '</li>';
-
-      // $config['last_link'] = 'Last';
-      // $config['last_tag_open'] = '<li class="page-item">';
-      // $config['last_tag_close'] = '</li>';
-
-      // $config['next_link'] = '&raquo';
-      // $config['next_tag_open'] = '<li class="page-item">';
-      // $config['next_tag_close'] = '</li>';
-
-      // $config['prev_link'] = '&laquo';
-      // $config['prev_tag_open'] = '<li class="page-item">';
-      // $config['prev_tag_close'] = '</li>';
-
-      // $config['cur_tag_open'] = '<li class="page-item active"><a class="page-link" href="#">';
-      // $config['cur_tag_close'] = '</a></li>';
-
-      // $config['num_tag_open'] = '<li class="page-item">';
-      // $config['num_tag_close'] = '</li>';
-
-      // $config['attributes'] = array('class' => 'page-link');
-
-      // $this->pagination->initialize($config);
-      // $data['start'] = $this->uri->segment(3);
-      // $data['page'] = $this->Assets->menu_model($data['user']['user_code'], $config['per_page'], $data['start']);
-      // $data['assets'] = $this->Assets->menu_model($data['user']['user_code'], $config['per_page'], $data['start']);
+    if($this->input->post('keyword')) {
+        $data['total_asset'] = $this->Assets->search_data_model($data['user']['user_code']);
+        $data['amount_data'] = count($data['total_asset']);
+    } else {
+        $data['amount_data'] = $this->Assets->get_total_row($data['user']['user_code']);
     }
 
     $data['title'] = 'List Assets';
     $result['error'] = "Data Not Found!";
-    // $data['pagination'] = $this->pagination->create_links();
-
-    // $data['store'] = $this->Assets->get_all_store_location();
-
-    if ($this->input->post('keyword')) {
-      $data['total_asset'] = $this->Assets->search_data_model($data['user']['user_code']);
-      $data['amount_data'] = count($data['total_asset']);
-    } else {
-      $data['amount_data'] = $this->Assets->get_total_row($data['user']['user_code']);
-    }
+    $data['rooms'] = $this->Rooms->get_all_rooms();
+    $data['buildings'] = $this->Buildings->get_all_buildings();
 
     if ($data['assets']) {
       $this->load->view('templates/header', $data);
@@ -90,15 +53,28 @@ class Asset extends CI_Controller
   {
     $this->form_validation->set_rules('name', 'Name', 'required|trim');
     $this->form_validation->set_rules('merk', 'Merk', 'required|trim');
-    $this->form_validation->set_rules('sn', 'Serial Number', 'required|trim');
+    // $this->form_validation->set_rules('sn', 'Serial Number', 'required|trim');
     $this->form_validation->set_rules('loc', 'Location', 'required');
+
+    $roomId = $this->input->post('loc');
+    $location = $this->Assets->get_name_location($roomId)['name'];
+    $codeLocation = $this->Assets->get_code_location($location)[0];
+    $prefix = substr($codeLocation['name'], 7, 1);
+    $last_sn = $this->Assets->get_last_asset_serial_number()[0];
+    
+    if($last_sn['serial_number'] === '') {
+      $serialNumber = $location.date("Y").date("m").+1;
+    } else {
+      $lastNumber = (int)substr($last_sn['serial_number'], 11, 1);
+      $serialNumber = $location.date("Y").date("m").+($lastNumber+1);
+    }
 
     $data = [
       'asset_name' => $this->input->post('name'),
       'merk' => $this->input->post('merk'),
       'qty' => 1,
-      'serial_number' => $this->input->post('sn'),
-      'origin_location' => $this->input->post('origin'),
+      'serial_number' => $serialNumber,
+      // 'origin_location' => $this->input->post('origin'),
       'asset_location' => $this->input->post('loc'),
       'status' => 0
     ];

@@ -8,7 +8,7 @@
                 <div class="col-sm" style="margin-top: 4.5%">
                     <h1 class="h3 text-gray-800"><?= $title; ?></h1>
                     <?php if ($user['user_code'] == 'IT') : ?>
-                        <button type="button" class="btn btn-primary btn-sm mb-3" data-toggle="modal" data-target="#addAsset">
+                        <button type="button" class="btn btn-success btn-sm mb-3" data-toggle="modal" data-target="#addAsset">
                             <i class="fas fa-plus mr-1"></i> Add Asset
                         </button>
                     <?php endif; ?>
@@ -23,7 +23,7 @@
                                 <div class="input-group" style="margin-top: 17%;">
                                 <?php endif; ?>
                                 <input type="text" name="keyword" class="form-control" placeholder="search your asset" aria-describedby="basic-addon2">
-                                <button type="submit" class="ml-2 btn btn-primary btn-sm"> <i class="fas fa-search"></i> Filter </button>
+                                <button type="submit" class="ml-2 btn btn-success btn-sm"> <i class="fas fa-search"></i> Filter </button>
                                 </div>
                     </form>
                 </div>
@@ -53,7 +53,7 @@
                                     <td scope="row" class="text-center"><?= $asset['asset_name']; ?></td>
                                     <td scope="row" class="text-center"><?= $asset['merk']; ?></td>
                                     <td scope="row" class="text-center"><?= $asset['serial_number']; ?></td>
-                                    <td scope="row" class="text-center"><?= $asset['asset_location']; ?></td>
+                                    <td scope="row" class="text-center"><?= $asset['name']; ?></td>
                                     <?php
                                     if ($user['user_code'] == 'IT') : ?>
                                             <td scope="row">
@@ -110,34 +110,34 @@
                         <label for="merk">Merk</label>
                         <input type="text" class="form-control" id="merk" name="merk" placeholder="Merk" required>
                     </div>
-                    <div class="form-group">
+                    <!-- <div class="form-group">
                         <label for="sn">Serial Number</label>
                         <input type="text" class="form-control" id="sn" name="sn" placeholder="Serial Number" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="origin">Origin Location</label>
-                        <select class="form-control" id="origin" name="origin" required>
-                            <option value=""> Origin Location </option>
-                            <?php foreach ($store as $str) : ?>
-                                <option value="<?= $str['store_code']; ?>"> <?= $str['store_code'] ?> - <?= $str['store_name'] ?> </option>
+                    </div> -->
+                    <!-- <div class="form-group">
+                        <label for="building">Gedung</label>
+                        <select class="form-control" id="building" name="building">
+                            <option value=""> -- Pilih Gedung -- </option>
+                            <?php foreach ($buildings as $building) : ?>
+                                <option value="<?= $building['id']; ?>"> <?= $building['name'] ?> </option>
                             <?php endforeach; ?>
                         </select>
                         <?= form_error('loc', '<small class="text-danger pl-3">', '</small>'); ?>
-                    </div>
+                    </div> -->
                     <div class="form-group">
                         <label for="loc">Location</label>
-                        <select class="form-control" id="loc" name="loc" required>
+                        <select class="form-control" id="loc" name="loc">
                             <option value=""> Location </option>
-                            <?php foreach ($store as $str) : ?>
-                                <option value="<?= $str['store_code']; ?>"> <?= $str['store_code'] ?> - <?= $str['store_name']; ?> </option>
+                            <?php foreach ($rooms as $room) : ?>
+                                <option value="<?= $room['id']; ?>"> <?= $room['name'] ?></option>
                             <?php endforeach; ?>
                         </select>
                         <?= form_error('loc', '<small class="text-danger pl-3">', '</small>'); ?>
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="submit" class="btn btn-primary">Add</button>
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-success">Add</button>
+                    <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
                 </div>
             </form>
         </div>
