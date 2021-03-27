@@ -3,28 +3,28 @@
 class Assets_model extends CI_Model
 {
 
-    public function registration_model($data, $user_token)
-    {
-        $this->db->insert('user', $data);
-        $this->db->insert('user_token', $user_token);
-    }
-
     public function login_model($email)
     {
         return $this->db->get_where('user', ['email' => $email])->row_array();
     }
 
-    public function menu_model($loc)
+    public function menu_model($loc, $building_id)
     {
         if ($loc == 'IT') {
             $this->db->select('*');
             $this->db->from('asset');
-            $this->db->join('rooms', 'rooms.id = asset.asset_location');
+            $this->db->join('rooms', 'rooms.id = asset.room_id');
             $this->db->order_by('id_asset', 'DESC');
             return $this->db->get()->result_array();
         } else {
-            $this->db->where('asset_location', $loc);
-            return $this->db->get('asset')->result_array();
+            $this->db->select('asset.id_asset, asset.asset_name, asset.merk, asset.serial_number, asset.placement_status, rooms.name');
+            $this->db->from('asset');
+            $this->db->join('rooms', 'rooms.id = asset.room_id');
+            $this->db->join('floors', 'floors.id = rooms.floor_id');
+            $this->db->join('buildings', 'buildings.id = floors.building_id');
+            $this->db->order_by('id_asset', 'DESC');
+            $this->db->where('buildings.id', $building_id);
+            return $this->db->get()->result_array();
         }
     }
 
@@ -96,17 +96,6 @@ class Assets_model extends CI_Model
         $this->db->where('source', $location);
         $this->db->where('deleted', 0);
         return $this->db->get()->result_array();
-    }
-
-    public function take_in_model($location)
-    {
-        $this->db->select('*');
-        $this->db->from('detail_process');
-        $this->db->join('asset', 'asset.id_asset = detail_process.asset_id');
-        $this->db->where('deleted', 0);
-        $this->db->where('detail_process.destination', $location);
-        return $this->db->get()->result_array();
-        // return $this->db->get_where('detail_process', ['deleted' => 0])->result_array();
     }
 
     public function print_model($location)
@@ -189,23 +178,6 @@ class Assets_model extends CI_Model
         }
     }
 
-    public function acc_model($id)
-    {
-        return $this->db->get_where('detail_process', ['id_detail_process' => $id])->row_array();
-    }
-
-    public function move_asset($location, $assetId, $id)
-    {
-        $this->db->set('deleted', 1);
-        $this->db->set('acctime', date('Y-m-d'));
-        $this->db->where('asset_id', $assetId);
-        $this->db->update('detail_process');
-        $this->db->set('asset_location', $location);
-        $this->db->where('id_asset', $assetId);
-        $this->db->update('asset');
-        return $this->db->affected_rows();
-    }
-
     public function reject_model($location, $assetId, $id)
     {
         $this->db->delete('detail_process', ['id_detail_process' => $id]);
@@ -215,15 +187,15 @@ class Assets_model extends CI_Model
         return $this->db->affected_rows();
     }
 
-    public function get_total_row($loc)
+    public function get_total_row($role, $room_id)
     {
-        if ($loc == 'IT') {
+        if ($role == 'IT') {
             $this->db->select('*');
             $this->db->from('asset');
-            $this->db->join('rooms', 'rooms.id = asset.asset_location');
+            $this->db->join('rooms', 'rooms.id = asset.room_id');
             return $this->db->get()->num_rows();
         } else {
-            return $this->db->get_where('asset', ['asset_location' => $loc])->num_rows();
+            return $this->db->get_where('asset', ['room_id' => $room_id])->num_rows();
         }
     }
 
@@ -264,12 +236,6 @@ class Assets_model extends CI_Model
         $sql = $this->db->query($query)->result_array();
 
         return $sql;
-    }
-
-    public function get_all_user($limit, $start)
-    {
-        $this->db->order_by('user_code', 'ASC');
-        return $this->db->get('user', $limit, $start)->result_array();
     }
 
     public function activate_list_user($id)
@@ -355,7 +321,8 @@ class Assets_model extends CI_Model
         // var_dump($location);
         $this->db->select('buildings.name');
         $this->db->from('rooms');
-        $this->db->join('buildings', 'rooms.building_id = buildings.id');
+        $this->db->join('floors', 'rooms.floor_id = floors.id');
+        $this->db->join('buildings', 'floors.building_id = buildings.id');
         $this->db->where('rooms.name', $location);
         // $this->db->order_by('buildings.id', 'DESC');
         return $this->db->get()->result_array();
@@ -367,6 +334,40 @@ class Assets_model extends CI_Model
         $this->db->from('asset');
         $this->db->order_by('id_asset', 'DESC');
         $this->db->limit(1);
+        return $this->db->get()->row_array();
+    }
+
+    public function get_asset_by_room_id($room_id)
+    {
+        $this->db->select('asset.asset_name, asset.merk, asset.serial_number, rooms.name');
+        $this->db->from('asset');
+        $this->db->join('rooms', 'rooms.id = asset.room_id');
+        $this->db->where('asset.room_id', $room_id);
         return $this->db->get()->result_array();
+    }
+
+    public function update_placement_status($id)
+    {
+        $this->db->set('placement_status', 0);
+        $this->db->where('id_asset', $id);
+        $this->db->update('asset');
+        return $this->db->affected_rows();
+    }
+
+    public function update_asset_location($id, $room_id)
+    {
+        $this->db->set('room_id', $room_id);
+        $this->db->set('placement_status', 1);
+        $this->db->where('id_asset', $id);
+        $this->db->update('asset');
+        return $this->db->affected_rows();
+    }
+
+    public function bulk_asset_transaction($asset_ids)
+    {
+        $this->db->set('placement_status', 0);
+        $this->db->where_in('id_asset', $asset_ids);
+        $this->db->update('asset');
+        return $result = $this->db->affected_rows();
     }
 }

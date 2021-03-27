@@ -1,33 +1,28 @@
-<div class="container-fluid" style="margin-top: 5%;">
+<div class="container-fluid">
     <!-- Page Heading -->
 
     <div class="row">
         <div class="col-sm">
             <h2> User's List </h2>
-        </div>
-        <div class="col-md" style="margin-right: 18%;">
-            <form action="<?= base_url('admin/list_user'); ?>" method="post">
-                <div class="input-group">
-                    <input type="text" name="keyword" class="form-control input-sm" placeholder="search user's" aria-label="Recipient's username" aria-describedby="basic-addon2">
-                    <button type="submit" class="ml-2 btn btn-primary btn-sm"> <i class="fas fa-search"></i> Search </button>
-                </div>
-            </form>
+            <a href="<?= base_url('user/create') ?>" class="btn btn-success btn-sm mb-3">
+                <i class="fas fa-plus mr-1"></i> Tambah User Baru
+            </a>
         </div>
     </div>
 
     <!-- Div untuk menampilkan pop up sweetalert -->
     <div class="flash-data" data-flashdata="<?= $this->session->flashdata('message'); ?>"></div>
 
-    <div class="row">
-        <div class="col-sm-10">
-            <table class="table table-hover">
+    <div class="row mt-3">
+        <div class="col-sm">
+            <table class="table table-hover" id="table-asset">
                 <thead>
                     <tr>
-                        <th scope="col">No</th>
-                        <th class="center" scope="col"> User Code </th>
-                        <th class="text-center" scope="col"> Fullname </th>
+                        <th class="text-center">No</th>
+                        <th class="text-center"> User Code </th>
                         <th class="text-center" scope="col"> Email </th>
-                        <th scope="col"> Status </th>
+                        <th class="text-center" scope="col"> Building </th>
+                        <th class="text-center"> Status </th>
                         <th class="text-center" scope="col"> Action </th>
                     </tr>
                 </thead>
@@ -35,18 +30,18 @@
                     <?php $i = $this->uri->segment(3) + 1; ?>
                     <?php foreach ($all_users as $user) : ?>
                         <tr>
-                            <th> <?= $i ?></th>
-                            <td> <?= $user['user_code']; ?></td>
-                            <td> <?= $user['fullname']; ?></td>
-                            <td> <?= $user['email']; ?></td>
+                            <th class="text-center"> <?= $i ?></th>
+                            <td class="text-center"> <?= $user['user_code']; ?></td>
+                            <td class="text-center"> <?= $user['email']; ?></td>
+                            <td class="text-center"> <?= $user['name']; ?></td>
                             <?php if ($user['is_active'] == 1) : ?>
-                                <td> Active </td>
+                                <td class="text-center"> Active </td>
                             <?php else : ?>
-                                <td> Inactive </td>
+                                <td class="text-center"> Inactive </td>
                             <?php endif; ?>
-                            <td>
+                            <td class="text-center">
                                 <?php if ($user['is_active'] == 1) : ?>
-                                    <a class="btn btn-info btn-sm deactivate-user" href="<?= base_url('admin/deactivated/') . $user['id_user']; ?>"> <i class="fas fa-times"></i> Deactivate </a>
+                                    <a class=" btn btn-info btn-sm deactivate-user" href="<?= base_url('admin/deactivated/') . $user['id_user']; ?>"> <i class="fas fa-times"></i> Deactivate </a>
                                 <?php else : ?>
                                     <a class="btn btn-success btn-sm activate-user" href="<?= base_url('admin/activated/') . $user['id_user']; ?>"> <i class="fas fa-check"></i> Activate </a>
                                 <?php endif; ?>
@@ -56,10 +51,53 @@
                     <?php endforeach; ?>
                 </tbody>
             </table>
-            <?= $pagination; ?>
         </div>
     </div>
 </div>
 <!-- /.container-fluid -->
 </div>
 <!-- End of Main Content -->
+
+<div class="modal fade" id="addUser" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Tambah User</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <form method="post" action="<?= base_url('Asset/add_asset'); ?>">
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label for="name">Name</label>
+                        <input type="text" class="form-control" id="name" name="name" placeholder="Name" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="code">User Code</label>
+                        <input type="text" class="form-control" id="code" name="code" placeholder="code" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="email">Email</label>
+                        <input type="text" class="form-control" id="email" name="email" placeholder="email" required>
+                        <?= form_error('loc', '<small class="text-danger pl-3">', '</small>'); ?>
+                    </div>
+                    <div class="form-group">
+                        <label for="loc">Lokasi</label>
+                        <select class="form-control" id="loc" name="loc">
+                            <option value=""> -- Pilih Lokasi -- </option>
+                            <?php foreach ($rooms as $room) : ?>
+                                <option value="<?= $room['id']; ?>"> <?= $room['name'] ?></option>
+                            <?php endforeach; ?>
+                        </select>
+                        <?= form_error('loc', '<small class="text-danger pl-3">', '</small>'); ?>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-success">Add</button>
+                    <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

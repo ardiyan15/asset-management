@@ -7,6 +7,8 @@ class TI extends CI_Controller
   {
     parent::__construct();
     $this->load->model('Assets_model', 'Assets');
+    $this->load->model('Take_In_model', 'Take_in');
+    $this->load->model('Transactions_model', 'Transactions');
   }
 
   public function index()
@@ -17,10 +19,10 @@ class TI extends CI_Controller
       redirect('auth');
     }
 
-    $data['title'] = "Take In";
-    $data['user'] = $this->Assets->login_model($this->session->userdata('email'));
-    $location = $data['user']['user_code'];
-    $data['asset'] = $this->Assets->take_in_model($location);
+    $data['title']  = "Take In";
+    $data['user']   = $this->Assets->login_model($this->session->userdata('email'));
+    $building_id    = $data['user']['building_id'];
+    $data['asset']  = $this->Take_in->get_asset_take_in_by_building_id($building_id);
 
     $this->load->view('templates/header', $data);
     $this->load->view('templates/sidebar', $data);
@@ -31,32 +33,26 @@ class TI extends CI_Controller
 
   public function acc($id)
   {
-    $data['user'] = $this->Assets->login_model($this->session->userdata('email'));
-    $data['asset'] = $this->Assets->acc_model($id);
+    $data['user']       = $this->Assets->login_model($this->session->userdata('email'));
+    $transaction        = $this->Transactions->get_data_transaction_by_id($id);
+    $update_transaction = $this->Transactions->update_status_transaction_by_id($transaction['id']);
 
-    $data['process'] = [
-      'id_detail_process' => $data['asset']['id_detail_process'],
-      'asset_id' => $data['asset']['asset_id'],
-      'source' => $data['asset']['source'],
-      'destination' => $data['asset']['destination'],
-      'createtime' => $data['asset']['createtime'],
-      'acctime' => date('Y-m-d'),
-      'deleted' => 1
-    ];
+    $update_asset       = $this->Assets->update_asset_location($transaction['asset_id'], $transaction['room_id']);
 
-    $id = $data['asset']['id_detail_process'];
-
-    $location = $data['user']['user_code'];
-    $fullname = $data['user']['fullname'];
-    $email = $data['asset']['email'];
-    $assetId = $data['asset']['asset_id'];
-
-    if ($this->Assets->move_asset($location, $assetId, $id) > 0) {
-      $this->session->set_flashdata(
-        'message',
-        'ti_success'
-      );
-      redirect('asset');
+    if ($update_transaction > 0) {
+      if($update_asset) {
+        $this->session->set_flashdata(
+          'message',
+          'ti_success'
+        );
+        redirect('asset');
+      } else {
+        $this->session->set_flashdata(
+          'message',
+          'failed'
+        );
+        redirect('asset');  
+      }
     } else {
       $this->session->set_flashdata(
         'message',

@@ -66,8 +66,8 @@ switch (flashData) {
         break;
     case 'success':
         Swal.fire({
-            title: 'Success',
-            text: 'Add Store Location Successfully',
+            title: 'Berhasil',
+            text: 'Bangunan berhasil ditambahkan',
             icon: 'success',
             showConfirmButton: true
         });
@@ -111,13 +111,42 @@ switch (flashData) {
             icon: 'error',
             showConfirmButton: true
         });
+    case 'editBuilding':
+        Swal.fire({
+            title: 'Berhasil',
+            text: 'Bangungan berhasil diubah',
+            icon: 'success',
+            showConfirmButton: true
+        });
+    case 'addUser':
+        Swal.fire({
+            title: 'Berhasil',
+            text: 'User berhasil ditambahkan',
+            icon: 'success',
+            showConfirmButton: true
+        });
+        break;
+    case 'addFloor':
+        Swal.fire({
+            title: 'Berhasil',
+            text: 'Lantai berhasil ditambahkan',
+            icon: 'success',
+            showConfirmButton: true
+        });
+        break;
+    case 'addRoom':
+        Swal.fire({
+            title: 'Berhasil',
+            text: 'Ruangan berhasil ditambahkan',
+            icon: 'success',
+            showConfirmButton: true
+        });
         break;
 }
 
 // Pop Up Delete
 $('.delete-button').on('click', function (e) {
     e.preventDefault();
-
     const href = $(this).attr('href');
 
     Swal.fire({

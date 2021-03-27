@@ -8,41 +8,33 @@
 
 
         <div class="row">
-            <div class="col-lg-10">
+            <div class="col-lg">
 
                 <?= $this->session->flashdata('message') ?>
-                <!-- <a href="" class="btn btn-primary mb-3" data-toggle="modal" data-target="#newMenuModal"> Add New Menu </a> -->
-                <table class="table table-hover">
+                <table class="table table-hover" id="table-asset">
                     <thead>
                         <tr>
-                            <th scope="col">No</th>
-                            <th scope="col">Name</th>
-                            <th scope="col">Merk</th>
-                            <th scope="col">Qty</th>
-                            <th scope="col">Serial Number</th>
-                            <th scope="col">From</th>
+                            <th class="text-center" scope="col">No</th>
+                            <th class="text-center" scope="col">Name</th>
+                            <th class="text-center" scope="col">Merk</th>
+                            <th class="text-center" scope="col">Serial Number</th>
                             <?php if ($user['user_code'] == 'IT') : ?>
                                 <th scope="col"> Destination </th>
                             <?php endif; ?>
-                            <th scope="col">Action</th>
+                            <th class="text-center" scope="col">Action</th>
                         </tr>
                     </thead>
                     <tbody>
                         <?php $i = 1; ?>
                         <?php foreach ($asset as $ast) : ?>
                             <tr>
-                                <td scope="col"> <?= $i; ?> </td>
-                                <td scope="col"> <?= $ast['asset_name']; ?> </td>
-                                <td scope="col"> <?= $ast['merk']; ?> </td>
-                                <td scope="col"> <?= $ast['qty']; ?> </td>
-                                <td scope="col"> <?= $ast['serial_number']; ?> </td>
-                                <td scope="col"> <?= $ast['source']; ?> </td>
-                                <?php if ($user['user_code'] == 'IT') : ?>
-                                    <td scope="col"> <?= $ast['destination']; ?> </td>
-                                <?php endif; ?>
-                                <td scope="col">
-                                    <a href="<?= base_url('TI/acc/') . $ast['id_detail_process']; ?>" class="btn btn-success btn-sm takein-button"> <i class="fas fa-check"></i> Accept </a>
-                                    <a href="<?= base_url('TI/reject/') . $ast['id_detail_process']; ?>" class="btn btn-warning btn-sm reject-button"> <i class=" fas fa-times"></i> Reject </a>
+                                <td class="text-center" scope="col"> <?= $i; ?> </td>
+                                <td class="text-center" scope="col"> <?= $ast['asset_name']; ?> </td>
+                                <td class="text-center" scope="col"> <?= $ast['merk']; ?> </td>
+                                <td class="text-center" scope="col"> <?= $ast['serial_number']; ?> </td>
+                                <td class="text-center" scope="col">
+                                    <a href="<?= base_url('TI/acc/'). $ast['id'] ?>" class="btn btn-success btn-sm takein-button"> <i class="fas fa-check"></i> Accept </a>
+                                    <a href="<?= base_url('TI/reject/') ?>" class="btn btn-warning btn-sm reject-button"> <i class=" fas fa-times"></i> Reject </a>
                                 </td>
                             </tr>
                         <?php endforeach; ?>

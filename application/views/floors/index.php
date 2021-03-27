@@ -3,19 +3,19 @@
     <div class="flash-data" data-flashdata="<?= $this->session->flashdata('message'); ?>"></div>
     <div class="container">
         <h3> <?= $title; ?> </h3>
-        <a href="" class="btn btn-success btn-sm" data-toggle="modal" data-target="#addStrLocation"> <i class="fas fa-plus mr-1"></i> Tambah Bangunan Baru </a>
+        <a href="" class="btn btn-success btn-sm" data-toggle="modal" data-target="#addStrLocation"> <i class="fas fa-plus mr-1"></i> Tambah Lantai Baru </a>
             <div class="row row-cols-4">
-                <?php foreach ($buildings as $building) : ?>
-                    <div class="col-sm-4 mt-3">
-                        <a href="<?= base_url('admin/list_rooms/'). $building['id'] ?>">
+                <?php foreach ($floors as $floor) : ?>
+                    <div class="col-sm-4 mt-3"> 
+                        <a href="<?= base_url('room/'). $floor['id'] ?>">
                             <div class="card">
                                 <div class="card-body">
-                                    <h5 class="card-title"><?= $building['name']; ?></h5>
-                                    <a href="" class="btn btn-default btn-sm" data-toggle="modal" data-target="#editStrLocation<?= $building['id']; ?>"> <i class="fas fa-edit"></i> Edit </a>
-                                    <?php if ($building['status'] == 1) : ?>
-                                        <a href="<?= base_url('admin/deactivateStr/') . $building['id']; ?>" class="btn btn-sm deactStr-button"> <i class=" fas fa-times"></i> List Room's </a>
+                                    <h5 class="card-title"><?= $floor['name']; ?></h5>
+                                    <a href="<?= base_url('floors/edit/').$floor['id'] ?>" class="btn btn-default btn-sm"> <i class="fas fa-edit"></i> Edit </a>
+                                    <?php if ($floor['status'] == 1) : ?>
+                                        <a href="<?= base_url('admin/deactivateStr/') . $floor['id']; ?>" class="btn btn-sm deactStr-button"> <i class=" fas fa-times"></i> List Room's </a>
                                     <?php else : ?>
-                                        <a href="<?= base_url('admin/activateStr/') . $building['id']; ?>" class="btn actvt-button"> <i class="fas fa-check"></i>Activate</a>
+                                        <a href="<?= base_url('admin/activateStr/') . $floor['id']; ?>" class="btn actvt-button"> <i class="fas fa-check"></i>Activate</a>
                                     <?php endif; ?>
                                 </div>
                             </div>
@@ -36,7 +36,8 @@
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
-            <form method="post" action="<?= base_url('Admin/add_building_location'); ?>">
+            <form method="post" action="<?= base_url('Floors/store'); ?>">
+            <input type="hidden" name="building_id" value="<?= $building_id ?>">
                 <div class="modal-body">
                     <div class="form-group">
                         <label for="nama"> Nama </label>

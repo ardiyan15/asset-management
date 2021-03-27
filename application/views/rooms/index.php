@@ -3,22 +3,23 @@
      <!-- Untuk Memunculkan pop up sweetalert -->
     <div class="flash-data" data-flashdata="<?= $this->session->flashdata('message'); ?>"></div>
 
-
-    <h3> <?= $title; ?> </h3>
-    <a href="" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#addStrLocation"> <i class="fas fa-plus mr-1"></i> Add New Store </a>
     <div class="container">
+        <h3> <?= $title; ?> </h3>
+        <a href="" class="btn btn-success btn-sm" data-toggle="modal" data-target="#addStrLocation">
+            <i class="fas fa-plus mr-1"></i> Tambah Ruangan Baru
+        </a>
         <div class="row row-cols-4">
-            <?php foreach ($buildings as $building) : ?>
+            <?php foreach ($rooms as $room) : ?>
                 <div class="col-sm-4 mt-3">
-                    <a href="<?= base_url('admin/list_rooms/'). $building['id'] ?>">
+                    <a href="<?= base_url('asset/location/'). $room['id'] ?>">
                         <div class="card">
                             <div class="card-body">
-                                <h5 class="card-title"><?= $building['name']; ?></h5>
-                                <a href="" class="btn btn-default btn-sm" data-toggle="modal" data-target="#editStrLocation<?= $building['id']; ?>"> <i class="fas fa-edit"></i> Edit </a>
-                                <?php if ($building['status'] == 1) : ?>
-                                    <a href="<?= base_url('admin/deactivateStr/') . $building['id']; ?>" class="btn btn-sm deactStr-button"> <i class=" fas fa-times"></i> List Room's </a>
+                                <h5 class="card-title"><?= $room['name']; ?></h5>
+                                <a href="" class="btn btn-default btn-sm" data-toggle="modal" data-target="#editStrLocation<?= $room['id']; ?>"> <i class="fas fa-edit"></i> Edit </a>
+                                <?php if ($room['status'] == 1) : ?>
+                                    <a href="<?= base_url('admin/deactivateStr/') . $room['id']; ?>" class="btn btn-sm deactStr-button"> <i class=" fas fa-times"></i> List Room's </a>
                                 <?php else : ?>
-                                    <a href="<?= base_url('admin/activateStr/') . $building['id']; ?>" class="btn actvt-button"> <i class="fas fa-check"></i>Activate</a>
+                                    <a href="<?= base_url('admin/activateStr/') . $room['id']; ?>" class="btn actvt-button"> <i class="fas fa-check"></i>Activate</a>
                                 <?php endif; ?>
                             </div>
                         </div>
@@ -28,43 +29,29 @@
         </div>
     </div>
 </div>
-</div>
 
-<!-- Start Modal Add Store Location -->
+
 <div class="modal fade" id="addStrLocation" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="exampleModalLabel">Books&Beyond Store Location</h5>
+                <h5 class="modal-title" id="exampleModalLabel">Tambah Lokasi Ruangan</h5>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
-            <form method="post" action="<?= base_url('Admin/addStrLocation'); ?>">
+            <form method="post" action="<?= base_url('Room/store'); ?>">
+            <input type="hidden" name="floor_id" value="<?= $floor_id ?>">
                 <div class="modal-body">
                     <div class="form-group">
-                        <label for="strCode"> Store Code</label>
-                        <input type="text" class="form-control" id="strCode" name="strCode" placeholder="Store Code" required>
+                        <label for="nama"> Nama </label>
+                        <input type="text" class="form-control" id="name" name="name" placeholder="Nama Bangunan" required>
                     </div>
-                    <div class="form-group">
-                        <label for="strName">Store Name</label>
-                        <input type="text" class="form-control" id="strName" name="strName" placeholder="Store Name" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="address"> Address </label>
-                        <input type="text" class="form-control" id="address" name="address" placeholder="Address Store" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="loc">Handphone</label>
-                        <input type="text" class="form-control" id="hp" name="handphone" placeholder="Handphone Store">
-                    </div>
-                </div>
                 <div class="modal-footer">
-                    <button type="submit" class="btn btn-primary">Add</button>
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-sm btn-success rounded"><i class="fas fa-plus mr-1"></i>Tambah</button>
+                    <button type="button" class="btn btn-sm btn-secondary rounded" data-dismiss="modal">Batal</button>
                 </div>
             </form>
         </div>
     </div>
 </div>
-<!-- End Modal Add Store Location -->

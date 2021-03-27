@@ -1,5 +1,4 @@
 <?php
-defined('BASEPATH') or exit('No direct script access allowed');
 
 class User extends CI_Controller
 {
@@ -8,7 +7,9 @@ class User extends CI_Controller
     {
         parent::__construct();
         $this->load->model('Assets_model', 'Assets');
-        is_logged_in();
+        $this->load->model('Buildings_model', 'Buildings');
+        $this->load->model('Users_model', 'Users');
+        // is_logged_in();
     }
 
     public function index()
@@ -120,6 +121,46 @@ class User extends CI_Controller
                     redirect('user/changepassword');
                 }
             }
+        }
+    }
+
+    public function create()
+    {
+        $data['user'] = $this->Assets->login_model($this->session->userdata('email'));
+        $data['buildings'] = $this->Buildings->get_all_buildings();
+        $data['title']      = 'List Assets';
+
+        $this->load->view('templates/header', $data);
+        $this->load->view('templates/sidebar', $data);
+        $this->load->view('templates/topbar', $data);
+        $this->load->view('user/create');
+        $this->load->view('templates/footer');
+    }
+
+    public function store()
+    {
+        $data = [
+            'user_code'     => $this->input->post('code'),
+            'email'         => $this->input->post('email'),
+            'fullname'         => $this->input->post('fullname'),
+            'password'      => password_hash($this->input->post('password'), PASSWORD_DEFAULT),
+            'role_id'       => $this->input->post('role'),
+            'is_active'        => 1,
+            'building_id'   => $this->input->post('building')
+        ];
+
+
+        $result = $this->Users->create($data);
+
+        if($result > 0) {
+            $this->session->set_flashdata('message', 'addUser');
+            redirect('admin/list_user');
+        } else {
+            $this->session->set_flashdata(
+                'message',
+                'failed '
+            );
+            redirect('admin/list_user');
         }
     }
 }

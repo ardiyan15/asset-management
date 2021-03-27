@@ -2,70 +2,109 @@
 <ul class="navbar-nav bg-gradient-primary sidebar sidebar-dark accordion" id="accordionSidebar">
 
     <!-- Sidebar - Brand -->
-    <a class="sidebar-brand d-flex align-items-center justify-content-center" href="index.html">
+    <a class="sidebar-brand d-flex align-items-center justify-content-center" href="<?= base_url('/admin') ?>">
         <div class="sidebar-brand-icon rotate-n-15">
             <i class="fas fa-book"></i>
         </div>
-        <div class="sidebar-brand-text mx-3"> Books&Beyond IT Assets </div>
+        <div class="sidebar-brand-text mx-3" style="font-size: 10px;"> Sistem Inventaris Universitas Raharja </div>
     </a>
+
 
     <!-- Divider -->
     <hr class="sidebar-divider">
-
-    <!-- QUERY FROM table user_access_Menu -->
-    <?php
-
-    $role_id = $this->session->userdata('role_id');
-    $queryMenu = "SELECT `user_menu`.`id_menu`,`menu`
-                        FROM `user_menu` JOIN `user_access_menu` 
-                        ON `user_menu`.`id_menu` = `user_access_menu`.`menu_id`
-                        WHERE `user_access_menu`.`role_id` = $role_id
-                        ORDER BY `user_access_menu`.`menu_id` ASC
-                    ";
-    $menus = $this->db->query($queryMenu)->result_array();
-
-    ?>
-
-    <!-- Looping Menu -->
-    <?php foreach ($menus as $menu) : ?>
-        <div class="sidebar-heading">
-            <?= $menu['menu']; ?>
-        </div>
-        <!-- Siapkan SUB-Menu Sesuai Menu -->
-        <?php
-            $menuId = $menu['id_menu'];
-            $querySubMenu = "SELECT * FROM `user_sub_menu`
-                             WHERE `user_sub_menu`.`menu_id` = $menuId";
-            $subMenu = $this->db->query($querySubMenu)->result_array();
-        ?>
-        <?php foreach ($subMenu as $sm) : ?>
-            <?php if ($title === $sm['title']) : ?>
-                <!-- Nav Item - Dashboard -->
-                <li class="nav-item active">
-            <?php else :  ?>
-                <li class="nav-item">
-            <?php endif; ?>
-                <a class="nav-link" href="<?= base_url($sm['url']); ?>">
-                    <i class="<?= $sm['icon']; ?>"></i>
-                    <span> <?= $sm['title']; ?></span></a>
-                </li>
-            <?php endforeach; ?>
-            <!-- Divider -->
-            <hr class="sidebar-divider">
-        <?php endforeach; ?>
-
+    <div class="sidebar-heading">
+        Data Master
+    </div>
+    
+    <li class="nav-item">
+        <a class="nav-link" href="<?= base_url('admin') ?>">
+            <i class="fas fa-fw fa-tachometer-alt"></i>
+            <span> Dashboard </span>
+        </a>
+    </li>
+    <?php if($user['role_id'] == 1): ?>
         <li class="nav-item">
-            <a class="nav-link" href="<?= base_url('auth/logout'); ?>">
-                <i class="fas fa-fw fa-sign-out-alt"></i>
-                <span>Logout</span>
+            <a class="nav-link" href="<?= base_url('asset') ?>">
+                <i class="fas fa-fw fa-drafting-compass"></i>
+                <span> Data Asset </span>
             </a>
         </li>
+        <li class="nav-item">
+            <a class="nav-link" href="<?= base_url('admin/list_user') ?>">
+                <i class="fas fa-fw fa-tachometer-alt"></i>
+                <span> Data Users </span>
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="<?= base_url('buildings') ?>">
+                <i class="fas fa-fw fa-coins"></i>
+                <span> Data Ruangan </span>
+            </a>
+        </li>
+    <?php endif; ?>
+    <hr class="sidebar-divider">
 
-        <!-- Divider -->
-        <hr class="sidebar-divider d-none d-md-block">
-        <!-- Sidebar Toggler (Sidebar) -->
-        <div class="text-center d-none d-md-inline">
-            <button class="rounded-circle border-0" id="sidebarToggle"></button>
-        </div>
+    <div class="sidebar-heading">
+        User
+    </div>
+    <li class="nav-item">
+        <a class="nav-link" href="<?= base_url('user') ?>">
+            <i class="fas fa-fw fa-coins"></i>
+            <span> My Profile </span>
+        </a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link" href="<?= base_url('user/editprofile') ?>">
+            <i class="fas fa-fw fa-coins"></i>
+            <span> Edit Profile </span>
+        </a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link" href="<?= base_url('user/changepassword') ?>">
+            <i class="fas fa-fw fa-coins"></i>
+            <span> Change Password </span>
+        </a>
+    </li>
+    <hr class="sidebar-divider">
+    <div class="sidebar-heading">
+        Asset
+    </div>
+    <li class="nav-item">
+        <a class="nav-link" href="<?= base_url('TO') ?>">
+            <i class="fas fa-fw fa-coins"></i>
+            <span> Take Out </span>
+        </a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link" href="<?= base_url('TI') ?>">
+            <i class="fas fa-fw fa-coins"></i>
+            <span> Take In </span>
+        </a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link" href="<?= base_url('History') ?>">
+            <i class="fas fa-fw fa-coins"></i>
+            <span> History </span>
+        </a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link" href="<?= base_url('transaction') ?>">
+            <i class="fas fa-fw fa-coins"></i>
+            <span> Transaksi Asset </span>
+        </a>
+    </li>
+    <hr class="sidebar-divider">
+    <li class="nav-item">
+        <a class="nav-link" href="<?= base_url('auth/logout'); ?>">
+            <i class="fas fa-fw fa-sign-out-alt"></i>
+            <span>Logout</span>
+        </a>
+    </li>
+
+    <!-- Sidebar Toggler (Sidebar) -->
+    <div class="text-center d-none d-md-inline">
+        <button class="rounded-circle border-0" id="sidebarToggle"></button>
+    </div>
+
 </ul>
 <!-- End of Sidebar -->
