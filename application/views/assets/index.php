@@ -1,15 +1,12 @@
-<!-- Begin Page Content -->
 <div class="container-fluid">
-    <!-- Page Heading -->
     <div class="row">
         <div class="col-sm">
             <div class="row">
                 <div class="col-sm">
                     <h1 class="h3 text-gray-800"><?= $title; ?></h1>
-                    <p style="font-size: 12px"> Total Asset's : <?= $amount_data; ?> </p>
                 </div>
                 <div class="col-sm">
-                    <form action="<?= base_url('asset'); ?>" method="post">
+                    <form action="<?= base_url('asset/location/').$room_id; ?>" method="post">
                         <div class="input-group">
                             <input type="text" name="keyword" class="form-control" placeholder="Filter asset" aria-describedby="basic-addon2">
                             <button type="submit" class="ml-2 btn btn-success btn-sm"> <i class="fas fa-search"></i> Filter </button>
@@ -24,10 +21,16 @@
                     <thead>
                         <tr>
                             <th class="text-center">No</th>
-                            <th class="text-center">Name</th>
+                            <th class="text-center">Nama</th>
                             <th class="text-center">Merk</th>
-                            <th class="text-center">Serial Number</th>
-                            <th class="text-center">Current Location</th>
+                            <th class="text-center">Nomor Seri</th>
+                            <th class="text-center">Lokasi Saat Ini</th>
+                            <th class="text-center">Aksi</th>
+                            <th class="text-center">
+                                <button data-target="#bulk_takeout" data-toggle="modal" class="btn btn-success btn-sm">
+                                    Pindahkan
+                                </button>
+                            </th>
                         </tr>
                     </thead>
                     <tbody>
@@ -39,7 +42,20 @@
                                     <td scope="row" class="text-center"><?= $asset['asset_name']; ?></td>
                                     <td scope="row" class="text-center"><?= $asset['merk']; ?></td>
                                     <td scope="row" class="text-center"><?= $asset['serial_number']; ?></td>
-                                    <td scope="row" class="text-center"><?= $asset['name']; ?></td>
+                                    <?php if($asset['placement_status'] == 1): ?>
+                                        <td scope="row" class="text-center"><?= $asset['name']; ?></td>
+                                        <td class="text-center">
+                                            <a href="<?= $asset['id_asset'] ?>" data-toggle="modal" data-target="#takeout<?= $asset['id_asset'] ?>" class="btn btn-warning btn-sm"> Pindahkan </a>
+                                        </td>
+                                    <?php else: ?>
+                                        <td scope="row" class="text-center">Sedang Dipindahkan</td>
+                                        <td></td>
+                                    <?php endif ?>
+                                    <td class="text-center">
+                                        <div class="form-check">
+                                            <input class="form-check-input" name="check" type="checkbox" value="<?= $asset['id_asset'] ?>">
+                                        </div>
+                                    </td>
                                 </tr>
                                 <?php $i++; ?>
                             <?php endforeach; ?>
@@ -57,3 +73,67 @@
     </div>
 </div>
 <!-- /.container-fluid -->
+
+<?php     
+    foreach($assets as $asset):
+?>
+<div class="modal fade" id="takeout<?= $asset['id_asset'] ?>" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Books&Beyond Asset</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <form method="post" action="<?= base_url('Transaction/store'); ?>">
+                <div class="modal-body">
+                    <div class="form-group">
+                    <input type="hidden" name="asset_id" value="<?= $asset['id_asset'] ?>">
+                    <input type="hidden" name="source" value="<?= $asset['room_id'] ?>">
+                        <label for="room">Lokasi</label>
+                        <select class="form-control" name="room">
+                            <option value=""> -- Pilih Lokasi -- </option>
+                            <?php foreach ($rooms as $room) : ?>
+                                <option value="<?= $room['id']; ?>"> <?= $room['name'] ?></option>
+                            <?php endforeach; ?>
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-success">Add</button>
+                    <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<?php endforeach; ?>
+
+<div class="modal fade" id="bulk_takeout" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Books&Beyond Asset</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label for="room">Lokasi</label>
+                        <select class="form-control" name="room" id="room_bulk_transaction">
+                            <option value=""> -- Pilih Lokasi -- </option>
+                            <?php foreach ($rooms as $room) : ?>
+                                <option value="<?= $room['id']; ?>"> <?= $room['name'] ?></option>
+                            <?php endforeach; ?>
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" id="submit_bulk_takeout" class="btn btn-success">Add</button>
+                    <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+                </div>
+        </div>
+    </div>
+</div>

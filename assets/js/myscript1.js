@@ -3,20 +3,20 @@ const flashData = $('.flash-data').data('flashdata');
 switch (flashData) {
     case 'added ':
         Swal.fire({
-            title: 'Success',
-            text: 'Add asset successfully',
+            title: 'Berhasil',
+            text: 'Berhasil menambahkan aset',
             icon: 'success',
             showConfirmButton: true
         });
-        break;
+    break;
     case 'edited ':
         Swal.fire({
-            title: 'Success',
-            text: 'Operation Success',
+            title: 'Berhasil',
+            text: 'Update Aset Berhasil',
             icon: 'success',
             showConfirmButton: true
         });
-        break;
+    break;
     case 'failed ':
         Swal.fire({
             title: 'Failed',
@@ -24,38 +24,39 @@ switch (flashData) {
             icon: 'error',
             showConfirmButton: true
         });
-        break;
+    break;
     case 'activate':
         Swal.fire({
-            title: 'Success',
-            text: 'User has been activated',
+            title: 'Berhasil',
+            text: 'User berhasil diaktifkan',
             icon: 'success',
             showConfirmButton: true
         });
-        break;
+    break;
     case 'deactivate':
         Swal.fire({
-            title: 'Success',
-            text: 'User has been deactivated',
+            title: 'Berhasil',
+            text: 'non-aktifkan user berhasil',
             icon: 'success',
             showConfirmButton: true
         });
-        break;
+    break;
     case 'take out':
         Swal.fire({
-            title: 'Success',
-            text: 'Operation Success',
+            title: 'Berhasil',
+            text: 'Berhasil memindahkan aset',
             icon: 'success',
             showConfirmButton: true
         });
+    break;
     case 'ti_success':
         Swal.fire({
-            title: 'Success',
-            text: 'Operation Success',
+            title: 'Berhasil',
+            text: 'Terima aset berhasil',
             icon: 'success',
             showConfirmButton: true
         });
-        break;
+    break;
     case 'reject':
         Swal.fire({
             title: 'Success',
@@ -63,7 +64,7 @@ switch (flashData) {
             icon: 'info',
             showConfirmButton: true
         });
-        break;
+    break;
     case 'success':
         Swal.fire({
             title: 'Berhasil',
@@ -71,7 +72,7 @@ switch (flashData) {
             icon: 'success',
             showConfirmButton: true
         });
-        break;
+    break;
     case 'edtStr':
         Swal.fire({
             title: 'Success',
@@ -79,7 +80,7 @@ switch (flashData) {
             icon: 'success',
             showConfirmButton: true
         });
-        break;
+    break;
     case 'deactStr':
         Swal.fire({
             title: 'Success',
@@ -87,7 +88,7 @@ switch (flashData) {
             icon: 'success',
             showConfirmButton: true
         });
-        break;
+    break;
     case 'actvtStr':
         Swal.fire({
             title: 'Success',
@@ -95,7 +96,7 @@ switch (flashData) {
             icon: 'success',
             showConfirmButton: true
         });
-        break;
+    break;
     case 'deleted':
         Swal.fire({
             title: 'Success',
@@ -103,7 +104,7 @@ switch (flashData) {
             icon: 'success',
             showConfirmButton: true
         });
-        break;
+    break;
     case 'failed':
         Swal.fire({
             title: 'Failed',
@@ -111,13 +112,15 @@ switch (flashData) {
             icon: 'error',
             showConfirmButton: true
         });
+    break;
     case 'editBuilding':
         Swal.fire({
             title: 'Berhasil',
-            text: 'Bangungan berhasil diubah',
+            text: 'Bangunan berhasil diubah',
             icon: 'success',
             showConfirmButton: true
         });
+    break;
     case 'addUser':
         Swal.fire({
             title: 'Berhasil',
@@ -125,7 +128,7 @@ switch (flashData) {
             icon: 'success',
             showConfirmButton: true
         });
-        break;
+    break;
     case 'addFloor':
         Swal.fire({
             title: 'Berhasil',
@@ -133,7 +136,7 @@ switch (flashData) {
             icon: 'success',
             showConfirmButton: true
         });
-        break;
+    break;
     case 'addRoom':
         Swal.fire({
             title: 'Berhasil',
@@ -141,22 +144,73 @@ switch (flashData) {
             icon: 'success',
             showConfirmButton: true
         });
-        break;
+    break;
+    case 'addCategory':
+        Swal.fire({
+            title: 'Berhasil',
+            text: 'Kategori berhasil ditambahkan',
+            icon: 'success',
+            showConfirmButton: true
+        });
+    break;
+    case 'deleteCategory':
+        Swal.fire({
+            title: 'Berhasil',
+            text: 'Kategori berhasil dihapus',
+            icon: 'success',
+            showConfirmButton: true
+        });
+    break;
+    case 'editCategory':
+        Swal.fire({
+            title: 'Berhasil',
+            text: 'Kategori berhasil diubah',
+            icon: 'success',
+            showConfirmButton: true
+        });
+    break;
+    case 'deleteBuilding':
+        Swal.fire({
+            title: 'Berhasil',
+            text: 'Bangunan berhasil dihapus',
+            icon: 'success',    
+            showConfirmButton: true
+        });
+    break;
+    case 'editFloor':
+        Swal.fire({
+            title: 'Berhasil',
+            text: 'Lantai berhasil diubah',
+            icon: 'success',    
+            showConfirmButton: true
+        });
+    break;
+    
+    case 'editRoom':
+        Swal.fire({
+            title: 'Berhasil',
+            text: 'Ruangan berhasil diubah',
+            icon: 'success',    
+            showConfirmButton: true
+        });
+    break;
 }
 
 // Pop Up Delete
 $('.delete-button').on('click', function (e) {
     e.preventDefault();
     const href = $(this).attr('href');
+    console.log(href)
 
     Swal.fire({
-        title: 'Are you sure?',
-        text: "You will delete this asset",
-        icon: 'warning',
+        title: 'Hapus Data',
+        text: "Anda yakin ingin menghapus data?",
+        icon: 'question',
         showCancelButton: true,
         confirmButtonColor: '#3085d6',
         cancelButtonColor: '#d33',
-        confirmButtonText: 'Yes, delete it!'
+        confirmButtonText: 'Ya',
+        cancelButtonText: 'Tidak',
     }).then((result) => {
         if (result.value) {
             document.location.href = href;
@@ -170,8 +224,8 @@ $('.activate-user').on('click', function (e) {
     const href = $(this).attr('href');
 
     Swal.fire({
-        title: 'Activate this user?',
-        text: "This user will be able to login",
+        title: 'Aktifkan user',
+        text: "Anda yakin ingin mengaktifkan user?",
         icon: 'question',
         showCancelButton: true,
         confirmButtonColor: '#3085d6',
@@ -190,13 +244,14 @@ $('.deactivate-user').on('click', function (e) {
     const href = $(this).attr('href');
 
     Swal.fire({
-        title: 'Deactivate this user?',
-        text: "This user will not be able to login",
-        icon: 'warning',
+        title: 'Non-aktifkan user',
+        text: "Anda yakin ingin menonaktifkan user?",
+        icon: 'question',
         showCancelButton: true,
         confirmButtonColor: '#3085d6',
         cancelButtonColor: '#d33',
-        confirmButtonText: 'Yes'
+        confirmButtonText: 'Ya',
+        cancelButtonText: 'Tidak'
     }).then((result) => {
         if (result.value) {
             document.location.href = href;
@@ -210,13 +265,14 @@ $('.takein-button').on('click', function (e) {
     const href = $(this).attr('href');
 
     Swal.fire({
-        title: 'Receive Asset',
-        text: "Have you receive the asset?",
+        title: 'Terima Aset',
+        text: "Anda yakin sudah menerima aset?",
         icon: 'question',
         showCancelButton: true,
         confirmButtonColor: '#3085d6',
         cancelButtonColor: '#d33',
-        confirmButtonText: 'Yes'
+        confirmButtonText: 'Ya',
+        cancelButtonText: 'Tidak',
     }).then((result) => {
         if (result.value) {
             document.location.href = href;
@@ -230,13 +286,14 @@ $('.reject-button').on('click', function (e) {
     const href = $(this).attr('href');
 
     Swal.fire({
-        title: 'Reject Asset',
-        text: "Have you receive the asset?",
+        title: 'Tolak?',
+        text: "Anda tidak menerima aset?",
         icon: 'question',
         showCancelButton: true,
         confirmButtonColor: '#3085d6',
         cancelButtonColor: '#d33',
-        confirmButtonText: 'Yes'
+        confirmButtonText: 'Ya',
+        cancelButtonText: 'Tidak'
     }).then((result) => {
         if (result.value) {
             document.location.href = href;
@@ -244,19 +301,18 @@ $('.reject-button').on('click', function (e) {
     })
 });
 
-$('.deactStr-button').on('click', function (e) {
+$('.delete-building').on('click', function (e) {
     e.preventDefault();
-
     const href = $(this).attr('href');
-
     Swal.fire({
-        title: 'Deactivate Store Location?',
-        text: "This Store will not be able to receive or send the asset",
+        title: 'Hapus Bangunan',
+        text: "Anda yakin ingin menghapus data bangunan?",
         icon: 'question',
         showCancelButton: true,
         confirmButtonColor: '#3085d6',
         cancelButtonColor: '#d33',
-        confirmButtonText: 'Yes'
+        confirmButtonText: 'Ya',
+        cancelButtonText: 'Tidak'
     }).then((result) => {
         if (result.value) {
             document.location.href = href;

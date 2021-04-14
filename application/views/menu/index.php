@@ -7,18 +7,17 @@
             <div class="row">
                 <div class="col-sm">
                     <h1 class="h3 text-gray-800"><?= $title; ?></h1>
-                    <?php if ($user['user_code'] == 'IT') : ?>
+                    <?php if ($user['role_id'] == '1') : ?>
                         <button type="button" class="btn btn-success btn-sm mb-3" data-toggle="modal" data-target="#addAsset">
                             <i class="fas fa-plus mr-1"></i> Tambah Asset Baru
                         </button>
                     <?php endif; ?>
-                    <p style="font-size: 12px"> Total Asset's : <?= $amount_data; ?> </p>
                 </div>
                 <div class="col-sm">
 
                     <form action="<?= base_url('asset'); ?>" method="post">
                         <div class="input-group">
-                            <input type="text" name="keyword" class="form-control" placeholder="search your asset" aria-describedby="basic-addon2">
+                            <input type="text" name="keyword" class="form-control" placeholder="Cari Aset">
                             <button type="submit" class="ml-2 btn btn-success btn-sm"> <i class="fas fa-search"></i> Filter </button>
                         </div>
                     </form>
@@ -32,12 +31,15 @@
                 <table class="table table-border table-sm table-hover" id="table-asset">
                     <thead>
                         <tr>
-                            <th>No</th>
-                            <th class="text-center">Name</th>
+                            <th class="text-center">No</th>
+                            <th class="text-center">Nama</th>
                             <th class="text-center">Merk</th>
-                            <th class="text-center">Serial Number</th>
-                            <th class="text-center">Current Location</th>
-                            <th class="text-center">Action</th>
+                            <th class="text-center">Nomor Seri</th>
+                            <th class="text-center">Lokasi Saat Ini</th>
+                            <th class="text-center">Tahun Input</th>
+                            <?php if($user['role_id'] == '1'): ?>
+                                <th class="text-center">Aksi</th>
+                            <?php endif ?>
                         </tr>
                     </thead>
                     <tbody>
@@ -45,25 +47,20 @@
                             <?php $i = $this->uri->segment(3) + 1; ?>
                             <?php foreach ($assets as $asset) : ?>
                                 <tr>
-                                    <td scope="row"> <?= $i; ?></td>
+                                    <td scope="row" class="text-center"> <?= $i; ?></td>
                                     <td scope="row" class="text-center"><?= $asset['asset_name']; ?></td>
                                     <td scope="row" class="text-center"><?= $asset['merk']; ?></td>
                                     <td scope="row" class="text-center"><?= $asset['serial_number']; ?></td>
                                     <?php if($asset['placement_status'] == 1): ?>
                                         <td scope="row" class="text-center"><?= $asset['name']; ?></td>
                                     <?php else: ?>
-                                        <td scope="row" class="text-center">Moving</td>
+                                        <td scope="row" class="text-center">Sedang Dipindahkan</td>
                                     <?php endif; ?>
-                                    <?php if ($user['user_code'] == 'IT') : ?>
-                                        <td scope="row">
-                                            <a href="" class="btn btn-info btn-sm" data-toggle="modal" data-target="#editAsset<?= $asset['id_asset']; ?>"> <i class="fas fa-edit"></i> Edit </a>
+                                    <td scope="row" class="text-center"><?= $asset['created']; ?></td>
+                                    <?php if ($user['role_id'] == '1') : ?>
+                                        <td scope="row" class="text-center">
+                                            <a href="<?= base_url('asset/update/').$asset['id_asset'] ?>" class="btn btn-info btn-sm"> <i class="fas fa-edit"></i> Edit </a>
                                             <a href="<?= base_url("asset/delete/") . $asset['id_asset']; ?>" class="btn btn-danger btn-sm delete-button"> <i class="fas fa-trash-alt"></i> Delete </a>
-                                        </td>
-                                    <?php else : ?>
-                                        <td>
-                                            <?php if ($user['user_code'] == 'IT') : ?>
-                                                <a href="" class="btn btn-info btn-sm" data-toggle="modal" data-target="#editAsset<?= $asset['id_asset']; ?>"> <i class="fas fa-edit"></i> Edit </a>
-                                            <?php endif; ?>
                                         </td>
                                     <?php endif; ?>
                                 </tr>
@@ -100,7 +97,7 @@
             <form method="post" action="<?= base_url('Asset/add_asset'); ?>">
                 <div class="modal-body">
                     <div class="form-group">
-                        <label for="name">Name</label>
+                        <label for="name">Nama</label>
                         <input type="text" class="form-control" id="name" name="name" placeholder="Name" required>
                     </div>
                     <div class="form-group">
@@ -129,8 +126,8 @@
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="submit" class="btn btn-success">Add</button>
-                    <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-success">Simpan</button>
+                    <button type="button" class="btn btn-danger" data-dismiss="modal">Tutup</button>
                 </div>
             </form>
         </div>

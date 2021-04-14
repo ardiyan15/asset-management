@@ -15,12 +15,12 @@
                         <div class="card">
                             <div class="card-body">
                                 <h5 class="card-title"><?= $room['name']; ?></h5>
-                                <a href="" class="btn btn-default btn-sm" data-toggle="modal" data-target="#editStrLocation<?= $room['id']; ?>"> <i class="fas fa-edit"></i> Edit </a>
-                                <?php if ($room['status'] == 1) : ?>
+                                <a href="<?= base_url('room/edit/'). $room['id'] ?>" class="btn btn-default btn-sm"> <i class="fas fa-edit"></i> Edit </a>
+                                <!-- <?php if ($room['status'] == 1) : ?>
                                     <a href="<?= base_url('admin/deactivateStr/') . $room['id']; ?>" class="btn btn-sm deactStr-button"> <i class=" fas fa-times"></i> List Room's </a>
                                 <?php else : ?>
                                     <a href="<?= base_url('admin/activateStr/') . $room['id']; ?>" class="btn actvt-button"> <i class="fas fa-check"></i>Activate</a>
-                                <?php endif; ?>
+                                <?php endif; ?> -->
                             </div>
                         </div>
                     </a>
@@ -45,7 +45,7 @@
                 <div class="modal-body">
                     <div class="form-group">
                         <label for="nama"> Nama </label>
-                        <input type="text" class="form-control" id="name" name="name" placeholder="Nama Bangunan" required>
+                        <input type="text" class="form-control" id="name" name="name" placeholder="Nama Ruangan" required>
                     </div>
                 <div class="modal-footer">
                     <button type="submit" class="btn btn-sm btn-success rounded"><i class="fas fa-plus mr-1"></i>Tambah</button>

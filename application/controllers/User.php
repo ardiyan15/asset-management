@@ -6,16 +6,16 @@ class User extends CI_Controller
     public function __construct()
     {
         parent::__construct();
+        $this->load->model('Auth_model', 'Auth');
         $this->load->model('Assets_model', 'Assets');
         $this->load->model('Buildings_model', 'Buildings');
         $this->load->model('Users_model', 'Users');
-        // is_logged_in();
     }
 
     public function index()
     {
-        $data['title'] = 'My Profile';
-        $data['user'] = $this->Assets->login_model($this->session->userdata('email'));
+        $data['title']  = 'Profil Saya';
+        $data['user']   = $this->Auth->get_active_user($this->session->userdata('username'));
 
         $this->load->view('templates/header', $data);
         $this->load->view('templates/sidebar', $data);
@@ -27,7 +27,7 @@ class User extends CI_Controller
     public function editProfile()
     {
         $data['title'] = 'Edit Profile';
-        $data['user'] = $this->Assets->login_model($this->session->userdata('email'));
+        $data['user'] = $this->Auth->get_active_user($this->session->userdata('username'));
 
         // Cek jika ada file gambar yang diupload
         $this->form_validation->set_rules('fullname', 'Full Name', 'required|trim');
@@ -38,8 +38,7 @@ class User extends CI_Controller
             $this->load->view('user/editProfile', $data);
             $this->load->view('templates/footer');
         } else {
-            $name = $this->input->post('fullname');
-            $email = $this->input->post('email');
+            $name = $this->input->post('username');
             $upload_image = $_FILES['image']['name'];
 
             if ($upload_image) {
@@ -75,8 +74,8 @@ class User extends CI_Controller
 
     public function changePassword()
     {
-        $data['title'] = 'Change Password';
-        $data['user'] = $this->Assets->login_model($this->session->userdata('email'));
+        $data['title'] = 'Ganti Password';
+        $data['user'] = $this->Auth->get_active_user($this->session->userdata('username'));
 
         $this->form_validation->set_rules('current_password', 'Current password', 'required|trim');
         $this->form_validation->set_rules('new_password1', 'New password', 'required|trim|min_length[3]|matches[new_password2]');
@@ -126,9 +125,9 @@ class User extends CI_Controller
 
     public function create()
     {
-        $data['user'] = $this->Assets->login_model($this->session->userdata('email'));
-        $data['buildings'] = $this->Buildings->get_all_buildings();
-        $data['title']      = 'List Assets';
+        $data['user']       = $this->Auth->get_active_user($this->session->userdata('username'));
+        $data['buildings']  = $this->Buildings->get_all_buildings();
+        $data['title']      = 'Daftar User Baru';
 
         $this->load->view('templates/header', $data);
         $this->load->view('templates/sidebar', $data);
@@ -140,15 +139,13 @@ class User extends CI_Controller
     public function store()
     {
         $data = [
-            'user_code'     => $this->input->post('code'),
-            'email'         => $this->input->post('email'),
-            'fullname'         => $this->input->post('fullname'),
+            'username'      => $this->input->post('username'),
+            'password'      => $this->input->post('password'),
             'password'      => password_hash($this->input->post('password'), PASSWORD_DEFAULT),
             'role_id'       => $this->input->post('role'),
-            'is_active'        => 1,
+            'is_active'     => 1,
             'building_id'   => $this->input->post('building')
         ];
-
 
         $result = $this->Users->create($data);
 
@@ -156,10 +153,7 @@ class User extends CI_Controller
             $this->session->set_flashdata('message', 'addUser');
             redirect('admin/list_user');
         } else {
-            $this->session->set_flashdata(
-                'message',
-                'failed '
-            );
+            $this->session->set_flashdata('message','failed ');
             redirect('admin/list_user');
         }
     }

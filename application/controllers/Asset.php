@@ -8,29 +8,32 @@ class Asset extends CI_Controller
   {
     parent::__construct();
     $this->load->model('Assets_model', 'Assets');
+    $this->load->model('Auth_model', 'Auth');
     $this->load->model('Rooms_model', 'Rooms');
     $this->load->model('Buildings_model', 'Buildings');
     $this->load->model('Categories_model', 'Categories');
-    // is_logged_in();
+    is_logged_in();
+    is_allowed();
   }
 
   public function index()
   {
-    $data['user'] = $this->Assets->login_model($this->session->userdata('email'));
+    $data['user'] = $this->Auth->get_active_user($this->session->userdata('username'));
+    $role_id = $this->session->userdata('role_id');
     if ($this->input->post('keyword')) {
-      $data['assets'] = $this->Assets->search_data_model($data['user']['user_code']);
+      $data['assets'] = $this->Assets->search_data_model($data['user']['role_id'], $data['user']['building_id']);
     } else {
-      $data['assets'] = $this->Assets->menu_model($data['user']['user_code'], $data['user']['building_id']);
+      $data['assets'] = $this->Assets->menu_model($role_id, $data['user']['building_id']);
     }
 
-    if($this->input->post('keyword')) {
-        $data['total_asset'] = $this->Assets->search_data_model($data['user']['user_code']);
-        $data['amount_data'] = count($data['total_asset']);
-    } else {
-        $data['amount_data'] = $this->Assets->get_total_row('IT', $data['user']['user_code']);
-    }
+    // if($this->input->post('keyword')) {
+    //     $data['total_asset'] = $this->Assets->search_data_model($data['user']['user_code'], $data['user']['building_id']);
+    //     $data['amount_data'] = count($data['total_asset']);
+    // } else {
+    //     $data['amount_data'] = $this->Assets->get_total_row('IT', $data['user']['user_code']);
+    // }
 
-    $data['title']      = 'List Assets';
+    $data['title']      = 'Daftar Aset';
     $result['error']    = "Data Not Found!";
     $data['rooms']      = $this->Rooms->get_all_rooms();
     $data['categories'] = $this->Categories->get_all_categories();
@@ -78,104 +81,102 @@ class Asset extends CI_Controller
     $final_serial_number = str_replace('-', "", $serial_number);
 
     $data = [
-      'asset_name' => $this->input->post('name'),
-      'merk' => $this->input->post('merk'),
-      'qty' => 1,
-      'serial_number' => $final_serial_number,
-      'room_id' => $this->input->post('loc'),
-      'status' => 0,
-      'placement_status' => 1
+      'asset_name'        => $this->input->post('name'),
+      'merk'              => $this->input->post('merk'),
+      'qty'               => 1,
+      'serial_number'     => $final_serial_number,
+      'room_id'           => $this->input->post('loc'),
+      'status'            => 0,
+      'placement_status'  => 1,
+      'created'           => date('Y-m-d')
     ];
 
     if ($this->form_validation->run() == false) {
-      $this->session->set_flashdata(
-        'message',
-        'failed'
-      );
+      $this->session->set_flashdata('message','failed');
       redirect('asset');
     } else {
       $add = $this->Assets->add_asset_model($data);
       if ($add > 0) {
-        $this->session->set_flashdata(
-          'message',
-          'added '
-        );
+        $this->session->set_flashdata('message','added ');
         redirect('asset');
       } else {
-        $this->session->set_flashdata(
-          'message',
-          'failed'
-        );
+        $this->session->set_flashdata('message','failed');
         redirect('asset');
       }
     }
   }
-
 
   public function delete($id)
   {
     $result = $this->Assets->delete_ast_model($id);
 
     if ($result > 0) {
-      $this->session->set_flashdata(
-        'message',
-        'deleted'
-      );
+      $this->session->set_flashdata('message','deleted');
       redirect('asset');
     } else {
-      $this->session->set_flashdata(
-        'failed',
-        'failed '
-      );
+      $this->session->set_flashdata('failed', 'failed ');
       redirect('asset');
     }
   }
 
+  public function update($id)
+  {
+    $data['user']           = $this->Auth->get_active_user($this->session->userdata('username'));
+    $data['title']          = 'Edit Aset';
+    $data['asset']          = $this->Assets->get_asset_by_id($id);
+    $data['serial_number']  = substr($data['asset']['serial_number'], 0, 4);
+    
+    $this->load->view('templates/header', $data);
+    $this->load->view('templates/sidebar', $data);
+    $this->load->view('templates/topbar', $data);
+    $this->load->view('menu/update', $data);
+    $this->load->view('templates/footer');
+  }
 
-  public function edit_asset($id)
+
+  public function edit_asset()
   {
     $this->form_validation->set_rules('name', 'Name', 'required|trim');
     $this->form_validation->set_rules('merk', 'Merk', 'required|trim');
-    $this->form_validation->set_rules('sn', 'Serial Number', 'required|trim');
-    $this->form_validation->set_rules('loc', 'Location', 'required');
+    $this->form_validation->set_rules('seri', 'Serial Number', 'required|trim');
+
+    $id                   = $this->input->post('id');
+    $serial_number        = $this->input->post('seri');
+    $asset                = $this->Assets->get_asset_by_id($id);
+    $remove_room_location = substr($asset['serial_number'], 4);
+    $new_serial_number    = $serial_number.$remove_room_location;
 
     $data = [
-      'asset_name' => $this->input->post('name'),
-      'merk' => $this->input->post('merk'),
-      'qty' => 1,
-      'serial_number' => $this->input->post('sn'),
-      'asset_location' => $this->input->post('loc'),
-      'status' => $this->input->post('status')
+      'asset_name'    => $this->input->post('nama'),
+      'merk'          => $this->input->post('merk'),
+      'serial_number' => $new_serial_number
     ];
 
-    $edit = $this->Assets->edit_asset_model($data, $id);
+    $result = $this->Assets->update_asset_by_id($data, $id);
 
-    if ($edit > 0) {
-      $this->session->set_flashdata(
-        'message',
-        'edited '
-      );
+    if ($result > 0) {
+      $this->session->set_flashdata('message', 'edited ');
       redirect('asset');
     } else {
-      $this->session->set_flashdata(
-        'message',
-        'Failed '
-      );
+      $this->session->set_flashdata('message', 'Failed ');
       redirect('asset');
     }
   }
 
   public function location($room_id)
   {
-    $session = $this->session->userdata('email');
-    if ($session === null) {
-        redirect('auth');
+    $data['room_id'] = $room_id;
+    $role_id         = $this->session->userdata('role_id'); 
+    $data['user']    = $this->Auth->get_active_user($this->session->userdata('username'));
+    $data['assets']  = $this->Assets->get_asset_by_room_id($room_id);
+
+    if ($this->input->post('keyword')) {
+      $data['assets'] = $this->Assets->search_data_model($data['user']['role_id'], $data['user']['building_id']);
     }
-    $data['user']         = $this->Assets->login_model($this->session->userdata('email'));
-    $data['amount_data']  = $this->Assets->get_total_row('', $room_id);
+    
+    $data['rooms']        = $this->Rooms->get_all_rooms();
     $data['title']        = "Lokasi Asset";
     $data['error']        = "Data Not Found!";
-    $data['assets']       = $this->Assets->get_asset_by_room_id($room_id);
 
     $this->load->view('templates/header', $data);
     $this->load->view('templates/sidebar', $data);

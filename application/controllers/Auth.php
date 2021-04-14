@@ -8,6 +8,7 @@ class Auth extends CI_Controller
     {
         parent::__construct();
         $this->load->model('Assets_model', 'Assets');
+        $this->load->model('Auth_model', 'Auth');
         $this->load->library('form_validation');
     }
 
@@ -16,7 +17,7 @@ class Auth extends CI_Controller
         if ($this->session->userdata('email')) {
             redirect('user');
         }
-        // $this->form_validation->set_rules('email', 'Email', 'required|trim|valid_email');
+        $this->form_validation->set_rules('username', 'Username', 'required|trim');
         $this->form_validation->set_rules('password', 'Password', 'required|trim');
         if ($this->form_validation->run() == false) {
             $data['title'] = 'Login Page';
@@ -32,10 +33,10 @@ class Auth extends CI_Controller
 
     private function _login()
     {
-        $email = $this->input->post('email');
+        $username = $this->input->post('username');
         $password = $this->input->post('password');
 
-        $user = $this->Assets->login_model($email, $password);
+        $user = $this->Auth->get_active_user($username);
 
         // User nya ada
         if ($user) {
@@ -44,9 +45,8 @@ class Auth extends CI_Controller
                 // cek password
                 if (password_verify($password, $user['password'])) {
                     $data = [
-                        'email' => $user['email'],
+                        'username' => $user['username'],
                         'role_id' => $user['role_id'],
-                        'code' => $user['code']
                     ];
                     $this->session->set_userdata($data);
                     if ($user['role_id'] == 1) {

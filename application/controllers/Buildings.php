@@ -2,22 +2,22 @@
 
 class Buildings extends CI_Controller
 {
+    var $data;
     public function __construct()
     {
         parent::__construct();
         $this->load->model('Assets_model', 'Assets');
+        $this->load->model('Auth_model', 'Auth');
         $this->load->model('Buildings_model', 'Buildings');
+        is_logged_in();
+        is_allowed();
     }
 
     public function index()
     {
-        $session = $this->session->userdata('email');
-        if ($session === null) {
-            redirect('auth');
-        }
-        $data['user']       = $this->Assets->login_model($this->session->userdata('email'));
+        $data['user']       = $this->Auth->get_active_user($this->session->userdata('username'));
         $data['title']      = "Lokasi Bangunan";
-        $data['buildings']  = $this->Buildings->get_all_buildings();
+        $data['buildings']  = $this->Buildings->get_active_buildings();
 
         $this->load->view('templates/header', $data);
         $this->load->view('templates/sidebar', $data);
@@ -29,7 +29,7 @@ class Buildings extends CI_Controller
     public function edit($id)
     {
         $data['title']  = 'Edit Building';
-        $data['user']   = $this->Assets->login_model($this->session->userdata('email'));
+        $data['user']   = $this->Auth->get_active_user($this->session->userdata('username'));
         $data['result'] = $this->Buildings->get_single_active_building_by_id($id);
         
         $this->load->view('templates/header', $data);
@@ -48,14 +48,25 @@ class Buildings extends CI_Controller
         ];
 
         $result = $this->Buildings->update_data_building_by_id($data);
+
         if($result > 0) {
             $this->session->set_flashdata('message', 'editBuilding');
             redirect('buildings');
         } else {
-            $this->session->set_flashdata(
-                'message',
-                'failed '
-            );
+            $this->session->set_flashdata('message', 'failed ');
+            redirect('buildings');
+        }
+    }
+
+    public function delete($id)
+    {
+        $result = $this->Buildings->delete_building_by_id($id);
+
+        if($result > 0) {
+            $this->session->set_flashdata('message', 'deleteBuilding');
+            redirect('buildings');
+        } else {
+            $this->session->set_flashdata('message', 'failed ');
             redirect('buildings');
         }
     }

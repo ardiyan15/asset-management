@@ -61,7 +61,19 @@
                         $('#table-asset').DataTable({
                             "columnDefs": [
                                 {"searchable": false, "targets": 0}
-                            ]
+                            ],
+                            "oLanguage": {
+                                "sLengthMenu": "_MENU_",
+                                "sSearch": "Cari",
+                                "sInfo": "Jumlah data: <b> _TOTAL_ </b>",
+                                "sInfoEmpty": "Tidak ada data"
+                            },
+                            "language": {
+                                "paginate": {
+                                    "previous": "Sebelumnya",
+                                    "next": "Selanjutnya"
+                                }
+                            }
                         });
                     });
                     

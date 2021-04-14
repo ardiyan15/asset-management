@@ -13,4 +13,18 @@ class Floors_model extends CI_Model {
         $this->db->insert('floors', $data);
         return $this->db->affected_rows();
     }
+
+    public function get_single_floor_by_id($id)
+    {
+        return $this->db->get_where('floors', ['id' => $id])->row_array();
+    }
+
+    public function update_floors_by_id($data)
+    {
+        $this->db->set('name', $data['name']);
+        $this->db->set('updated_at', $data['updated_at']);
+        $this->db->where('id', $data['id']);
+        $this->db->update('floors');
+        return $this->db->affected_rows();
+    }
 }

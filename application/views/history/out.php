@@ -1,23 +1,21 @@
 <!-- Begin Page Content -->
 <div class="container-fluid">
+    <a href="<?= base_url('history') ?>" class="btn btn-primary btn-sm mb-3">Kembali</a>
     <!-- Page Heading -->
     <?php if ($asset) : ?>
-
         <h1 class="h3 mb-4 text-gray-800"><?= $title; ?></h1>
-
         <div class="row">
-            <div class="col-lg-10">
-                <table class="table table-hover">
+            <div class="col-lg">
+                <table class="table table-hover" id="table-asset">
                     <thead>
                         <tr>
                             <th scope="col">No</th>
-                            <th class="text-center" scope="col">Name</th>
+                            <th class="text-center" scope="col">Nama</th>
                             <th class="text-center" scope="col">Merk</th>
-                            <th class="text-center" scope="col">Qty</th>
-                            <th class="text-center" scope="col">Serial Number</th>
-                            <th class="text-center" scope="col">Source</th>
-                            <th class="text-center" scope="col">Destination</th>
-                            <th class="text-center" scope="col">Send Time</th>
+                            <th class="text-center" scope="col">Nomor Seri</th>
+                            <th class="text-center" scope="col">Sumber</th>
+                            <th class="text-center" scope="col">Tujuan</th>
+                            <th class="text-center" scope="col">Tanggal Pengiriman</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -27,16 +25,15 @@
                                 <th scope="row"><?= $i; ?></th>
                                 <td class="text-center"><?= $ast['asset_name']; ?></td>
                                 <td class="text-center"><?= $ast['merk']; ?></td>
-                                <td class="text-center"><?= $ast['qty']; ?></td>
                                 <td class="text-center"><?= $ast['serial_number']; ?></td>
                                 <td class="text-center"><?= $ast['source']; ?></td>
-                                <td class="text-center"><?= $ast['destination']; ?></td>
-                                <td class="text-center"><?= $ast['createtime']; ?></td>
+                                <td class="text-center"><?= $ast['name']; ?></td>
+                                <td class="text-center"><?= $ast['sent']; ?></td>
                             </tr>
                             <?php $i++; ?>
                         <?php endforeach; ?>
                     <?php else : ?>
-                        <h3> Data not found </h3>
+                        <h3> Tidak Ada Riwayat Transaksi Keluar </h3>
                     <?php endif; ?>
                     </tbody>
                 </table>

@@ -7,17 +7,17 @@ class History extends CI_Controller
     public function __construct()
     {
         parent::__construct();
+        $this->load->model('Auth_model', 'Auth');
         $this->load->model('Assets_model', 'Assets');
+        $this->load->model('Transactions_model', 'Transactions');
+        is_logged_in();
+        is_allowed();
     }
 
     public function index()
     {
-        $data['title'] = 'History';
-        $session = $this->session->userdata('email');
-        if ($session == null) {
-            redirect('auth');
-        }
-        $data['user'] = $this->Assets->login_model($this->session->userdata('email'));
+        $data['title'] = 'Riwayat Transaksi';
+        $data['user'] = $this->Auth->get_active_user($this->session->userdata('username'));
 
         $this->load->view('templates/header', $data);
         $this->load->view('templates/sidebar', $data);
@@ -28,14 +28,11 @@ class History extends CI_Controller
 
     public function asset_out()
     {
-        $data['title'] = 'Assets That Have Been Sent';
-        $session = $this->session->userdata('email');
-        if ($session == null) {
-            redirect('auth');
-        }
-        $data['user'] = $this->Assets->login_model($this->session->userdata('email'));
-
-        $data['asset'] = $this->Assets->get_data_history_asset_out($data['user']['user_code']);
+        $role_id        = $this->session->userdata('role_id');
+        $data['title']  = 'Riwayat Transaksi Keluar';
+        $data['user']   = $this->Auth->get_active_user($this->session->userdata('username'));
+        $building_id    = $data['user']['building_id'];
+        $data['asset']  = $this->Transactions->transactions_complete_out($role_id, $building_id);
 
         $this->load->view('templates/header', $data);
         $this->load->view('templates/sidebar', $data);
@@ -46,14 +43,11 @@ class History extends CI_Controller
 
     public function asset_in()
     {
-        $data['title'] = 'Assets That Have Been Received';
-        $session = $this->session->userdata('email');
-        if ($session == null) {
-            redirect('auth');
-        }
-        $data['user'] = $this->Assets->login_model($this->session->userdata('email'));
-
-        $data['asset'] = $this->Assets->get_data_history_asset_in($data['user']['user_code']);
+        $role_id        = $this->session->userdata('role_id');
+        $data['title']  = 'Riwayat Transaksi Masuk';
+        $data['user']   = $this->Auth->get_active_user($this->session->userdata('username'));
+        $building_id    = $data['user']['building_id'];
+        $data['asset']  = $this->Transactions->transactions_complete_in($role_id, $building_id);
 
         $this->load->view('templates/header', $data);
         $this->load->view('templates/sidebar', $data);

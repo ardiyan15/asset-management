@@ -5,22 +5,29 @@
     <h2> <?= $title; ?></h2>
 
     <form action="<?= base_url('admin/index'); ?>" method="POST">
-        <div class="form-group" style="width: 20%; height: 10%">
-            <label for="order"> Order By Store / Deparment</label>
-            <select id="order" name="order">
-                <option value=""> Store / Department </option>
-                <?php foreach ($store as $str) : ?>
-                    <option value="<?= $str['store_code']; ?>"> <?= $str['store_code'] ?> <?= $str['store_name'] ?> </option>
-                <?php endforeach; ?>
-            </select>
-            <button class="mt-2 btn btn-primary btn-sm"> Filter </button>
-            <p class="ml-1 mt-3" style="font-size: 12px;"> Filter by :
-                <?php if ($order == null) {
-                    echo "All";
-                } else {
-                    echo $order;
-                } ?>
-            </p>
+        <div class="row">
+            <div class="col-md-12">
+                    <label for="order"> Filter berdasarkan ruangan </label>
+            </div>
+            <div class="col-md-12">
+                <div class="form-group">
+                    <select id="order" name="room_id" class="pr-3 pl-3">
+                        <option value=""> -- Pilih Ruangan -- </option>
+                        <?php foreach ($rooms as $room) : ?>
+                            <option value="<?= $room['id']; ?>"> <?= $room['name'] ?> </option>
+                        <?php endforeach; ?>
+                    </select>
+                    <br>
+                    <button class="mt-2 btn btn-success btn-sm"> Filter </button>
+                    <p class="ml-1 mt-3" style="font-size: 12px;"> Filter berdasarkan :
+                        <?php if ($room_name == null) {
+                            echo "<b> semua ruangan </b>";
+                        } else {
+                            echo "<b>" .$room_name['name']. "</b>";
+                        } ?>
+                    </p>
+                </div>
+            </div>
         </div>
     </form>
     <div style="height: 70%; width: 70%;">

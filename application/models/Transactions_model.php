@@ -25,12 +25,13 @@ class Transactions_model extends CI_Model {
         return $this->db->affected_rows();
     }
 
-    public function bulk_transaction($asset_ids, $room_id)
+    public function bulk_transaction($asset_ids, $room_id, $source_ids)
     {
-        foreach($asset_ids as $asset_id){
+        foreach(array_combine($asset_ids, $source_ids) as $asset_id => $source_id){
             $result[] = [
                 'asset_id' => $asset_id,
-                'room_id'  => $room_id,
+                'room_id' => $room_id,
+                'source_id'  => $source_id,
                 'status'   => 0,
                 'sent'     => date('Y-m-d'),
                 'created_at' => date('Y-m-d'),
@@ -38,6 +39,66 @@ class Transactions_model extends CI_Model {
         }
 
         $this->db->insert_batch('transactions', $result);
+        return $this->db->affected_rows();
+    }
+
+    public function transaction_out_process($building_id)
+    {
+        $this->db->select('asset.asset_name, asset.merk, asset.serial_number, rooms.name, transactions.sent, floors.building_id');
+        $this->db->from('transactions');
+        $this->db->join('asset', 'asset.id_asset = transactions.asset_id');
+        $this->db->join('rooms', 'rooms.id = transactions.room_id');
+        $this->db->join('rooms AS source', 'source.id = transactions.source_id');
+        $this->db->join('floors', 'floors.id = source.floor_id');
+        $this->db->join('buildings', 'buildings.id = floors.building_id');
+        $this->db->where(['transactions.status' => 0, 'buildings.id' => $building_id]);
+        return $this->db->get()->result_array();
+    }
+
+    public function transactions_complete_out($role_id, $building_id)
+    {
+        $this->db->select('asset.asset_name, asset.merk, asset.serial_number, rooms.name, transactions.sent, source.name AS source');
+        $this->db->from('transactions');
+        $this->db->join('asset', 'asset.id_asset = transactions.asset_id');
+        $this->db->join('rooms', 'rooms.id = transactions.room_id');
+        $this->db->join('rooms AS source', 'source.id = transactions.source_id');
+        $this->db->join('floors', 'floors.id = source.floor_id');
+        $this->db->join('buildings', 'buildings.id = floors.building_id');
+        if($role_id !== '1'){
+            $this->db->where(['transactions.status' => 1, 'buildings.id' => $building_id]);   
+        }
+        return $this->db->get()->result_array();
+    }
+
+    public function transactions_complete_in($role_id, $building_id)
+    {
+        $this->db->select('asset.asset_name, asset.merk, asset.serial_number, rooms.name, transactions.sent, source.name AS source, transactions.received');
+        $this->db->from('transactions');
+        $this->db->join('asset', 'asset.id_asset = transactions.asset_id');
+        $this->db->join('rooms AS source', 'source.id = transactions.source_id');
+        $this->db->join('rooms', 'rooms.id = transactions.room_id');
+        $this->db->join('floors', 'floors.id = rooms.floor_id');
+        $this->db->join('buildings', 'buildings.id = floors.building_id');
+        if($role_id !== '1'){
+            $this->db->where(['transactions.status' => 1, 'buildings.id' => $building_id]);
+        }
+        return $this->db->get()->result_array();
+    }
+
+    public function get_transaction_room_id_by_asset_id($asset_ids)
+    {
+        $this->db->select('room_id');
+        $this->db->from('transactions');
+        $this->db->where('status', 0);
+        $this->db->where_in('asset_id', $asset_ids);
+        return $this->db->get()->result_array();
+    }
+
+    public function bulk_update($asset_ids)
+    {
+        $this->db->set('status', 1);
+        $this->db->where_in('asset_id', $asset_ids);
+        $this->db->update('transactions');
         return $this->db->affected_rows();
     }
 }

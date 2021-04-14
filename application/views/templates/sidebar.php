@@ -32,13 +32,19 @@
         <li class="nav-item">
             <a class="nav-link" href="<?= base_url('admin/list_user') ?>">
                 <i class="fas fa-fw fa-tachometer-alt"></i>
-                <span> Data Users </span>
+                <span> Data Pengguna </span>
             </a>
         </li>
         <li class="nav-item">
             <a class="nav-link" href="<?= base_url('buildings') ?>">
                 <i class="fas fa-fw fa-coins"></i>
                 <span> Data Ruangan </span>
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="<?= base_url('category') ?>">
+                <i class="fas fa-fw fa-coins"></i>
+                <span> Data Kategori </span>
             </a>
         </li>
     <?php endif; ?>
@@ -50,47 +56,47 @@
     <li class="nav-item">
         <a class="nav-link" href="<?= base_url('user') ?>">
             <i class="fas fa-fw fa-coins"></i>
-            <span> My Profile </span>
+            <span> Profil Saya </span>
         </a>
     </li>
     <li class="nav-item">
         <a class="nav-link" href="<?= base_url('user/editprofile') ?>">
             <i class="fas fa-fw fa-coins"></i>
-            <span> Edit Profile </span>
+            <span> Ubah Profil </span>
         </a>
     </li>
     <li class="nav-item">
         <a class="nav-link" href="<?= base_url('user/changepassword') ?>">
             <i class="fas fa-fw fa-coins"></i>
-            <span> Change Password </span>
+            <span> Ganti Password </span>
         </a>
     </li>
     <hr class="sidebar-divider">
     <div class="sidebar-heading">
-        Asset
+        Transaksi
     </div>
+    <li class="nav-item">
+        <a class="nav-link" href="<?= base_url('transaction') ?>">
+            <i class="fas fa-fw fa-coins"></i>
+            <span> Transaksi Asset </span>
+        </a>
+    </li>
     <li class="nav-item">
         <a class="nav-link" href="<?= base_url('TO') ?>">
             <i class="fas fa-fw fa-coins"></i>
-            <span> Take Out </span>
+            <span> Transaksi Keluar </span>
         </a>
     </li>
     <li class="nav-item">
         <a class="nav-link" href="<?= base_url('TI') ?>">
             <i class="fas fa-fw fa-coins"></i>
-            <span> Take In </span>
+            <span> Transaksi Masuk </span>
         </a>
     </li>
     <li class="nav-item">
         <a class="nav-link" href="<?= base_url('History') ?>">
             <i class="fas fa-fw fa-coins"></i>
-            <span> History </span>
-        </a>
-    </li>
-    <li class="nav-item">
-        <a class="nav-link" href="<?= base_url('transaction') ?>">
-            <i class="fas fa-fw fa-coins"></i>
-            <span> Transaksi Asset </span>
+            <span> Riwayat Transaksi </span>
         </a>
     </li>
     <hr class="sidebar-divider">

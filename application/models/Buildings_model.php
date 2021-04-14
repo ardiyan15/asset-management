@@ -2,10 +2,20 @@
 
 class Buildings_model extends CI_Model {
 
-    public function get_all_buildings()
+    public function get_active_buildings()
     {
         $this->db->order_by('id', 'DESC');
-        return $this->db->get_where('buildings')->result_array();
+        return $this->db->get_where('buildings', ['status' => 1])->result_array();
+    }
+
+    public function get_all_buildings()
+    {
+        $this->db->select('buildings.id, buildings.name');
+        $this->db->from('buildings');
+        $this->db->join('user', 'user.building_id = buildings.id', 'left');
+        $this->db->where(['user.username' => null, 'buildings.status' => 1]);
+        $this->db->order_by('buildings.id', 'DESC');
+        return $this->db->get()->result_array();
     }
 
     public function add_building($data)
@@ -24,6 +34,14 @@ class Buildings_model extends CI_Model {
         $this->db->set('name', $data['name']);
         $this->db->set('updated_at', $data['updated_at']);
         $this->db->where('id', $data['id']);
+        $this->db->update('buildings');
+        return $this->db->affected_rows();
+    }
+
+    public function delete_building_by_id($id)
+    {
+        $this->db->set('status', 0);
+        $this->db->where('id', $id);
         $this->db->update('buildings');
         return $this->db->affected_rows();
     }

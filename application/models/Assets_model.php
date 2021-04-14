@@ -2,22 +2,16 @@
 
 class Assets_model extends CI_Model
 {
-
-    public function login_model($email)
+    public function menu_model($role_id, $building_id)
     {
-        return $this->db->get_where('user', ['email' => $email])->row_array();
-    }
-
-    public function menu_model($loc, $building_id)
-    {
-        if ($loc == 'IT') {
+        if ($role_id == '1') {
             $this->db->select('*');
             $this->db->from('asset');
             $this->db->join('rooms', 'rooms.id = asset.room_id');
             $this->db->order_by('id_asset', 'DESC');
             return $this->db->get()->result_array();
-        } else {
-            $this->db->select('asset.id_asset, asset.asset_name, asset.merk, asset.serial_number, asset.placement_status, rooms.name');
+        } else { 
+            $this->db->select('asset.id_asset, asset.asset_name, asset.merk, asset.serial_number, asset.placement_status, rooms.name, rooms.id AS room_id, asset.created');
             $this->db->from('asset');
             $this->db->join('rooms', 'rooms.id = asset.room_id');
             $this->db->join('floors', 'floors.id = rooms.floor_id');
@@ -82,20 +76,8 @@ class Assets_model extends CI_Model
         $this->db->set('status', 0);
         $this->db->where('id_asset', $id);
         $this->db->update('asset');
-
         $this->db->insert('detail_process', $dtlPrces);
-
         return $this->db->affected_rows();
-    }
-
-    public function take_out_process($location)
-    {
-        $this->db->select('*');
-        $this->db->from('detail_process');
-        $this->db->join('asset', 'asset.id_asset = detail_process.asset_id');
-        $this->db->where('source', $location);
-        $this->db->where('deleted', 0);
-        return $this->db->get()->result_array();
     }
 
     public function print_model($location)
@@ -106,7 +88,6 @@ class Assets_model extends CI_Model
         $this->db->where('deleted', 0);
         $this->db->where_in('id_detail_process', $location);
         return $this->db->get()->result_array();
-        // return $this->db->get_where('detail_process', ['deleted' => 0])->result_array();
     }
 
     public function add_asset_model($data)
@@ -135,46 +116,42 @@ class Assets_model extends CI_Model
         return $this->db->affected_rows();
     }
 
-    // public function get_location()
-    // {
-    //     $this->db->order_by('store_code', 'ASC');
-    //     return $this->db->get('store_location')->result_array();
-    // }
-
-    public function edit_asset_model($data, $id)
+    public function update_asset_by_id($data, $id)
     {
         $this->db->where('id_asset', $id);
         $this->db->update('asset', $data);
         return $this->db->affected_rows();
     }
 
-    public function search_data_model($loc)
+    public function search_data_model($role_id, $building_id)
     {
-        if ($loc == 'IT') {
+        if ($role_id == "1") {
             $keyword = $this->input->post('keyword', true);
-            $this->db->like('serial_number', $keyword);
-            $this->db->or_like('asset_name', $keyword);
-            $this->db->or_like('merk', $keyword);
-            $this->db->or_like('asset_name', $keyword);
-            $this->db->or_like('origin_location', $keyword);
-            $this->db->or_like('asset_location', $keyword);
-            if ($keyword == 'Bad' || $keyword == 'BAD' || $keyword == 'bad') {
-                $keyword = 1;
-            } elseif ($keyword == 'Good') {
-                $keyword = 0;
-            }
-            $this->db->or_like('status', $keyword);
-
-            return $this->db->get('asset')->result_array();
+            $this->db->select('asset.id_asset, asset.asset_name, asset.merk, asset.serial_number, rooms.name, asset.placement_status, asset.created');
+            $this->db->from('asset');
+            $this->db->join('rooms', 'rooms.id = asset.room_id');
+            $this->db->like('asset.serial_number', $keyword);
+            $this->db->or_like('asset.asset_name', $keyword);
+            $this->db->or_like('asset.merk', $keyword);
+            $this->db->or_like('asset.created', $keyword);
+            $this->db->or_like('rooms.name', $keyword);
+            $this->db->order_by('id_asset', 'DESC');
+            return $this->db->get()->result_array();
         } else {
             $keyword = $this->input->post('keyword', true);
+            $this->db->select('asset.asset_name, asset.merk, asset.serial_number, rooms.name');
+            $this->db->from('asset');
+            $this->db->join('rooms', 'rooms.id = asset.id_asset');
+            $this->db->join('floors', 'floors.id = rooms.floor_id');
+            $this->db->join('buildings', 'buildings.id = floors.building_id');
             $this->db->group_start();
             $this->db->like('asset_name', $keyword);
-            $this->db->or_like('merk', $keyword);
-            $this->db->or_like('serial_number', $keyword);
-            $this->db->or_like('asset_location', $keyword);
+            $this->db->or_like('asset.serial_number', $keyword);
+            $this->db->or_like('asset.merk', $keyword);
+            $this->db->or_like('rooms.name', $keyword);
             $this->db->group_end();
-            return $this->db->get_where('asset', ['asset_location' => $loc])->result_array();
+            // $this->db->where('buildings.id', $building_id);
+            return $this->db->get()->result_array();
         }
     }
 
@@ -189,7 +166,7 @@ class Assets_model extends CI_Model
 
     public function get_total_row($role, $room_id)
     {
-        if ($role == 'IT') {
+        if ($role == '1') {
             $this->db->select('*');
             $this->db->from('asset');
             $this->db->join('rooms', 'rooms.id = asset.room_id');
@@ -225,12 +202,12 @@ class Assets_model extends CI_Model
         return $this->db->get('asset')->result_array();
     }
 
-    public function count_asset($order)
+    public function filter_asset_by_room_id($room_id)
     {
-        if ($order == null) {
+        if ($room_id == null) {
             $query = "SELECT asset.asset_name, COUNT(*) AS total FROM asset GROUP BY asset_name";
         } else {
-            $query = "SELECT asset.asset_name, COUNT(*) AS total FROM asset WHERE asset_location = '$order' GROUP BY asset_name";
+            $query = "SELECT asset.asset_name, COUNT(*) AS total FROM asset WHERE room_id = '$room_id' GROUP BY asset_name";
         }
 
         $sql = $this->db->query($query)->result_array();
@@ -318,7 +295,6 @@ class Assets_model extends CI_Model
 
     public function get_code_location($location)
     {
-        // var_dump($location);
         $this->db->select('buildings.name');
         $this->db->from('rooms');
         $this->db->join('floors', 'rooms.floor_id = floors.id');
@@ -339,7 +315,7 @@ class Assets_model extends CI_Model
 
     public function get_asset_by_room_id($room_id)
     {
-        $this->db->select('asset.asset_name, asset.merk, asset.serial_number, rooms.name');
+        $this->db->select('asset.id_asset, asset.asset_name, asset.merk, asset.serial_number, asset.placement_status, rooms.name, rooms.id AS room_id');
         $this->db->from('asset');
         $this->db->join('rooms', 'rooms.id = asset.room_id');
         $this->db->where('asset.room_id', $room_id);
@@ -369,5 +345,23 @@ class Assets_model extends CI_Model
         $this->db->where_in('id_asset', $asset_ids);
         $this->db->update('asset');
         return $result = $this->db->affected_rows();
+    }
+
+    public function get_asset_by_id($id)
+    {
+        return $this->db->get_where('asset', ['id_asset' => $id])->row_array();
+    }
+
+    public function update_room_id_by_asset_id($room_ids, $asset_ids)
+    {
+        foreach(array_combine($asset_ids, $room_ids) as $asset_id => $room_id){
+            $result[] = [
+                'id_asset' => $asset_id,
+                'room_id' => $room_id,
+                'placement_status' => 1,
+            ];
+        }
+        $this->db->update_batch('asset', $result, 'id_asset');
+        return $this->db->affected_rows();
     }
 }

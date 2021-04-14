@@ -7,11 +7,11 @@
         <div class="col-lg-5">
             <div class="card">
                 <div class="card-header">
-                    Asset Out
+                    Asset Keluar
                 </div>
                 <div class="card-body">
-                    <h5 class="card-title">See what you send</h5>
-                    <a href="<?= base_url('history/asset_out'); ?>" class="btn btn-primary btn-sm"> Click Here </a>
+                    <h5 class="card-title">Riwayat Transaksi Keluar</h5>
+                    <a href="<?= base_url('history/asset_out'); ?>" class="btn btn-primary btn-sm"> Detail </a>
                 </div>
             </div>
         </div>
@@ -19,11 +19,11 @@
         <div class="col-lg-5">
             <div class="card">
                 <div class="card-header">
-                    Asset In
+                    Asset Masuk
                 </div>
                 <div class="card-body">
-                    <h5 class="card-title">See what you receive</h5>
-                    <a href="<?= base_url('history/asset_in'); ?>" class="btn btn-primary btn-sm">Click Here</a>
+                    <h5 class="card-title">Riwayat Transaksi Masuk</h5>
+                    <a href="<?= base_url('history/asset_in'); ?>" class="btn btn-primary btn-sm">Detail</a>
                 </div>
             </div>
         </div>

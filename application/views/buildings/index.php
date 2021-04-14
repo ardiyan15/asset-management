@@ -11,9 +11,9 @@
                             <div class="card">
                                 <div class="card-body">
                                     <h5 class="card-title"><?= $building['name']; ?></h5>
-                                    <a href="<?= base_url('buildings/edit/').$building['id'] ?>" class="btn btn-default btn-sm"> <i class="fas fa-edit"></i> Edit </a>
+                                    <a href="<?= base_url('buildings/edit/').$building['id'] ?>" class="btn btn-default btn-sm"> <i class="fas fa-edit"></i> Ubah </a>
                                     <?php if ($building['status'] == 1) : ?>
-                                        <a href="<?= base_url('admin/deactivateStr/') . $building['id']; ?>" class="btn btn-sm deactStr-button"> <i class=" fas fa-times"></i> List Room's </a>
+                                        <a href="<?= base_url('buildings/delete/') . $building['id']; ?>" class="btn btn-sm delete-building"> <i class=" fas fa-times"></i> Hapus </a>
                                     <?php else : ?>
                                         <a href="<?= base_url('admin/activateStr/') . $building['id']; ?>" class="btn actvt-button"> <i class="fas fa-check"></i>Activate</a>
                                     <?php endif; ?>

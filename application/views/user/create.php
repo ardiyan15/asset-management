@@ -1,16 +1,9 @@
 <div class="container">
+    <h1 class="h3 mb-3 text-gray-800"><?= $title; ?></h1>
     <form action="<?= base_url('user/store') ?>" method="POST">
         <div class="form-group">
-            <label for="code">User Code</label>
-            <input type="text" class="form-control" name="code" placeholder="User Code">
-        </div>
-        <div class="form-group">
-            <label>Email</label>
-            <input type="text" class="form-control" name="email" placeholder="Email">
-        </div>
-        <div class="form-group">
-            <label>Fullname</label>
-            <input type="text" class="form-control" name="fullname" placeholder="Fullname">
+            <label>Username</label>
+            <input type="text" class="form-control" name="username" placeholder="Username">
         </div>
         <div class="form-group">
             <label>Password</label>
@@ -33,7 +26,7 @@
                 <?php endforeach ?>
             </select>
         </div>
-        <button type="submit" class="btn btn-success">Submit</button>
-        <a href="<?= base_url('admin/list_user') ?>" class="btn btn-danger">Batal</a>
+        <button type="submit" class="btn btn-success btn-sm">Submit</button>
+        <a href="<?= base_url('admin/list_user') ?>" class="btn btn-danger btn-sm">Batal</a>
     </form>
 </div>

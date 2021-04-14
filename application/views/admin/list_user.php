@@ -3,7 +3,7 @@
 
     <div class="row">
         <div class="col-sm">
-            <h2> User's List </h2>
+            <h2> Daftar Pengguna </h2>
             <a href="<?= base_url('user/create') ?>" class="btn btn-success btn-sm mb-3">
                 <i class="fas fa-plus mr-1"></i> Tambah User Baru
             </a>
@@ -18,12 +18,11 @@
             <table class="table table-hover" id="table-asset">
                 <thead>
                     <tr>
-                        <th class="text-center">No</th>
-                        <th class="text-center"> User Code </th>
-                        <th class="text-center" scope="col"> Email </th>
-                        <th class="text-center" scope="col"> Building </th>
+                        <th class="text-center"> No </th>
+                        <th class="text-center"> Username </th>
+                        <th class="text-center"> Bangunan </th>
                         <th class="text-center"> Status </th>
-                        <th class="text-center" scope="col"> Action </th>
+                        <th class="text-center"> Aksi </th>
                     </tr>
                 </thead>
                 <tbody>
@@ -31,19 +30,18 @@
                     <?php foreach ($all_users as $user) : ?>
                         <tr>
                             <th class="text-center"> <?= $i ?></th>
-                            <td class="text-center"> <?= $user['user_code']; ?></td>
-                            <td class="text-center"> <?= $user['email']; ?></td>
+                            <td class="text-center"> <?= $user['username']; ?></td>
                             <td class="text-center"> <?= $user['name']; ?></td>
                             <?php if ($user['is_active'] == 1) : ?>
-                                <td class="text-center"> Active </td>
+                                <td class="text-center"> Aktif </td>
                             <?php else : ?>
-                                <td class="text-center"> Inactive </td>
+                                <td class="text-center"> Tidak Aktif </td>
                             <?php endif; ?>
                             <td class="text-center">
                                 <?php if ($user['is_active'] == 1) : ?>
-                                    <a class=" btn btn-info btn-sm deactivate-user" href="<?= base_url('admin/deactivated/') . $user['id_user']; ?>"> <i class="fas fa-times"></i> Deactivate </a>
+                                    <a class=" btn btn-danger btn-sm deactivate-user" href="<?= base_url('admin/deactivated/') . $user['id_user']; ?>"> <i class="fas fa-times"></i> Non-aktifkan </a>
                                 <?php else : ?>
-                                    <a class="btn btn-success btn-sm activate-user" href="<?= base_url('admin/activated/') . $user['id_user']; ?>"> <i class="fas fa-check"></i> Activate </a>
+                                    <a class="btn btn-success btn-sm activate-user" href="<?= base_url('admin/activated/') . $user['id_user']; ?>"> <i class="fas fa-check"></i> Aktifkan </a>
                                 <?php endif; ?>
                             </td>
                         </tr>
