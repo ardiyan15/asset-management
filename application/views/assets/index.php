@@ -3,7 +3,8 @@
         <div class="col-sm">
             <div class="row">
                 <div class="col-sm">
-                    <h1 class="h3 text-gray-800"><?= $title; ?></h1>
+                    <h3 class="h3 text-gray"><?= $title; ?></h3>
+                    <p class="mt-2 font-weight-bold"><?= $room['name'] ?></p> 
                 </div>
                 <div class="col-sm">
                     <form action="<?= base_url('asset/location/').$room_id; ?>" method="post">
@@ -16,7 +17,7 @@
             </div>
             <!-- Untuk Menampilkan pop up sweetalert -->
             <div class="flash-data" data-flashdata="<?= $this->session->flashdata('message'); ?>"></div>
-            <div class="table-responsive mt-3">
+            <div class="table-responsive mt-4">
                 <table class="table table-border table-sm table-hover" id="table-asset">
                     <thead>
                         <tr>

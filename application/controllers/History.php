@@ -11,7 +11,6 @@ class History extends CI_Controller
         $this->load->model('Assets_model', 'Assets');
         $this->load->model('Transactions_model', 'Transactions');
         is_logged_in();
-        is_allowed();
     }
 
     public function index()

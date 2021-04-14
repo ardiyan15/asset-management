@@ -339,3 +339,8 @@ $('.actvt-button').on('click', function (e) {
         }
     })
 });
+
+// jQUery for autocomplete
+$(document).ready(function() {
+    $('.filter-room').select2();
+});

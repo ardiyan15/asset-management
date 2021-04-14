@@ -7,9 +7,10 @@
         <div class="col-lg-6">
             <?= form_open_multipart('user/editProfile'); ?>
                 <div class="form-group row">
+                    <input type="hidden" name="id_user" value="<?= $user['id_user'] ?>">
                     <label for="name" class="col-sm-2 col-form-label">Username</label>
                     <div class="col-sm-10">
-                        <input type="text" class="form-control" id="username" name="username" value="<?= $user['username']; ?>">
+                        <input type="text" class="form-control" id="username" name="username" value="<?= $user['username']; ?>" readonly>
                         <?= form_error('username', '<small class="text-danger pl-3">', '</small>'); ?>
                     </div>
                 </div>

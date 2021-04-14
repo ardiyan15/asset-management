@@ -11,23 +11,17 @@ class Admin extends CI_Controller
         $this->load->model('Rooms_model', 'Rooms');
         $this->load->model('Users_model', 'Users');
         is_logged_in();
-        is_allowed();
     }
 
     public function index()
     {
-        $data['title'] = 'Dashboard';
-        $session = $this->session->userdata('username');
-        
-        if ($session === null) {
-            redirect('auth');
-        }
-
+        $data['title']      = 'Dashboard';
         $data['user']       = $this->Auth->get_active_user($this->session->userdata('username'));
+        $building_id        = $data['user']['building_id'];
         $data['room_id']    = $this->input->post('room_id');
-        $data['assets']     = $this->Assets->filter_asset_by_room_id($data['room_id']);
+        $data['assets']     = $this->Assets->filter_asset_by_room_id($data['room_id'], $building_id);
         $data['room_name']  = $this->Rooms->get_room_name_by_id($data['room_id']);
-        $data['rooms']      = $this->Rooms->get_all_rooms();
+        $data['rooms']      = $this->Rooms->get_room_by_building_id($building_id);
 
         $this->load->view('templates/header', $data);
         $this->load->view('templates/sidebar', $data);

@@ -22,23 +22,6 @@ class Assets_model extends CI_Model
         }
     }
 
-    public function update_profile_model($name, $email, $newImage)
-    {
-        if ($newImage !== null) {
-            $this->db->set('image', $newImage);
-        }
-        $this->db->set('fullname', $name);
-        $this->db->where('email', $email);
-        $this->db->update('user');
-    }
-
-    public function change_password_model($password_hash, $email)
-    {
-        $this->db->set('password', $password_hash);
-        $this->db->where('email', $email);
-        $this->db->update('user');
-    }
-
     public function check_user_token($token)
     {
         return $this->db->get_where('user_token', ['token' => $token])->row_array();
@@ -139,9 +122,9 @@ class Assets_model extends CI_Model
             return $this->db->get()->result_array();
         } else {
             $keyword = $this->input->post('keyword', true);
-            $this->db->select('asset.asset_name, asset.merk, asset.serial_number, rooms.name');
+            $this->db->select('asset.asset_name, asset.merk, asset.serial_number, rooms.name, asset.placement_status, asset.created');
             $this->db->from('asset');
-            $this->db->join('rooms', 'rooms.id = asset.id_asset');
+            $this->db->join('rooms', 'rooms.id = asset.room_id');
             $this->db->join('floors', 'floors.id = rooms.floor_id');
             $this->db->join('buildings', 'buildings.id = floors.building_id');
             $this->db->group_start();
@@ -150,7 +133,7 @@ class Assets_model extends CI_Model
             $this->db->or_like('asset.merk', $keyword);
             $this->db->or_like('rooms.name', $keyword);
             $this->db->group_end();
-            // $this->db->where('buildings.id', $building_id);
+            $this->db->where('buildings.id', $building_id);
             return $this->db->get()->result_array();
         }
     }
@@ -202,17 +185,14 @@ class Assets_model extends CI_Model
         return $this->db->get('asset')->result_array();
     }
 
-    public function filter_asset_by_room_id($room_id)
+    public function filter_asset_by_room_id($room_id, $building_id)
     {
         if ($room_id == null) {
-            $query = "SELECT asset.asset_name, COUNT(*) AS total FROM asset GROUP BY asset_name";
+            $query = "SELECT asset.asset_name, COUNT(*) AS total FROM asset INNER JOIN rooms ON asset.room_id = rooms.id INNER JOIN floors ON rooms.floor_id = floors.id INNER JOIN buildings ON floors.building_id = buildings.id WHERE buildings.id = $building_id GROUP BY asset_name";
         } else {
             $query = "SELECT asset.asset_name, COUNT(*) AS total FROM asset WHERE room_id = '$room_id' GROUP BY asset_name";
         }
-
-        $sql = $this->db->query($query)->result_array();
-
-        return $sql;
+        return $this->db->query($query)->result_array();
     }
 
     public function activate_list_user($id)

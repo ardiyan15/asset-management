@@ -2,8 +2,10 @@
     <!-- Untuk Memunculkan pop up sweetalert -->
     <div class="flash-data" data-flashdata="<?= $this->session->flashdata('message'); ?>"></div>
     <div class="container">
-        <h3> <?= $title; ?> </h3>
-        <a href="" class="btn btn-success btn-sm" data-toggle="modal" data-target="#addStrLocation"> <i class="fas fa-plus mr-1"></i> Tambah Lantai Baru </a>
+        <h3> <?= $title; ?> : <b><?= $building_name['name'] ?></b></h3>
+        <?php if($role_id == '1'): ?>
+            <a href="" class="btn btn-success btn-sm" data-toggle="modal" data-target="#addStrLocation"> <i class="fas fa-plus mr-1"></i> Tambah Lantai Baru </a>
+        <?php endif; ?>
             <div class="row row-cols-4">
                 <?php foreach ($floors as $floor) : ?>
                     <div class="col-sm-4 mt-3"> 

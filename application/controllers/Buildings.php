@@ -10,14 +10,16 @@ class Buildings extends CI_Controller
         $this->load->model('Auth_model', 'Auth');
         $this->load->model('Buildings_model', 'Buildings');
         is_logged_in();
-        is_allowed();
     }
 
     public function index()
     {
         $data['user']       = $this->Auth->get_active_user($this->session->userdata('username'));
         $data['title']      = "Lokasi Bangunan";
-        $data['buildings']  = $this->Buildings->get_active_buildings();
+        $data['role_id']    = $data['user']['role_id'];
+        $building_id        = $data['user']['building_id'];
+        $role_id            = $data['user']['role_id'];
+        $data['buildings']  = $this->Buildings->get_active_buildings($role_id, $building_id);
 
         $this->load->view('templates/header', $data);
         $this->load->view('templates/sidebar', $data);

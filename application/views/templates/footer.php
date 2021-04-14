@@ -36,7 +36,6 @@
                 </script>
 
                 <!-- Bootstrap core JavaScript-->
-                <script src="<?= base_url('assets/'); ?>vendor/jquery/jquery.min.js"></script>
                 <script src="<?= base_url('assets/'); ?>vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
 
                 <!-- Core plugin JavaScript-->
@@ -50,11 +49,9 @@
                         $(this).next('.custom-file-label').addClass("selected").html(fileName);
                     });
                 </script>
-                <!-- <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js" integrity="sha256-pasqAKBDmFT4eHoN2ndd6lN370kFiGUFyTiUHWhU7k8=" crossorigin="anonymous"></script> -->
                 <script src="https://code.jquery.com/jquery-3.6.0.js" integrity="sha256-H+K7U5CnXl1h5ywQfKtSj8PCmoN9aaq30gDh27Xc0jk=" crossorigin="anonymous"></script>
                 <script src="http://cdn.datatables.net/1.10.23/js/jquery.dataTables.min.js"></script>
                 <script src="<?= base_url('assets/') ?>js/sweetalert2.all.min.js"></script>
-                <script src="<?= base_url('assets/') ?>js/myscript1.js"></script>
                 <script src="<?= base_url('assets/') ?>js/ajax.js"></script>
                 <script>
                     $(document).ready( function () {
@@ -76,7 +73,7 @@
                             }
                         });
                     });
-                    
                 </script>
+                <script src="<?= base_url('assets/') ?>js/myscript1.js"></script>
             </body>
         </html>

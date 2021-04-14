@@ -11,7 +11,6 @@ class TI extends CI_Controller
     $this->load->model('Take_In_model', 'Take_in');
     $this->load->model('Transactions_model', 'Transactions');
     is_logged_in();
-    is_allowed();
   }
 
   public function index()
@@ -30,7 +29,6 @@ class TI extends CI_Controller
 
   public function acc($id)
   {
-    $data['user']       = $this->Assets->login_model($this->session->userdata('email'));
     $transaction        = $this->Transactions->get_data_transaction_by_id($id);
     $update_transaction = $this->Transactions->update_status_transaction_by_id($transaction['id']);
     $update_asset       = $this->Assets->update_asset_location($transaction['asset_id'], $transaction['room_id']);
@@ -68,10 +66,9 @@ class TI extends CI_Controller
 
   public function bulk_acc()
   {
-      $asset_ids      = $this->input->post('asset_ids');
-      $rooms_ids      = $this->Transactions->get_transaction_room_id_by_asset_id($asset_ids);
-      $value_room_ids = array_column($rooms_ids, 'room_id');
-
+      $asset_ids          = $this->input->post('asset_ids');
+      $rooms_ids          = $this->Transactions->get_transaction_room_id_by_asset_id($asset_ids);
+      $value_room_ids     = array_column($rooms_ids, 'room_id');
       $asset_result       = $this->Assets->update_room_id_by_asset_id($value_room_ids, $asset_ids);
       $result_transaction = $this->Transactions->bulk_update($asset_ids, $value_room_ids);
       

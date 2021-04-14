@@ -11,15 +11,15 @@ class TO extends CI_Controller
         $this->load->model('Assets_model', 'Assets');
         $this->load->model('Transactions_model', 'Transactions');
         is_logged_in();
-        is_allowed();
     }
 
     public function index()
     {
         $data['title']  = "Transaksi Keluar";
         $data['user']   = $this->Auth->get_active_user($this->session->userdata('username'));
+        $role_id        = $data['user']['role_id'];
         $building_id    = $data['user']['building_id'];
-        $data['asset']  = $this->Transactions->transaction_out_process($building_id);
+        $data['asset']  = $this->Transactions->transaction_out_process($role_id, $building_id);
 
         $this->load->view('templates/header', $data);
         $this->load->view('templates/sidebar', $data);

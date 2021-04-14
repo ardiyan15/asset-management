@@ -7,11 +7,11 @@
     <form action="<?= base_url('admin/index'); ?>" method="POST">
         <div class="row">
             <div class="col-md-12">
-                    <label for="order"> Filter berdasarkan ruangan </label>
+                <label for="order"> Filter berdasarkan ruangan </label>
             </div>
             <div class="col-md-12">
                 <div class="form-group">
-                    <select id="order" name="room_id" class="pr-3 pl-3">
+                    <select id="order" name="room_id" class="pr-3 pl-3 filter-room">
                         <option value=""> -- Pilih Ruangan -- </option>
                         <?php foreach ($rooms as $room) : ?>
                             <option value="<?= $room['id']; ?>"> <?= $room['name'] ?> </option>

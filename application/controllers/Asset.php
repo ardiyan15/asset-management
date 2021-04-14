@@ -13,25 +13,18 @@ class Asset extends CI_Controller
     $this->load->model('Buildings_model', 'Buildings');
     $this->load->model('Categories_model', 'Categories');
     is_logged_in();
-    is_allowed();
   }
 
   public function index()
   {
     $data['user'] = $this->Auth->get_active_user($this->session->userdata('username'));
     $role_id = $this->session->userdata('role_id');
+
     if ($this->input->post('keyword')) {
       $data['assets'] = $this->Assets->search_data_model($data['user']['role_id'], $data['user']['building_id']);
     } else {
       $data['assets'] = $this->Assets->menu_model($role_id, $data['user']['building_id']);
     }
-
-    // if($this->input->post('keyword')) {
-    //     $data['total_asset'] = $this->Assets->search_data_model($data['user']['user_code'], $data['user']['building_id']);
-    //     $data['amount_data'] = count($data['total_asset']);
-    // } else {
-    //     $data['amount_data'] = $this->Assets->get_total_row('IT', $data['user']['user_code']);
-    // }
 
     $data['title']      = 'Daftar Aset';
     $result['error']    = "Data Not Found!";
@@ -166,6 +159,7 @@ class Asset extends CI_Controller
   public function location($room_id)
   {
     $data['room_id'] = $room_id;
+    $data['room']    = $this->Rooms->get_single_room_by_id($room_id);
     $role_id         = $this->session->userdata('role_id'); 
     $data['user']    = $this->Auth->get_active_user($this->session->userdata('username'));
     $data['assets']  = $this->Assets->get_asset_by_room_id($room_id);

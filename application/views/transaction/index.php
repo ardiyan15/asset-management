@@ -13,9 +13,9 @@
                     <?php endif; ?>
                 </div>
                 <div class="col-sm">
-                    <form action="<?= base_url('asset'); ?>" method="post">
+                    <form action="<?= base_url('transaction'); ?>" method="post">
                         <div class="input-group">
-                            <input type="text" name="keyword" class="form-control" placeholder="search your asset" aria-describedby="basic-addon2">
+                            <input type="text" name="keyword" class="form-control" placeholder="Filter Aset" />
                             <button type="submit" class="ml-2 btn btn-success btn-sm"> <i class="fas fa-search"></i> Filter </button>
                         </div>
                     </form>

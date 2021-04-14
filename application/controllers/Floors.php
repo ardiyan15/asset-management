@@ -6,18 +6,20 @@ class Floors extends CI_Controller
     {
         parent::__construct();
         $this->load->model('Auth_model', 'Auth');
+        $this->load->model('Buildings_model', 'Buildings');
         $this->load->model('Assets_model', 'Assets');
         $this->load->model('Floors_model', 'Floors');
         is_logged_in();
-        is_allowed();
     }
 
     public function index($building_id)
     {
         $data['user']           = $this->Auth->get_active_user($this->session->userdata('username'));
+        $data['role_id']        = $data['user']['role_id'];
         $data['title']          = "Lokasi Lantai";
         $data['floors']         = $this->Floors->get_all_floors_by_building_id($building_id);
         $data['building_id']    = $building_id;
+        $data['building_name']  = $this->Buildings->get_single_active_building_by_id($this->uri->segment(2));
 
         $this->load->view('templates/header', $data);
         $this->load->view('templates/sidebar', $data);

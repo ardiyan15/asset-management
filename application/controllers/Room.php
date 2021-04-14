@@ -6,18 +6,20 @@ class Room extends CI_Controller
     {
         parent::__construct();
         $this->load->model('Auth_model', 'Auth');
+        $this->load->model('Floors_model', 'Floors');
         $this->load->model('Rooms_model', 'Rooms');
         $this->load->model('Assets_model', 'Assets');
         is_logged_in();
-        is_allowed();
     }
 
     public function index($floor_id)
     {
         $data['user']       = $this->Auth->get_active_user($this->session->userdata('username'));
+        $data['role_id']    = $data['user']['role_id'];
         $data['title']      = "Lokasi Ruangan";
         $data['rooms']      = $this->Rooms->get_all_rooms_by_floor_id($floor_id);
         $data['floor_id']   = $this->uri->segment(2);
+        $data['floor']      = $this->Floors->get_single_floor_by_id($this->uri->segment(2));
 
         $this->load->view('templates/header', $data);
         $this->load->view('templates/sidebar', $data);

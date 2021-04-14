@@ -22,25 +22,25 @@
             <span> Dashboard </span>
         </a>
     </li>
-    <?php if($user['role_id'] == 1): ?>
-        <li class="nav-item">
-            <a class="nav-link" href="<?= base_url('asset') ?>">
-                <i class="fas fa-fw fa-drafting-compass"></i>
-                <span> Data Asset </span>
-            </a>
-        </li>
+    <li class="nav-item">
+        <a class="nav-link" href="<?= base_url('asset') ?>">
+            <i class="fas fa-fw fa-drafting-compass"></i>
+            <span> Data Asset </span>
+        </a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link" href="<?= base_url('buildings') ?>">
+            <i class="fas fa-fw fa-coins"></i>
+            <span> Data Ruangan </span>
+        </a>
+    </li>
+    <?php if($user['role_id'] == '1'): ?>
         <li class="nav-item">
             <a class="nav-link" href="<?= base_url('admin/list_user') ?>">
                 <i class="fas fa-fw fa-tachometer-alt"></i>
                 <span> Data Pengguna </span>
             </a>
-        </li>
-        <li class="nav-item">
-            <a class="nav-link" href="<?= base_url('buildings') ?>">
-                <i class="fas fa-fw fa-coins"></i>
-                <span> Data Ruangan </span>
-            </a>
-        </li>
+        </li>    
         <li class="nav-item">
             <a class="nav-link" href="<?= base_url('category') ?>">
                 <i class="fas fa-fw fa-coins"></i>

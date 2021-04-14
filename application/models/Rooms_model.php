@@ -8,6 +8,17 @@ class Rooms_model extends CI_Model {
         return $this->db->get_where('rooms', ['status' => 1])->result_array();
     }
 
+    public function get_room_by_building_id($building_id)
+    {
+        $this->db->select('rooms.name, rooms.id');
+        $this->db->from('rooms');
+        $this->db->join('floors', 'floors.id = rooms.floor_id');
+        $this->db->join('buildings', 'buildings.id = floors.building_id');
+        $this->db->where(['buildings.id' => $building_id, 'rooms.status' => 1]);
+        $this->db->order_by('rooms.id', 'DESC');
+        return $this->db->get()->result_array();
+    }
+
     public function get_all_rooms_by_floor_id($floor_id)
     {
         $this->db->order_by('id', 'DESC');

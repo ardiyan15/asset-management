@@ -14,6 +14,7 @@
                                 <th class="text-center">Name</th>
                                 <th class="text-center">Merk</th>
                                 <th class="text-center">Serial Number</th>
+                                <th class="text-center">Sumber</th>
                                 <th class="text-center">Tujuan</th>
                                 <th class="text-center">Tanggal Pengiriman</th>
                             </tr>
@@ -26,6 +27,7 @@
                                     <td class="text-center"> <?= $ast['asset_name']; ?> </td>
                                     <td class="text-center"> <?= $ast['merk']; ?> </td>
                                     <td class="text-center"> <?= $ast['serial_number']; ?> </td>
+                                    <td class="text-center"> <?= $ast['source_name']; ?> </td>
                                     <td class="text-center"> <?= $ast['name']; ?> </td>
                                     <td class="text-center"> <?= $ast['sent']; ?> </td>
                                 </tr>

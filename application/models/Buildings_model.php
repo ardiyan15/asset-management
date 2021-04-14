@@ -2,10 +2,15 @@
 
 class Buildings_model extends CI_Model {
 
-    public function get_active_buildings()
+    public function get_active_buildings($role_id, $building_id)
     {
-        $this->db->order_by('id', 'DESC');
-        return $this->db->get_where('buildings', ['status' => 1])->result_array();
+        if($role_id == '1'){
+            $this->db->order_by('id', 'DESC');
+            return $this->db->get_where('buildings', ['status' => 1])->result_array();
+        } else {
+            $this->db->order_by('id', 'DESC');
+            return $this->db->get_where('buildings', ['status' => 1, 'id' => $building_id])->result_array();
+        }
     }
 
     public function get_all_buildings()

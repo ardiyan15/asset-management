@@ -29,29 +29,31 @@ class Transactions_model extends CI_Model {
     {
         foreach(array_combine($asset_ids, $source_ids) as $asset_id => $source_id){
             $result[] = [
-                'asset_id' => $asset_id,
-                'room_id' => $room_id,
-                'source_id'  => $source_id,
-                'status'   => 0,
-                'sent'     => date('Y-m-d'),
-                'created_at' => date('Y-m-d'),
+                'asset_id'      => $asset_id,
+                'room_id'       => $room_id,
+                'source_id'     => $source_id,
+                'status'        => 0,
+                'sent'          => date('Y-m-d'),
+                'created_at'    => date('Y-m-d'),
             ];
         }
-
         $this->db->insert_batch('transactions', $result);
         return $this->db->affected_rows();
     }
 
-    public function transaction_out_process($building_id)
+    public function transaction_out_process($role_id, $building_id)
     {
-        $this->db->select('asset.asset_name, asset.merk, asset.serial_number, rooms.name, transactions.sent, floors.building_id');
+        $this->db->select('asset.asset_name, asset.merk, asset.serial_number, rooms.name, transactions.sent, source.name AS source_name');
         $this->db->from('transactions');
         $this->db->join('asset', 'asset.id_asset = transactions.asset_id');
         $this->db->join('rooms', 'rooms.id = transactions.room_id');
         $this->db->join('rooms AS source', 'source.id = transactions.source_id');
-        $this->db->join('floors', 'floors.id = source.floor_id');
-        $this->db->join('buildings', 'buildings.id = floors.building_id');
-        $this->db->where(['transactions.status' => 0, 'buildings.id' => $building_id]);
+        if($role_id !== '1'){
+            $this->db->join('floors', 'floors.id = source.floor_id');
+            $this->db->join('buildings', 'buildings.id = floors.building_id');
+            $this->db->where('buildings.id', $building_id);
+        }
+        $this->db->where(['transactions.status' => 0]);
         return $this->db->get()->result_array();
     }
 
@@ -97,6 +99,8 @@ class Transactions_model extends CI_Model {
     public function bulk_update($asset_ids)
     {
         $this->db->set('status', 1);
+        $this->db->set('updated_at', date('Y-m-d H:i:s'));
+        $this->db->set('received', date('Y-m-d'));
         $this->db->where_in('asset_id', $asset_ids);
         $this->db->update('transactions');
         return $this->db->affected_rows();

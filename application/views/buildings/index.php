@@ -3,7 +3,9 @@
     <div class="flash-data" data-flashdata="<?= $this->session->flashdata('message'); ?>"></div>
     <div class="container">
         <h3> <?= $title; ?> </h3>
-        <a href="" class="btn btn-success btn-sm" data-toggle="modal" data-target="#addStrLocation"> <i class="fas fa-plus mr-1"></i> Tambah Bangunan Baru </a>
+        <?php if($role_id == '1'): ?>
+            <a href="" class="btn btn-success btn-sm" data-toggle="modal" data-target="#addStrLocation"> <i class="fas fa-plus mr-1"></i> Tambah Bangunan Baru </a>
+        <?php endif; ?>
             <div class="row row-cols-4">
                 <?php foreach ($buildings as $building) : ?>
                     <div class="col-sm-4 mt-3">
@@ -12,11 +14,11 @@
                                 <div class="card-body">
                                     <h5 class="card-title"><?= $building['name']; ?></h5>
                                     <a href="<?= base_url('buildings/edit/').$building['id'] ?>" class="btn btn-default btn-sm"> <i class="fas fa-edit"></i> Ubah </a>
-                                    <?php if ($building['status'] == 1) : ?>
+                                    <!-- <?php if ($building['status'] == 1) : ?>
                                         <a href="<?= base_url('buildings/delete/') . $building['id']; ?>" class="btn btn-sm delete-building"> <i class=" fas fa-times"></i> Hapus </a>
                                     <?php else : ?>
                                         <a href="<?= base_url('admin/activateStr/') . $building['id']; ?>" class="btn actvt-button"> <i class="fas fa-check"></i>Activate</a>
-                                    <?php endif; ?>
+                                    <?php endif; ?> -->
                                 </div>
                             </div>
                         </a>

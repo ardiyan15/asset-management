@@ -10,6 +10,7 @@ class User extends CI_Controller
         $this->load->model('Assets_model', 'Assets');
         $this->load->model('Buildings_model', 'Buildings');
         $this->load->model('Users_model', 'Users');
+        is_logged_in();
     }
 
     public function index()
@@ -27,10 +28,9 @@ class User extends CI_Controller
     public function editProfile()
     {
         $data['title'] = 'Edit Profile';
-        $data['user'] = $this->Auth->get_active_user($this->session->userdata('username'));
-
+        $data['user']  = $this->Auth->get_active_user($this->session->userdata('username'));
         // Cek jika ada file gambar yang diupload
-        $this->form_validation->set_rules('fullname', 'Full Name', 'required|trim');
+        $this->form_validation->set_rules('username', 'username', 'required|trim');
         if ($this->form_validation->run() == false) {
             $this->load->view('templates/header', $data);
             $this->load->view('templates/sidebar', $data);
@@ -38,13 +38,14 @@ class User extends CI_Controller
             $this->load->view('user/editProfile', $data);
             $this->load->view('templates/footer');
         } else {
-            $name = $this->input->post('username');
-            $upload_image = $_FILES['image']['name'];
+            $id_user        = $this->input->post('id_user');
+            $username           = $this->input->post('username');
+            $upload_image   = $_FILES['image']['name'];
 
             if ($upload_image) {
-                $config['allowed_types'] = 'gif|jpg|png|jpeg';
-                $config['max_size']     = '2048';
-                $config['upload_path']  = './assets/img/profile/';
+                $config['allowed_types']    = 'gif|jpg|png|jpeg';
+                $config['max_size']         = '2048';
+                $config['upload_path']      = './assets/img/profile/';
 
                 $this->load->library('upload', $config);
 
@@ -60,7 +61,14 @@ class User extends CI_Controller
                     echo $this->upload->display_errors();
                 }
             }
-            $this->Assets->update_profile_model($name, $email, $newImage);
+
+            $data = [
+                'newImage'  => $newImage,
+                'username'  => $username,
+                'id_user'   => $id_user
+            ];
+
+            $this->Auth->update_profile_model($data);
 
             $this->session->set_flashdata(
                 'message',
@@ -110,7 +118,7 @@ class User extends CI_Controller
                 } else {
                     // Password sudah ok
                     $password_hash = password_hash($newPassword, PASSWORD_DEFAULT);
-                    $this->Assets->change_password_model($password_hash, $data['user']['email']);
+                    $this->Auth->change_password_model($password_hash, $data['user']['id_user']);
                     $this->session->set_flashdata(
                         'message',
                         '<div class="alert alert-success" role="alert">

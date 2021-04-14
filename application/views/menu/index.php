@@ -17,7 +17,7 @@
 
                     <form action="<?= base_url('asset'); ?>" method="post">
                         <div class="input-group">
-                            <input type="text" name="keyword" class="form-control" placeholder="Cari Aset">
+                            <input type="text" name="keyword" class="form-control" placeholder="Filter Aset">
                             <button type="submit" class="ml-2 btn btn-success btn-sm"> <i class="fas fa-search"></i> Filter </button>
                         </div>
                     </form>
@@ -27,7 +27,7 @@
             <!-- Untuk Menampilkan pop up sweetalert -->
             <div class="flash-data" data-flashdata="<?= $this->session->flashdata('message'); ?>"></div>
 
-            <div class="table-responsive">
+            <div class="table-responsive mt-4">
                 <table class="table table-border table-sm table-hover" id="table-asset">
                     <thead>
                         <tr>
@@ -59,8 +59,8 @@
                                     <td scope="row" class="text-center"><?= $asset['created']; ?></td>
                                     <?php if ($user['role_id'] == '1') : ?>
                                         <td scope="row" class="text-center">
-                                            <a href="<?= base_url('asset/update/').$asset['id_asset'] ?>" class="btn btn-info btn-sm"> <i class="fas fa-edit"></i> Edit </a>
-                                            <a href="<?= base_url("asset/delete/") . $asset['id_asset']; ?>" class="btn btn-danger btn-sm delete-button"> <i class="fas fa-trash-alt"></i> Delete </a>
+                                            <a href="<?= base_url('asset/update/').$asset['id_asset'] ?>" class="btn btn-info btn-sm"> <i class="fas fa-edit"></i> Ubah </a>
+                                            <a href="<?= base_url("asset/delete/") . $asset['id_asset']; ?>" class="btn btn-danger btn-sm delete-button"> <i class="fas fa-trash-alt"></i> Hapus </a>
                                         </td>
                                     <?php endif; ?>
                                 </tr>
