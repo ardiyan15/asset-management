@@ -82,7 +82,7 @@
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="exampleModalLabel">Tambah Aset</h5>
+                <h5 class="modal-title" id="exampleModalLabel">Pindahkan Aset</h5>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
@@ -93,7 +93,7 @@
                     <input type="hidden" name="asset_id" value="<?= $asset['id_asset'] ?>">
                     <input type="hidden" name="source" value="<?= $asset['room_id'] ?>">
                         <label for="room">Lokasi</label>
-                        <select class="form-control" name="room">
+                        <select class="form-control filter-room" name="room">
                             <option value=""> -- Pilih Lokasi -- </option>
                             <?php foreach ($rooms as $room) : ?>
                                 <option value="<?= $room['id']; ?>"> <?= $room['name'] ?></option>
@@ -102,8 +102,8 @@
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="submit" class="btn btn-success">Add</button>
-                    <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-success btn-sm">Pindahkan</button>
+                    <button type="button" class="btn btn-danger btn-sm" data-dismiss="modal">Tutup</button>
                 </div>
             </form>
         </div>
