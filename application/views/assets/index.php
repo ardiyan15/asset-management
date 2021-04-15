@@ -110,31 +110,3 @@
     </div>
 </div>
 <?php endforeach; ?>
-
-<div class="modal fade" id="bulk_takeout" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel">
-    <div class="modal-dialog" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="exampleModalLabel">Tambah Aset</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-                <div class="modal-body">
-                    <div class="form-group">
-                        <label for="room">Lokasi</label>
-                        <select class="form-control" name="room" id="room_bulk_transaction">
-                            <option value=""> -- Pilih Lokasi -- </option>
-                            <?php foreach ($rooms as $room) : ?>
-                                <option value="<?= $room['id']; ?>"> <?= $room['name'] ?></option>
-                            <?php endforeach; ?>
-                        </select>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="submit" id="submit_bulk_takeout" class="btn btn-success">Add</button>
-                    <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
-                </div>
-        </div>
-    </div>
-</div>
