@@ -15,7 +15,7 @@ class Transaction extends CI_Controller
   {
     $data['user']       = $this->Auth->get_active_user($this->session->userdata('username'));
     $building_id        = $data['user']['building_id'];
-    $data['title']      = 'List Assets';
+    $data['title']      = 'Transaksi Aset';
     $result['error']    = "Data Not Found!";
     $data['rooms']      = $this->Rooms->get_all_rooms();
 

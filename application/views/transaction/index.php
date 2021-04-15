@@ -6,11 +6,6 @@
             <div class="row">
                 <div class="col-sm">
                     <h1 class="h3 text-gray-800"><?= $title; ?></h1>
-                    <?php if ($user['role_id'] == '1') : ?>
-                        <button type="button" class="btn btn-success btn-sm mb-3" data-toggle="modal" data-target="#addAsset">
-                            <i class="fas fa-plus mr-1"></i> Tambah Asset Baru
-                        </button>
-                    <?php endif; ?>
                 </div>
                 <div class="col-sm">
                     <form action="<?= base_url('transaction'); ?>" method="post">
@@ -106,7 +101,7 @@
                     <input type="hidden" name="asset_id" value="<?= $asset['id_asset'] ?>">
                     <input type="hidden" name="source" value="<?= $asset['room_id'] ?>">
                         <label for="room">Lokasi</label>
-                        <select class="form-control" name="room">
+                        <select class="form-control filter-room" name="room">
                             <option value=""> -- Pilih Lokasi -- </option>
                             <?php foreach ($rooms as $room) : ?>
                                 <option value="<?= $room['id']; ?>"> <?= $room['name'] ?></option>
@@ -115,8 +110,8 @@
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="submit" class="btn btn-success">Pindahkan</button>
-                    <button type="button" class="btn btn-danger" data-dismiss="modal">Tutup</button>
+                    <button type="submit" class="btn btn-success btn-sm">Pindahkan</button>
+                    <button type="button" class="btn btn-danger btn-sm" data-dismiss="modal">Tutup</button>
                 </div>
             </form>
         </div>
@@ -125,11 +120,11 @@
 <?php endforeach; ?>
 
 
-<div class="modal fade" id="bulk_takeout" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel">
+<div class="modal fade" id="bulk_takeout" role="dialog" aria-labelledby="exampleModalLabel">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="exampleModalLabel">Books&Beyond Asset</h5>
+                <h5 class="modal-title" id="exampleModalLabel">Pindahkan Aset</h5>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
@@ -137,7 +132,7 @@
                 <div class="modal-body">
                     <div class="form-group">
                         <label for="room">Lokasi</label>
-                        <select class="form-control" name="room" id="room_bulk_transaction">
+                        <select class="form-control filter-room" name="room" id="room_bulk_transaction">
                             <option value=""> -- Pilih Lokasi -- </option>
                             <?php foreach ($rooms as $room) : ?>
                                 <option value="<?= $room['id']; ?>"> <?= $room['name'] ?></option>

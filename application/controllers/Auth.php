@@ -54,7 +54,7 @@ class Auth extends CI_Controller
                     $this->session->set_flashdata(
                         'message',
                         '<div class="alert alert-danger alert-dismissible fade show" role="alert">
-                            <strong> Wrong email or password </strong>
+                            <strong> username atau password salah </strong>
                             <button type="button" class="close" data-dismiss="alert" aria-label="Close">
                                 <span aria-hidden="true">&times;</span>
                             </button>
@@ -66,7 +66,7 @@ class Auth extends CI_Controller
                 $this->session->set_flashdata(
                     'message',
                     '<div class="alert alert-danger" role="alert">
-                        The email has not been activated.
+                        User belum aktif.
                     </div>'
                 );
                 redirect('auth');
@@ -75,7 +75,7 @@ class Auth extends CI_Controller
             $this->session->set_flashdata(
                 'message',
                 '<div class="alert alert-danger" role="alert">
-                    Wrong email or password!.
+                    username atau password salah.
                 </div>'
             );
             redirect('auth');
@@ -232,7 +232,7 @@ class Auth extends CI_Controller
         $this->session->set_flashdata(
             'message',
             '<div class="alert alert-success" role="alert">
-                You have been logged out
+                Logout Berhasil
             </div>'
         );
         redirect('auth');

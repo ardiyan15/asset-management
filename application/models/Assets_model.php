@@ -185,10 +185,13 @@ class Assets_model extends CI_Model
         return $this->db->get('asset')->result_array();
     }
 
-    public function filter_asset_by_room_id($room_id, $building_id)
+    public function filter_asset_by_room_id($role_id, $room_id, $building_id)
     {
         if ($room_id == null) {
             $query = "SELECT asset.asset_name, COUNT(*) AS total FROM asset INNER JOIN rooms ON asset.room_id = rooms.id INNER JOIN floors ON rooms.floor_id = floors.id INNER JOIN buildings ON floors.building_id = buildings.id WHERE buildings.id = $building_id GROUP BY asset_name";
+            if($role_id == '1'){
+                $query = "SELECT asset.asset_name, COUNT(*) AS total FROM asset INNER JOIN rooms ON asset.room_id = rooms.id INNER JOIN floors ON rooms.floor_id = floors.id INNER JOIN buildings ON floors.building_id = buildings.id GROUP BY asset_name";
+            }
         } else {
             $query = "SELECT asset.asset_name, COUNT(*) AS total FROM asset WHERE room_id = '$room_id' GROUP BY asset_name";
         }

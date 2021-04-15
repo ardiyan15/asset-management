@@ -39,7 +39,7 @@ class User extends CI_Controller
             $this->load->view('templates/footer');
         } else {
             $id_user        = $this->input->post('id_user');
-            $username           = $this->input->post('username');
+            $username       = $this->input->post('username');
             $upload_image   = $_FILES['image']['name'];
 
             if ($upload_image) {
@@ -73,7 +73,7 @@ class User extends CI_Controller
             $this->session->set_flashdata(
                 'message',
                 '<div class="alert alert-success" role="alert">
-                   Your profile has been updated
+                   Profil berhasil diubah
                 </div>'
             );
             redirect('user');
@@ -82,8 +82,8 @@ class User extends CI_Controller
 
     public function changePassword()
     {
-        $data['title'] = 'Ganti Password';
-        $data['user'] = $this->Auth->get_active_user($this->session->userdata('username'));
+        $data['title']  = 'Ganti Password';
+        $data['user']   = $this->Auth->get_active_user($this->session->userdata('username'));
 
         $this->form_validation->set_rules('current_password', 'Current password', 'required|trim');
         $this->form_validation->set_rules('new_password1', 'New password', 'required|trim|min_length[3]|matches[new_password2]');
@@ -102,7 +102,7 @@ class User extends CI_Controller
                 $this->session->set_flashdata(
                     'message',
                     '<div class="alert alert-danger" role="alert">
-                       Wrong current password
+                       Password saat ini salah
                     </div>'
                 );
                 redirect('user/changepassword');
@@ -111,7 +111,7 @@ class User extends CI_Controller
                     $this->session->set_flashdata(
                         'message',
                         '<div class="alert alert-danger" role="alert">
-                          New password cannot be the same as current password
+                          Password baru tidak boleh sama dengan password lama
                         </div>'
                     );
                     redirect('user/changepassword');
@@ -122,7 +122,7 @@ class User extends CI_Controller
                     $this->session->set_flashdata(
                         'message',
                         '<div class="alert alert-success" role="alert">
-                          Password Changed
+                          Password berhasil diubah
                         </div>'
                     );
                     redirect('user/changepassword');
@@ -146,13 +146,30 @@ class User extends CI_Controller
 
     public function store()
     {
+        $upload_image   = $_FILES['image']['name'];
+
+        if ($upload_image) {
+            $config['allowed_types']    = 'gif|jpg|png|jpeg';
+            $config['max_size']         = '2048';
+            $config['upload_path']      = './assets/img/profile/';
+
+            $this->load->library('upload', $config);
+
+            if ($this->upload->do_upload('image')) {
+                $image = $this->upload->data('file_name');
+            } else {
+                echo $this->upload->display_errors();
+            }
+        }
+
         $data = [
             'username'      => $this->input->post('username'),
             'password'      => $this->input->post('password'),
             'password'      => password_hash($this->input->post('password'), PASSWORD_DEFAULT),
             'role_id'       => $this->input->post('role'),
             'is_active'     => 1,
-            'building_id'   => $this->input->post('building')
+            'building_id'   => $this->input->post('building'),
+            'image'         => $image
         ];
 
         $result = $this->Users->create($data);

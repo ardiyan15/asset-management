@@ -18,10 +18,11 @@ class Admin extends CI_Controller
         $data['title']      = 'Dashboard';
         $data['user']       = $this->Auth->get_active_user($this->session->userdata('username'));
         $building_id        = $data['user']['building_id'];
-        $data['room_id']    = $this->input->post('room_id');
-        $data['assets']     = $this->Assets->filter_asset_by_room_id($data['room_id'], $building_id);
-        $data['room_name']  = $this->Rooms->get_room_name_by_id($data['room_id']);
-        $data['rooms']      = $this->Rooms->get_room_by_building_id($building_id);
+        $role_id            = $data['user']['role_id'];
+        $room_id            = $this->input->post('room_id');
+        $data['assets']     = $this->Assets->filter_asset_by_room_id($role_id, $room_id, $building_id);
+        $data['room_name']  = $this->Rooms->get_room_name_by_id($room_id);
+        $data['rooms']      = $this->Rooms->get_room_by_building_id($role_id, $building_id);
 
         $this->load->view('templates/header', $data);
         $this->load->view('templates/sidebar', $data);

@@ -18,7 +18,8 @@ class TI extends CI_Controller
     $data['title']  = "Transaksi Masuk";
     $data['user']   = $this->Auth->get_active_user($this->session->userdata('username'));
     $building_id    = $data['user']['building_id'];
-    $data['asset']  = $this->Take_in->get_asset_take_in_by_building_id($building_id);
+    $role_id        = $data['user']['role_id'];
+    $data['asset']  = $this->Take_in->get_asset_take_in_by_building_id($role_id, $building_id);
 
     $this->load->view('templates/header', $data);
     $this->load->view('templates/sidebar', $data);
@@ -75,7 +76,7 @@ class TI extends CI_Controller
       if($asset_result && $result_transaction > 0){
         echo json_encode(1);
       } else {
-        echo json_encode(0); 
+        echo json_encode(0);
       }
   }
 }

@@ -85,11 +85,11 @@
 <!-- End of Main Content -->
 
 <!-- Start Modal Add Menu -->
-<div class="modal fade" id="addAsset" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel">
+<div class="modal fade" id="addAsset" role="dialog" aria-labelledby="exampleModalLabel">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="exampleModalLabel">Books&Beyond Asset</h5>
+                <h5 class="modal-title" id="exampleModalLabel">Tambah Aset</h5>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
@@ -106,7 +106,7 @@
                     </div>
                     <div class="form-group">
                         <label for="category">Kategori</label>
-                        <select class="form-control" id="category" name="category">
+                        <select class="form-control filter-room" id="category" name="category">
                             <option value=""> -- Pilih Kategori -- </option>
                             <?php foreach ($categories as $categorie) : ?>
                                 <option value="<?= $categorie['code']; ?>"> <?= $categorie['name'] ?> </option>
@@ -116,7 +116,7 @@
                     </div>
                     <div class="form-group">
                         <label for="loc">Lokasi</label>
-                        <select class="form-control" id="loc" name="loc">
+                        <select class="form-control filter-room" id="loc" name="loc">
                             <option value=""> -- Pilih Lokasi -- </option>
                             <?php foreach ($rooms as $room) : ?>
                                 <option value="<?= $room['id']; ?>"> <?= $room['name'] ?></option>

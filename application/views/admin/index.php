@@ -1,9 +1,5 @@
-<!-- Begin Page Content -->
 <div class="container-fluid">
-    <!-- Page Heading -->
-
     <h2> <?= $title; ?></h2>
-
     <form action="<?= base_url('admin/index'); ?>" method="POST">
         <div class="row">
             <div class="col-md-12">
@@ -18,7 +14,7 @@
                         <?php endforeach; ?>
                     </select>
                     <br>
-                    <button class="mt-2 btn btn-success btn-sm"> Filter </button>
+                    <button class="btn btn-success btn-sm"> Filter </button>
                     <p class="ml-1 mt-3" style="font-size: 12px;"> Filter berdasarkan :
                         <?php if ($room_name == null) {
                             echo "<b> semua ruangan </b>";
