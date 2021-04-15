@@ -78,7 +78,7 @@
 <?php     
     foreach($assets as $asset):
 ?>
-<div class="modal fade" id="takeout<?= $asset['id_asset'] ?>" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel">
+<div class="modal fade" id="takeout<?= $asset['id_asset'] ?>" role="dialog" aria-labelledby="exampleModalLabel">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <div class="modal-header">
