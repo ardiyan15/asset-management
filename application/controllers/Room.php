@@ -68,6 +68,7 @@ class Room extends CI_Controller
         $data = [
             'id'            => $this->input->post('id'),
             'name'          => $this->input->post('name'),
+            'description'   => $this->input->post('description'),
             'updated_at'    => date("Y-m-d H:i:s")
         ];
 

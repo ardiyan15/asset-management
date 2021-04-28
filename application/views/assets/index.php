@@ -3,8 +3,9 @@
         <div class="col-sm">
             <div class="row">
                 <div class="col-sm">
-                    <h3 class="h3 text-gray"><?= $title; ?></h3>
-                    <p class="mt-2 font-weight-bold"><?= $room['name'] ?></p> 
+                     <h3 class="h3 text-gray"><?= $title; ?></h3>
+                     <p class="mt-2 font-weight-bold"><?= $room['name'] ?> ( <?= $room['description'] ?> )</p> 
+                     <a href="<?= base_url('room/').$room['floor_id'] ?>">Kembali</a>
                 </div>
                 <div class="col-sm">
                     <form action="<?= base_url('asset/location/').$room_id; ?>" method="post">

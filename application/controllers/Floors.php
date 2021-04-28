@@ -16,7 +16,7 @@ class Floors extends CI_Controller
     {
         $data['user']           = $this->Auth->get_active_user($this->session->userdata('username'));
         $data['role_id']        = $data['user']['role_id'];
-        $data['title']          = "Lokasi Lantai";
+        $data['title']          = "Lokasi Bangunan";
         $data['floors']         = $this->Floors->get_all_floors_by_building_id($building_id);
         $data['building_id']    = $building_id;
         $data['building_name']  = $this->Buildings->get_single_active_building_by_id($this->uri->segment(2));

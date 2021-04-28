@@ -5,8 +5,12 @@
                 <input type="hidden" name="id" value="<?= $room['id'] ?>">
                 <input type="hidden" name="floor_id" value="<?= $room['floor_id'] ?>">
                 <div class="form-group">
-                    <label>Nama Ruangan</label>
+                    <label>Kode Ruangan</label>
                     <input type="text" name="name" class="form-control" value="<?= $room['name'] ?>">
+                </div>
+                <div class="form-group">
+                    <label>Keterangan</label>
+                    <input type="text" name="description" class="form-control" value="<?= $room['description'] ?>">
                 </div>
                 <button type="submit" class="btn btn-success btn-sm">Simpan</button>
                 <a href="<?= base_url('room/'). $room['floor_id'] ?>" class="btn btn-danger btn-sm">Batal</a>

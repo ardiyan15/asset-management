@@ -5,6 +5,7 @@
 
     <div class="container">
         <h3> <?= $title; ?> : <b> <?= $floor['name'] ?> </b></h3>
+        <a href="<?= base_url('floors/').$floor['building_id'] ?>" class="btn btn-sm btn-secondary">Kembali</a>
         <?php if($role_id == '1'): ?>
             <a href="" class="btn btn-success btn-sm" data-toggle="modal" data-target="#addStrLocation">
                 <i class="fas fa-plus mr-1"></i> Tambah Ruangan Baru
@@ -13,19 +14,20 @@
         <div class="row row-cols-4">
             <?php foreach ($rooms as $room) : ?>
                 <div class="col-sm-4 mt-3">
-                    <a href="<?= base_url('asset/location/'). $room['id'] ?>">
-                        <div class="card">
-                            <div class="card-body">
+                    <div class="card">
+                        <div class="card-body">
+                            <a href="<?= base_url('asset/location/'). $room['id'] ?>">
                                 <h5 class="card-title"><?= $room['name']; ?></h5>
+                            </a>
+                                <p><?= $room['description'] ?></p>
                                 <a href="<?= base_url('room/edit/'). $room['id'] ?>" class="btn btn-default btn-sm"> <i class="fas fa-edit"></i> Edit </a>
                                 <!-- <?php if ($room['status'] == 1) : ?>
                                     <a href="<?= base_url('admin/deactivateStr/') . $room['id']; ?>" class="btn btn-sm deactStr-button"> <i class=" fas fa-times"></i> List Room's </a>
                                 <?php else : ?>
                                     <a href="<?= base_url('admin/activateStr/') . $room['id']; ?>" class="btn actvt-button"> <i class="fas fa-check"></i>Activate</a>
                                 <?php endif; ?> -->
-                            </div>
                         </div>
-                    </a>
+                    </div>
                 </div>
             <?php endforeach; ?>
         </div>

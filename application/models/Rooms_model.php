@@ -57,6 +57,7 @@ class Rooms_model extends CI_Model {
     public function update_room_by_id($data)
     {
         $this->db->set('name', $data['name']);
+        $this->db->set('description', $data['description']);
         $this->db->set('updated_at', $data['updated_at']);
         $this->db->where('id', $data['id']);
         $this->db->update('rooms');

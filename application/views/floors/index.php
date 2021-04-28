@@ -3,6 +3,7 @@
     <div class="flash-data" data-flashdata="<?= $this->session->flashdata('message'); ?>"></div>
     <div class="container">
         <h3> <?= $title; ?> : <b><?= $building_name['name'] ?></b></h3>
+        <a href="<?= base_url('buildings') ?>" class="btn btn-sm btn-secondary">Kembali</a>
         <?php if($role_id == '1'): ?>
             <a href="" class="btn btn-success btn-sm" data-toggle="modal" data-target="#addStrLocation"> <i class="fas fa-plus mr-1"></i> Tambah Lantai Baru </a>
         <?php endif; ?>
