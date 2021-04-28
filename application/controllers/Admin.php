@@ -23,7 +23,6 @@ class Admin extends CI_Controller
         $data['assets']     = $this->Assets->filter_asset_by_room_id($role_id, $room_id, $building_id);
         $data['room_name']  = $this->Rooms->get_room_name_by_id($room_id);
         $data['rooms']      = $this->Rooms->get_room_by_building_id($role_id, $building_id);
-
         $this->load->view('templates/header', $data);
         $this->load->view('templates/sidebar', $data);
         $this->load->view('templates/topbar', $data);

@@ -39,7 +39,7 @@
                             <?php endif; ?>
                             <td class="text-center">
                                 <?php if ($user['is_active'] == 1) : ?>
-                                    <a class=" btn btn-danger btn-sm deactivate-user" href="<?= base_url('admin/deactivated/') . $user['id_user']; ?>"> <i class="fas fa-times"></i> Non-aktifkan </a>
+                                    <a class="btn btn-danger btn-sm deactivate-user" href="<?= base_url('admin/deactivated/') . $user['id_user']; ?>"> <i class="fas fa-times"></i> Non-aktifkan </a>
                                 <?php else : ?>
                                     <a class="btn btn-success btn-sm activate-user" href="<?= base_url('admin/activated/') . $user['id_user']; ?>"> <i class="fas fa-check"></i> Aktifkan </a>
                                 <?php endif; ?>

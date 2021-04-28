@@ -26,7 +26,7 @@
             </div>
         </div>
     </form>
-    <div style="height: 70%; width: 70%;">
+    <div>
         <canvas id="myChart" class="chart"></canvas>
     </div>
 
@@ -40,7 +40,7 @@
                             }
                             ?>], //keterangan nama-nama label
                 datasets: [{
-                    label: 'Books & Beyond Asset IT', //Judul Grafik
+                    label: 'Inventaris Universitas Raharja', //Judul Grafik
                     data: [<?php foreach ($assets as $asset) {
                                 echo $asset['total'] . ',';
                             } ?>],
@@ -57,8 +57,12 @@
                         'rgba(50, 255, 64, 0.2)', //Warna Background Data Grafik
                         'rgba(50, 255, 100, 0.2)', //Warna Background Data Grafik
                         'rgba(129, 255, 100, 0.2)', //Warna Background Data Grafik
-                        'rgba(139, 200, 100, 0.2)', //Warna Background Data Grafik
+                        'rgba(139, 100, 100, 0.2)', //Warna Background Data Grafik
                         'rgba(139, 200, 50, 0.2)', //Warna Background Data Grafik
+                        'rgba(139, 100, 50, 0.2)', //Warna Background Data Grafik
+                        'rgba(139, 50, 50, 0.2)', //Warna Background Data Grafik
+                        'rgba(29, 50, 50, 0.2)', //Warna Background Data Grafik
+                        'rgba(255, 50, 50, 0.2)', //Warna Background Data Grafik
                     ],
                     borderColor: [
                         'rgba(255,99,132,1)', //Warna Garis Data Grafik

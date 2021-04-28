@@ -58,20 +58,19 @@ class Asset extends CI_Controller
     $location     = $this->Assets->get_name_location($roomId)['name'];
     $category     = $this->input->post('category');
     $codeLocation = $this->Assets->get_code_location($location)[0];
-    $prefix       = substr($codeLocation['name'], 7, 1);
     $last_sn      = $this->Assets->get_last_asset_serial_number();
-
     if($last_sn == null) {
       $prefix_number    = str_pad(1, "5", 0, STR_PAD_LEFT);
       $serial_number    = $location.$category.date("y").date("m").$prefix_number;
     } else {
-      $last_number          = substr($last_sn['serial_number'], 11);
+      $last_number          = substr($last_sn['serial_number'], 12);
       $convert_to_integer   = (int)$last_number;
-      $generate_number      = sprintf("%'.05d", $convert_to_integer+1);
+      $generate_number      = sprintf("%'.04d", $convert_to_integer+1);
       $serial_number        = $location.$category.date("y").date("m").$generate_number;
     }
     
     $final_serial_number = str_replace('-', "", $serial_number);
+    // var_dump($final_serial_number); die;
 
     $data = [
       'asset_name'        => $this->input->post('name'),
