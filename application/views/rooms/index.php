@@ -17,15 +17,16 @@
                     <div class="card">
                         <div class="card-body">
                             <a href="<?= base_url('asset/location/'). $room['id'] ?>">
-                                <h5 class="card-title"><?= $room['name']; ?></h5>
+                                <h5 class="card-title d-inline mr-2"><?= $room['name']; ?></h5>
                             </a>
-                                <p><?= $room['description'] ?></p>
-                                <a href="<?= base_url('room/edit/'). $room['id'] ?>" class="btn btn-default btn-sm"> <i class="fas fa-edit"></i> Edit </a>
-                                <!-- <?php if ($room['status'] == 1) : ?>
-                                    <a href="<?= base_url('admin/deactivateStr/') . $room['id']; ?>" class="btn btn-sm deactStr-button"> <i class=" fas fa-times"></i> List Room's </a>
-                                <?php else : ?>
-                                    <a href="<?= base_url('admin/activateStr/') . $room['id']; ?>" class="btn actvt-button"> <i class="fas fa-check"></i>Activate</a>
-                                <?php endif; ?> -->
+                            <label style="font-size: 12px;">( Jumlah Aset: </label> <label class="font-weight-bold" style="font-size: 12px;"><?= $room['total'] ?></label> )
+                            <p><?= $room['description'] ?></p>
+                            <a href="<?= base_url('room/edit/'). $room['id'] ?>" class="btn btn-default btn-sm"> <i class="fas fa-edit"></i> Edit </a>
+                            <!-- <?php if ($room['status'] == 1) : ?>
+                                <a href="<?= base_url('admin/deactivateStr/') . $room['id']; ?>" class="btn btn-sm deactStr-button"> <i class=" fas fa-times"></i> List Room's </a>
+                            <?php else : ?>
+                                <a href="<?= base_url('admin/activateStr/') . $room['id']; ?>" class="btn actvt-button"> <i class="fas fa-check"></i>Activate</a>
+                            <?php endif; ?> -->
                         </div>
                     </div>
                 </div>
