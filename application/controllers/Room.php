@@ -32,6 +32,7 @@ class Room extends CI_Controller
     {
         $data = [
             'name'          => $this->input->post('name'),
+            'description'   => $this->input->post('description'),
             'status'        => 1,
             'created_at'    => date("Y-m-d H:i:s"),
             'floor_id'      => $this->input->post('floor_id')

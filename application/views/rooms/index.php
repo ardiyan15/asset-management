@@ -49,8 +49,12 @@
             <input type="hidden" name="floor_id" value="<?= $floor_id ?>">
                 <div class="modal-body">
                     <div class="form-group">
-                        <label for="nama"> Nama </label>
-                        <input type="text" class="form-control" id="name" name="name" placeholder="Nama Ruangan" required>
+                        <label for="nama"> Kode Ruangan </label>
+                        <input type="text" class="form-control" id="name" name="name" placeholder="Kode Ruangan" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="description"> Keterangan </label>
+                        <input type="text" class="form-control" id="name" name="description" placeholder="Keterangan" required>
                     </div>
                 <div class="modal-footer">
                     <button type="submit" class="btn btn-sm btn-success rounded"><i class="fas fa-plus mr-1"></i>Tambah</button>
