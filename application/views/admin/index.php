@@ -26,7 +26,7 @@
             </div>
         </div>
     </form>
-    <div>
+    <div style="width: 65%">
         <canvas id="myChart" class="chart"></canvas>
     </div>
 
