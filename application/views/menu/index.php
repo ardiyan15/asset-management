@@ -124,6 +124,10 @@
                         </select>
                         <?= form_error('loc', '<small class="text-danger pl-3">', '</small>'); ?>
                     </div>
+                    <div class="form-group">
+                        <label for="name">Jumlah</label>
+                        <input type="text" class="form-control" id="qty" name="qty" placeholder="Masukkan Jumlah" value="1">
+                    </div>
                 </div>
                 <div class="modal-footer">
                     <button type="submit" class="btn btn-success">Simpan</button>

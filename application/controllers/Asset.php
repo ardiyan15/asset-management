@@ -57,28 +57,60 @@ class Asset extends CI_Controller
     $roomId       = $this->input->post('loc');
     $location     = $this->Assets->get_name_location($roomId)['name'];
     $category     = $this->input->post('category');
-    $codeLocation = $this->Assets->get_code_location($location)[0];
+    $qty          = $this->input->post('qty');
     $last_sn      = $this->Assets->get_last_asset_serial_number();
+
     if($last_sn == null) {
       $prefix_number    = str_pad(1, "5", 0, STR_PAD_LEFT);
-      $serial_number    = $location.$category.date("y").date("m").$prefix_number;
+      $serial_number = $location.$category.date("y").date("m").$prefix_number;
+      if($qty > 1){
+        $number = 1;
+         for($i = 0; $i < $qty; $i++){
+           $prefix_number = str_pad($number, "5", 0, STR_PAD_LEFT);
+           $result[] = [
+             "asset_name"         => $this->input->post('name'),
+             'merk'               => $this->input->post('merk'),
+             'serial_number'      => str_replace("-", "", $location.$category.date('y').date("m").$prefix_number),
+             'room_id'            => $this->input->post('loc'),
+             'status'             => 0,
+             'placement_status'   => 1,
+             'created'            => date('Y-m-d')
+            ];
+            $number++;
+         }
+      }
     } else {
-      $string_length          = strlen($last_sn['serial_number']);
+      $string_length = strlen($last_sn['serial_number']);
       // if room's name is equal 5 character, e.g L-201
       if($string_length === 15){
-        $last_number          = substr($last_sn['serial_number'], 11);
+        $last_number = substr($last_sn['serial_number'], 11);
       // if room's name is equal 6 character, e.g Lobby
       } else if($string_length === 16){
-        $last_number          = substr($last_sn['serial_number'], 12);
+        $last_number = substr($last_sn['serial_number'], 12);
       // if room's name is less than 5 and 6 character, e.g H-U
       } else {
-        $last_number          = substr($last_sn['serial_number'], 9);
+        $last_number = substr($last_sn['serial_number'], 9);
       }
-      $convert_to_integer   = (int)$last_number;
-      $generate_number      = sprintf("%'.04d", $convert_to_integer+1);
-      $serial_number        = $location.$category.date("y").date("m").$generate_number;
+      $convert_to_integer = (int)$last_number;
+      $generate_number = sprintf("%'.04d", $convert_to_integer+1);
+      $serial_number = $location.$category.date("y").date("m").$generate_number;
+      if($qty > 1){
+        for($i = 0; $i < $qty; $i++){
+          $prefix_number = str_pad($generate_number, "5", 0, STR_PAD_LEFT);
+          $result[] = [
+            "asset_name"         => $this->input->post('name'),
+            'merk'               => $this->input->post('merk'),
+            'serial_number'      => str_replace("-", "", $location.$category.date('y').date("m").$prefix_number),
+            'room_id'            => $this->input->post('loc'),
+            'status'             => 0,
+            'placement_status'   => 1,
+            'created'            => date('Y-m-d')
+           ];
+           $generate_number++;
+        }
+      }
     }
-    
+
     $final_serial_number = str_replace('-', "", $serial_number);
 
     $data = [
@@ -91,6 +123,10 @@ class Asset extends CI_Controller
       'placement_status'  => 1,
       'created'           => date('Y-m-d')
     ];
+
+    if($qty > 1){
+      $data = $result;
+    }
 
     if ($this->form_validation->run() == false) {
       $this->session->set_flashdata('message','failed');
