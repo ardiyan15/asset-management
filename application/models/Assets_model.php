@@ -75,7 +75,8 @@ class Assets_model extends CI_Model
 
     public function add_asset_model($data)
     {
-        if(gettype($data) === "array"){
+        // true if array is multidimensional
+        if(count($data) !== count($data, COUNT_RECURSIVE)){
             $this->db->insert_batch('asset', $data);
         } else {
             $this->db->insert('asset', $data);
