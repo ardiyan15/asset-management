@@ -75,14 +75,13 @@ class Assets_model extends CI_Model
 
     public function add_asset_model($data)
     {
-        $check = $this->db->get_where('asset', ['serial_number' => $data['serial_number']])->row_array();
-
-        if ($check) {
-            return 0;
+        // true if array is multidimensional
+        if(count($data) !== count($data, COUNT_RECURSIVE)){
+            $this->db->insert_batch('asset', $data);
         } else {
             $this->db->insert('asset', $data);
-            return $this->db->affected_rows();
         }
+        return $this->db->affected_rows();
     }
 
     public function delete_ast_model($id)
