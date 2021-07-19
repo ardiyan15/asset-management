@@ -1,0 +1,3 @@
+Update 17/07/2021
+
+- Tambahkan fitur untuk Quantity disaat ingin menambahkan Asset yang berjumlah lebih dari 1 secara sekaligus

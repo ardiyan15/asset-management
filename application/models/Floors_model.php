@@ -4,7 +4,7 @@ class Floors_model extends CI_Model {
 
     public function get_all_floors_by_building_id($building_id)
     {
-        $this->db->order_by('id', 'DESC');
+        $this->db->order_by('name', 'ASC');
         return $this->db->get_where('floors', ['building_id' => $building_id ])->result_array();
     }
 

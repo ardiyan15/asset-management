@@ -9,7 +9,7 @@
                     <input type="text" name="name" class="form-control" value="<?= $floor['name'] ?>">
                 </div>
                 <button type="submit" class="btn btn-success btn-sm">Simpan</button>
-                <a href="<?= base_url('floors/'). $floor['building_id'] ?>" class="btn btn-danger btn-sm">Batalt</a>
+                <a href="<?= base_url('floors/'). $floor['building_id'] ?>" class="btn btn-danger btn-sm">Batal</a>
             </form>
         </div>
     </div>

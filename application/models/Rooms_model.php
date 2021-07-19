@@ -26,7 +26,7 @@ class Rooms_model extends CI_Model {
         $this->db->select('rooms.name, rooms.id, rooms.status, rooms.description, COUNT(id_asset) AS total');
         $this->db->from('rooms');
         $this->db->join('asset', 'asset.room_id = rooms.id', 'left');
-        $this->db->order_by('rooms.id', 'DESC');
+        $this->db->order_by('rooms.name', 'ASC');
         $this->db->group_by('rooms.id');
         $this->db->where(['rooms.status' => 1, 'rooms.floor_id' => $floor_id]);
         return $this->db->get()->result_array();
