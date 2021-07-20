@@ -13,8 +13,7 @@
                             <option value="<?= $room['id']; ?>"> <?= $room['name'] ?> </option>
                         <?php endforeach; ?>
                     </select>
-                    <br>
-                    <button class="btn btn-success btn-sm"> Filter </button>
+                    <button class="btn btn-success btn-sm mt-2"> Filter </button>
                     <p class="ml-1 mt-3" style="font-size: 12px;"> Filter berdasarkan :
                         <?php if ($room_name == null) {
                             echo "<b> semua ruangan </b>";

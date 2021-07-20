@@ -186,13 +186,15 @@ class Assets_model extends CI_Model
 
     public function filter_asset_by_room_id($role_id, $room_id, $building_id)
     {
+        // when user running the filter by room name
         if ($room_id == null) {
             $query = "SELECT asset.asset_name, COUNT(*) AS total FROM asset INNER JOIN rooms ON asset.room_id = rooms.id INNER JOIN floors ON rooms.floor_id = floors.id INNER JOIN buildings ON floors.building_id = buildings.id WHERE buildings.id = $building_id GROUP BY asset_name";
+            // if user login as administrator
             if($role_id == '1'){
-                $query = "SELECT asset.asset_name, COUNT(*) AS total FROM asset INNER JOIN rooms ON asset.room_id = rooms.id INNER JOIN floors ON rooms.floor_id = floors.id INNER JOIN buildings ON floors.building_id = buildings.id GROUP BY asset_name";
+                $query = "SELECT asset.asset_name, COUNT(*) AS total FROM asset INNER JOIN rooms ON asset.room_id = rooms.id INNER JOIN floors ON rooms.floor_id = floors.id INNER JOIN buildings ON floors.building_id = buildings.id GROUP BY asset_name ORDER BY RAND() LIMIT 10";
             }
         } else {
-            $query = "SELECT asset.asset_name, COUNT(*) AS total FROM asset WHERE room_id = '$room_id' GROUP BY asset_name";
+            $query = "SELECT asset.asset_name, COUNT(*) AS total FROM asset WHERE room_id = '$room_id' GROUP BY asset_name ORDER BY RAND() LIMIT 10";
         }
         return $this->db->query($query)->result_array();
     }

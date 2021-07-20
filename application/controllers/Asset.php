@@ -93,7 +93,6 @@ class Asset extends CI_Controller
       }
       $convert_to_integer = (int)$last_number;
       $generate_number = sprintf("%'.05d", $convert_to_integer+1);
-      // var_dump($generate_number); die;
       $serial_number = $location.$category.date("y").date("m").$generate_number;
       if($qty > 1){
         for($i = 0; $i < $qty; $i++){
