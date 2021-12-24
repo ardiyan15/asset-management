@@ -18,14 +18,14 @@
                         <?php if ($room_name == null) {
                             echo "<b> semua ruangan </b>";
                         } else {
-                            echo "<b>" .$room_name['name']. "</b>";
+                            echo "<b>" . $room_name['name'] . "</b>";
                         } ?>
                     </p>
                 </div>
             </div>
         </div>
     </form>
-    <div style="width: 65%">
+    <div style="width: 65%; height: 320px;">
         <canvas id="myChart" class="chart"></canvas>
     </div>
 
@@ -77,11 +77,20 @@
             options: {
                 scales: {
                     yAxes: [{
+                        gridLines: {
+                            display: false
+                        },
                         ticks: {
+                            display: false,
                             beginAtZero: true,
                             stepSize: 2,
                             suggestedMax: 10,
-                            suggestedMin: 1
+                            suggestedMin: 1,
+                        },
+                    }],
+                    xAxes: [{
+                        gridLines: {
+                            display: false
                         }
                     }]
                 },

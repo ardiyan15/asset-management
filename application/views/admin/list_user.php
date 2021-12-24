@@ -1,6 +1,4 @@
 <div class="container-fluid">
-    <!-- Page Heading -->
-
     <div class="row">
         <div class="col-sm">
             <h2> Daftar Pengguna </h2>
@@ -21,7 +19,6 @@
                         <th class="text-center"> No </th>
                         <th class="text-center"> Username </th>
                         <th class="text-center"> Bangunan </th>
-                        <th class="text-center"> Status </th>
                         <th class="text-center"> Aksi </th>
                     </tr>
                 </thead>
@@ -32,17 +29,8 @@
                             <th class="text-center"> <?= $i ?></th>
                             <td class="text-center"> <?= $user['username']; ?></td>
                             <td class="text-center"> <?= $user['name']; ?></td>
-                            <?php if ($user['is_active'] == 1) : ?>
-                                <td class="text-center"> Aktif </td>
-                            <?php else : ?>
-                                <td class="text-center"> Tidak Aktif </td>
-                            <?php endif; ?>
                             <td class="text-center">
-                                <?php if ($user['is_active'] == 1) : ?>
-                                    <a class="btn btn-danger btn-sm deactivate-user" href="<?= base_url('admin/deactivated/') . $user['id_user']; ?>"> <i class="fas fa-times"></i> Non-aktifkan </a>
-                                <?php else : ?>
-                                    <a class="btn btn-success btn-sm activate-user" href="<?= base_url('admin/activated/') . $user['id_user']; ?>"> <i class="fas fa-check"></i> Aktifkan </a>
-                                <?php endif; ?>
+                                <a class="btn btn-danger btn-sm rounded activate-user" href="<?= base_url('admin/deleteUser/') . $user['id_user']; ?>"> <i class="fas fa-trash-alt"></i></a>
                             </td>
                         </tr>
                         <?php $i++; ?>
@@ -52,7 +40,6 @@
         </div>
     </div>
 </div>
-<!-- /.container-fluid -->
 </div>
 <!-- End of Main Content -->
 

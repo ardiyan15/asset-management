@@ -1,7 +1,8 @@
 <?php
 
-class Rooms_model extends CI_Model {
-    
+class Rooms_model extends CI_Model
+{
+
     public function get_all_rooms()
     {
         $this->db->order_by('id', 'DESC');
@@ -12,7 +13,7 @@ class Rooms_model extends CI_Model {
     {
         $this->db->select('rooms.name, rooms.id');
         $this->db->from('rooms');
-        if($role_id !== '1'){
+        if ($role_id !== '1') {
             $this->db->join('floors', 'floors.id = rooms.floor_id');
             $this->db->join('buildings', 'buildings.id = floors.building_id');
             $this->db->where(['buildings.id' => $building_id, 'rooms.status' => 1]);
@@ -67,5 +68,13 @@ class Rooms_model extends CI_Model {
         $this->db->where('id', $data['id']);
         $this->db->update('rooms');
         return $this->db->affected_rows();
+    }
+
+    public function get_room_id_by_name($name)
+    {
+        $this->db->select('rooms.id');
+        $this->db->from('rooms');
+        $this->db->where('name', $name);
+        return $this->db->get()->row_array();
     }
 }

@@ -41,6 +41,7 @@ class Admin extends CI_Controller
         $this->load->view('templates/topbar', $data);
         $this->load->view('admin/list_user', $data);
         $this->load->view('templates/footer');
+        unset($_SESSION['message']);
     }
 
     public function activated($id)
@@ -48,10 +49,10 @@ class Admin extends CI_Controller
         $active = $this->Assets->activate_list_user($id);
 
         if ($active > 0) {
-            $this->session->set_flashdata('message','activate');
+            $this->session->set_flashdata('message', 'activate');
             redirect('admin/list_user');
         } else {
-            $this->session->set_flashdata('message','not_activate');
+            $this->session->set_flashdata('message', 'not_activate');
             redirect('admin/list_user');
         }
     }
@@ -61,10 +62,23 @@ class Admin extends CI_Controller
         $deactivate = $this->Assets->deactivate_list_user($id);
 
         if ($deactivate > 0) {
-            $this->session->set_flashdata('message','deactivate');
+            $this->session->set_flashdata('message', 'deactivate');
             redirect('admin/list_user');
         } else {
-            $this->session->set_flashdata('message','not_deactivate');
+            $this->session->set_flashdata('message', 'not_deactivate');
+            redirect('admin/list_user');
+        }
+    }
+
+    public function deleteUser($id)
+    {
+        $deleted = $this->Assets->delete_user($id);
+
+        if ($deleted > 0) {
+            $this->session->set_flashdata('message', 'delete');
+            redirect('admin/list_user');
+        } else {
+            $this->session->set_flashdata('message', 'delete');
             redirect('admin/list_user');
         }
     }
@@ -80,10 +94,10 @@ class Admin extends CI_Controller
         $add_building = $this->Buildings->add_building($data);
 
         if ($add_building > 0) {
-            $this->session->set_flashdata('message','success');
+            $this->session->set_flashdata('message', 'success');
             redirect('buildings');
         } else {
-            $this->session->set_flashdata('message','failed ');
+            $this->session->set_flashdata('message', 'failed ');
             redirect('buildings');
         }
     }
@@ -101,10 +115,10 @@ class Admin extends CI_Controller
         $edit = $this->Assets->editStrLocationMdl($data, $id);
 
         if ($edit > 0) {
-            $this->session->set_flashdata('message','edtStr');
+            $this->session->set_flashdata('message', 'edtStr');
             redirect('admin/store_location');
         } else {
-            $this->session->set_flashdata('message','failed ');
+            $this->session->set_flashdata('message', 'failed ');
             redirect('admin/store_location');
         }
     }
@@ -114,10 +128,10 @@ class Admin extends CI_Controller
         $result = $this->Assets->activated_store($id);
 
         if ($result > 0) {
-            $this->session->set_flashdata('message','actvtStr');
+            $this->session->set_flashdata('message', 'actvtStr');
             redirect('admin/store_location');
         } else {
-            $this->session->set_flashdata('message','failed');
+            $this->session->set_flashdata('message', 'failed');
             redirect('admin/store_location');
         }
     }
@@ -134,7 +148,7 @@ class Admin extends CI_Controller
             redirect('auth');
         }
         $data['user'] = $this->Assets->login_model($this->session->userdata('email'));
-        
+
         $building_id = $this->uri->segment(3);
         $data['title'] = "Room Location";
         $data['buildings'] = $this->Rooms->get_all_rooms_by_building_id($building_id);

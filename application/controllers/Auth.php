@@ -14,7 +14,7 @@ class Auth extends CI_Controller
 
     public function index()
     {
-        if ($this->session->userdata('email')) {
+        if ($this->session->userdata('username')) {
             redirect('user');
         }
         $this->form_validation->set_rules('username', 'Username', 'required|trim');
@@ -24,6 +24,7 @@ class Auth extends CI_Controller
             $this->load->view('templates/auth_header', $data);
             $this->load->view('auth/v_login');
             $this->load->view('templates/auth_footer');
+            unset($_SESSION['message']);
         } else {
             // Validasinya berhasil
             // Method login merupakan method private yang hanya bisa diakses oleh method di dalam controller auth
@@ -48,7 +49,7 @@ class Auth extends CI_Controller
                         'username'  => $user['username'],
                         'role_id'   => $user['role_id'],
                     ];
-                    $this->session->set_userdata($data);                    
+                    $this->session->set_userdata($data);
                     redirect('admin');
                 } else {
                     $this->session->set_flashdata(
@@ -149,8 +150,8 @@ class Auth extends CI_Controller
         $config = array();
         $config['protocol']  = 'smtp';
         $config['smtp_host'] = 'ssl://smtp.googlemail.com';
-        $config['smtp_user'] = 'ardhiyan15@gmail.com';
-        $config['smtp_pass'] = 'veteran768015';
+        $config['smtp_user'] = '';
+        $config['smtp_pass'] = '';
         $config['smtp_port'] = 465;
         $config['mailtype']  = 'html';
         $config['charset']   = 'utf-8';
@@ -162,10 +163,9 @@ class Auth extends CI_Controller
         $this->email->from('ardhiyan15@gmail.com', 'Ardiyan Agus Prayogo');
 
         if ($type == 'verify') {
-            $this->email->to('ardhiyan02@gmail.com');
+            $this->email->to('');
         } else {
-            // $this->email->to($this->input->post('email'));
-            $this->email->to('ardhiyan15@gmail.com');
+            $this->email->to('');
         }
 
         if ($type == 'verify') {
@@ -226,7 +226,7 @@ class Auth extends CI_Controller
 
     public function logout()
     {
-        $this->session->unset_userdata('email');
+        $this->session->unset_userdata('username');
         $this->session->unset_userdata('role_id');
 
         $this->session->set_flashdata(
@@ -262,7 +262,6 @@ class Auth extends CI_Controller
                 $user_token = [
                     'email' => $email,
                     'token' => $token,
-                    // 'date_created' => time()
                 ];
 
                 $this->Assets->create_user_token($user_token);
@@ -343,7 +342,7 @@ class Auth extends CI_Controller
             $this->session->unset_userdata('reset_email');
 
             $this->session->set_flashdata(
-                'message',  
+                'message',
                 '<div class="alert alert-success" role="alert">
                     Password has been changed, please login.
                 </div>'
