@@ -5,21 +5,24 @@
                 <div class="col-sm">
                     <h3 class="h3 text-gray"><?= $title; ?></h3>
                     <p class="mt-2 font-weight-bold"><?= $room['name'] ?> ( <?= $room['description'] ?> )</p>
-                    <a href="<?= base_url('room/') . $room['floor_id'] ?>">Kembali</a>
+                    <div class="row" style="margin-left: 2px;">
+                        <a href="<?= base_url('room/') . $room['floor_id'] ?>" style="margin-right: 10px;">Kembali</a>
+                        <a target="_blank" href="<?= base_url('asset/print_report/') . $room_id ?>" class="btn btn-primary btn-sm rounded">Print Laporan PDF</a><br />
+                    </div>
                 </div>
                 <div class="col-sm">
-                    <form action="<?= base_url('asset/location/') . $room_id; ?>" method="post">
+                    <!-- <form action="<?= base_url('asset/location/') . $room_id; ?>" method="post">
                         <div class="input-group">
                             <input type="text" name="keyword" class="form-control" placeholder="Filter asset" aria-describedby="basic-addon2">
                             <button type="submit" class="ml-2 btn btn-success btn-sm"> <i class="fas fa-search"></i> Filter </button>
                         </div>
-                    </form>
+                    </form> -->
                 </div>
             </div>
             <!-- Untuk Menampilkan pop up sweetalert -->
             <div class="flash-data" data-flashdata="<?= $this->session->flashdata('message'); ?>"></div>
             <div class="table-responsive mt-4">
-                <table class="table table-border table-sm table-hover" id="table-asset">
+                <table class="table table-border table-sm table-hover" id="myTable">
                     <thead>
                         <tr>
                             <th>No</th>

@@ -345,4 +345,14 @@ class Asset extends CI_Controller
   {
     force_download('csv_file/base_import_format.xls', NULL);
   }
+
+  public function print_report($room_id)
+  {
+    $data['room']    = $this->Rooms->get_single_room_by_id($room_id);
+    $data['assets']  = $this->Assets->get_asset_by_room_id($room_id);
+    $this->load->library('pdf');
+    $this->pdf->setPaper('A4', 'portrait');
+    $this->pdf->filename = 'laporan-aset-ruangan.pdf';
+    $this->pdf->load_view('assets/report_asset', $data);
+  }
 }
