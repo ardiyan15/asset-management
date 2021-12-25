@@ -46,8 +46,8 @@
             <form method="post" action="<?= base_url('Transaction/store'); ?>">
                 <div class="modal-body">
                     <div class="form-group">
-                        <input type="text" name="asset_id" id="assetId" value="">
-                        <input type="text" name="source" id="source" value="">
+                        <input type="hidden" name="asset_id" id="assetId" value="">
+                        <input type="hidden" name="source" id="source" value="">
                         <label for="room">Lokasi</label>
                         <select class="form-control filter-room" name="room">
                             <option value=""> -- Pilih Lokasi -- </option>
