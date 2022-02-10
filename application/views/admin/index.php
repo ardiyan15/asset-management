@@ -2,8 +2,12 @@
     <h2> <?= $title; ?></h2>
     <form action="<?= base_url('admin/index'); ?>" method="POST">
         <div class="row">
-            <div class="col-md-12">
+            <div class="col-md-6">
                 <label for="order"> Filter berdasarkan ruangan </label>
+            </div>
+            <div class="text-right col-md-6" style="margin-top: -5%;">
+                <img class="mr-2" src="<?= base_url('assets/img/logo_raharja.png') ?>" width="50">
+                <img src="<?= base_url('assets/img/kampus_merdeka.png') ?>" width="50">
             </div>
             <div class="col-md-12">
                 <div class="form-group">
@@ -25,14 +29,14 @@
             </div>
         </div>
     </form>
-    <div style="width: 65%; height: 320px;">
+    <div style="width: 70%; height: 320px;">
         <canvas id="myChart" class="chart"></canvas>
     </div>
 
     <script>
         var ctx = document.getElementById("myChart");
         var myChart = new Chart(ctx, {
-            type: 'bar', //Tipe tampilan grafik, sobat bisa menggunakan tampilan bar, pie, line, radar dan sebagainya
+            type: 'horizontalBar', //Tipe tampilan grafik, sobat bisa menggunakan tampilan bar, pie, line, radar dan sebagainya
             data: {
                 labels: [<?php foreach ($assets as $asset) {
                                 echo '"' . $asset['asset_name'] . '"' . ",";
@@ -77,11 +81,12 @@
             options: {
                 scales: {
                     yAxes: [{
+                        stacked: true,
                         gridLines: {
                             display: false
                         },
                         ticks: {
-                            display: false,
+                            display: true,
                             beginAtZero: true,
                             stepSize: 2,
                             suggestedMax: 10,
@@ -97,6 +102,23 @@
                 layout: {
                     padding: {
                         bottom: 20
+                    }
+                },
+                animation: {
+                    duration: 0,
+                    onComplete: function() {
+                        // render the value of the chart above the bar
+                        var ctx = this.chart.ctx;
+                        ctx.font = Chart.helpers.fontString(Chart.defaults.global.defaultFontSize, 'normal', Chart.defaults.global.defaultFontFamily);
+                        ctx.fillStyle = this.chart.config.options.defaultFontColor;
+                        ctx.textAlign = 'center';
+                        ctx.textBaseline = 'bottom';
+                        this.data.datasets.forEach(function(dataset) {
+                            for (var i = 0; i < dataset.data.length; i++) {
+                                var model = dataset._meta[Object.keys(dataset._meta)[0]].data[i]._model;
+                                ctx.fillText(dataset.data[i], model.x + 15, model.y + 5);
+                            }
+                        });
                     }
                 }
             }

@@ -1,4 +1,8 @@
 <div class="container-fluid">
+    <div class="text-right col-md-6" style="margin-top: -5%;">
+        <img class="mr-2" src="<?= base_url('assets/img/logo_raharja.png') ?>" width="50">
+        <img src="<?= base_url('assets/img/kampus_merdeka.png') ?>" width="50">
+    </div>
     <div class="row">
         <div class="col-sm">
             <div class="row">
@@ -113,3 +117,38 @@ foreach ($assets as $asset) :
         </div>
     </div>
 <?php endforeach; ?>
+
+<div class="modal fade" id="bulk_takeout" role="dialog" aria-labelledby="exampleModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Pindahkan Aset</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label for="room">Lokasi</label>
+                    <select class="form-control filter-room" name="room" id="room_bulk_transaction">
+                        <option value=""> -- Pilih Lokasi -- </option>
+                        <?php foreach ($rooms as $room) : ?>
+                            <option value="<?= $room['id']; ?>"> <?= $room['name'] ?></option>
+                        <?php endforeach; ?>
+                    </select>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="submit" id="submit_bulk_takeout" class="btn btn-success btn-sm">Pindahkan</button>
+                <button type="button" class="btn btn-danger btn-sm" data-dismiss="modal">Batal</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function takeout(assetId, roomId) {
+        $("#assetId").val(assetId)
+        $("#source").val(roomId)
+    }
+</script>

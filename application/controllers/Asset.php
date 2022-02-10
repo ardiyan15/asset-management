@@ -225,7 +225,6 @@ class Asset extends CI_Controller
   {
     $data['room_id'] = $room_id;
     $data['room']    = $this->Rooms->get_single_room_by_id($room_id);
-    $role_id         = $this->session->userdata('role_id');
     $data['user']    = $this->Auth->get_active_user($this->session->userdata('username'));
     $data['assets']  = $this->Assets->get_asset_by_room_id($room_id);
 

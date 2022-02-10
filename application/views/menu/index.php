@@ -1,14 +1,19 @@
 <div class="container-fluid">
+
     <div class="row">
         <div class="col-sm">
             <div class="row">
-                <div class="col-sm">
+                <div class="col-md-6">
                     <h1 class="h3 text-gray-800"><?= $title; ?></h1>
                     <button type="button" class="btn btn-success btn-sm mb-3" data-toggle="modal" data-target="#addAsset">
                         <i class="fas fa-plus mr-1"></i> Tambah Asset Baru
                     </button>
                     <button type="button" class="btn btn-warning btn-sm mb-3" data-toggle="modal" data-target="#import"><i class="fas fa-file-import"></i> Import File CSV</button>
                     <a href="<?= base_url('asset/download') ?>" class="btn btn-primary btn-sm rounded mb-3"><i class="fa fa-download" aria-hidden="true"></i> Download Format CSV</a>
+                </div>
+                <div class="text-right col-md-6">
+                    <img class="mr-2" src="<?= base_url('assets/img/logo_raharja.png') ?>" width="50">
+                    <img src="<?= base_url('assets/img/kampus_merdeka.png') ?>" width="50">
                 </div>
             </div>
             <!-- Untuk Menampilkan pop up sweetalert -->
