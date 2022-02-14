@@ -1,18 +1,18 @@
 <div class="container-fluid">
-    <div class="text-right col-md-6" style="margin-top: -5%;">
-        <img class="mr-2" src="<?= base_url('assets/img/logo_raharja.png') ?>" width="50">
-        <img src="<?= base_url('assets/img/kampus_merdeka.png') ?>" width="50">
-    </div>
     <div class="row">
         <div class="col-sm">
             <div class="row">
-                <div class="col-sm">
+                <div class="col-md-6">
                     <h3 class="h3 text-gray"><?= $title; ?></h3>
                     <p class="mt-2 font-weight-bold"><?= $room['name'] ?> ( <?= $room['description'] ?> )</p>
                     <div class="row" style="margin-left: 2px;">
                         <a href="<?= base_url('room/') . $room['floor_id'] ?>" style="margin-right: 10px;">Kembali</a>
                         <a target="_blank" href="<?= base_url('asset/print_report/') . $room_id ?>" class="btn btn-primary btn-sm rounded">Print Laporan PDF</a><br />
                     </div>
+                </div>
+                <div class="text-right col-md-6">
+                    <img class="mr-2" src="<?= base_url('assets/img/logo_raharja.png') ?>" width="50">
+                    <img src="<?= base_url('assets/img/kampus_merdeka.png') ?>" width="50">
                 </div>
                 <div class="col-sm">
                     <!-- <form action="<?= base_url('asset/location/') . $room_id; ?>" method="post">

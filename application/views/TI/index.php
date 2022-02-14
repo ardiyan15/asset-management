@@ -1,15 +1,17 @@
 <!-- Begin Page Content -->
 <div class="container-fluid">
-    <!-- Page Heading -->
-
     <?php if ($asset) : ?>
-
-        <h1 class="h3 mb-4 text-gray-800"><?= $title; ?></h1>
-
-
+        <div class="row">
+            <div class="col-md-6">
+                <h1 class="h3 mb-4 text-gray-800"><?= $title; ?></h1>
+            </div>
+            <div class="text-right col-md-6">
+                <img class="mr-2" src="<?= base_url('assets/img/logo_raharja.png') ?>" width="50">
+                <img src="<?= base_url('assets/img/kampus_merdeka.png') ?>" width="50">
+            </div>
+        </div>
         <div class="row">
             <div class="col-lg">
-
                 <?= $this->session->flashdata('message') ?>
                 <table class="table table-hover" id="table-asset">
                     <thead>
@@ -37,7 +39,7 @@
                                 <td class="text-center" scope="col"> <?= $ast['name']; ?> </td>
                                 <td class="text-center" scope="col"> <?= $ast['destination']; ?> </td>
                                 <td class="text-center" scope="col">
-                                    <a href="<?= base_url('TI/acc/'). $ast['id'] ?>" class="btn btn-success btn-sm takein-button"> <i class="fas fa-check"></i> Terima </a>
+                                    <a href="<?= base_url('TI/acc/') . $ast['id'] ?>" class="btn btn-success btn-sm takein-button"> <i class="fas fa-check"></i> Terima </a>
                                     <!-- <a href="<?= base_url('TI/reject/') ?>" class="btn btn-danger btn-sm reject-button"> <i class=" fas fa-times"></i> Tolak </a> -->
                                 </td>
                                 <td class="text-center">

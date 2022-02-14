@@ -1,6 +1,13 @@
-
 <div class="container-fluid">
-    <a href="<?= base_url('history') ?>" class="btn btn-primary btn-sm mb-3">Kembali</a>
+    <div class="row">
+        <div class="col-md-6">
+            <a href="<?= base_url('history') ?>" class="btn btn-primary btn-sm mb-3">Kembali</a>
+        </div>
+        <div class="text-right col-md-6">
+            <img class="mr-2" src="<?= base_url('assets/img/logo_raharja.png') ?>" width="50">
+            <img src="<?= base_url('assets/img/kampus_merdeka.png') ?>" width="50">
+        </div>
+    </div>
     <?php if ($asset) : ?>
         <h1 class="h3 mb-4 text-gray-800"><?= $title; ?></h1>
         <div class="row">

@@ -1,16 +1,18 @@
 <div class="container-fluid">
     <div class="row">
-        <div class="col-sm">
+        <div class="col-md-6">
             <h2> Daftar Pengguna </h2>
             <a href="<?= base_url('user/create') ?>" class="btn btn-success btn-sm mb-3">
                 <i class="fas fa-plus mr-1"></i> Tambah User Baru
             </a>
         </div>
+        <div class="text-right col-md-6">
+            <img class="mr-2" src="<?= base_url('assets/img/logo_raharja.png') ?>" width="50">
+            <img src="<?= base_url('assets/img/kampus_merdeka.png') ?>" width="50">
+        </div>
     </div>
-
     <!-- Div untuk menampilkan pop up sweetalert -->
     <div class="flash-data" data-flashdata="<?= $this->session->flashdata('message'); ?>"></div>
-
     <div class="row mt-3">
         <div class="col-sm">
             <table class="table table-hover" id="table-asset">

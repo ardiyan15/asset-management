@@ -1,18 +1,19 @@
 <div class="container-fluid">
-    <!-- Page Heading -->
-
     <div class="row">
-        <div class="col-sm">
+        <div class="col-md-6">
             <h2> Daftar Kategori </h2>
             <a href="" data-toggle="modal" data-target="#addCategories" class="btn btn-success btn-sm mb-3">
                 <i class="fas fa-plus mr-1"></i> Tambah Kategori Baru
             </a>
         </div>
+        <div class="text-right col-md-6">
+            <img class="mr-2" src="<?= base_url('assets/img/logo_raharja.png') ?>" width="50">
+            <img src="<?= base_url('assets/img/kampus_merdeka.png') ?>" width="50">
+        </div>
     </div>
 
     <!-- Div untuk menampilkan pop up sweetalert -->
     <div class="flash-data" data-flashdata="<?= $this->session->flashdata('message'); ?>"></div>
-
     <div class="row mt-3">
         <div class="col-sm">
             <table class="table table-hover" id="table-asset">
@@ -38,7 +39,7 @@
                                 <td class="text-center"> Tidak Aktif </td>
                             <?php endif; ?>
                             <td class="text-center">
-                                <a href="<?= base_url('category/edit/').$category['id'] ?>" class="btn btn-info btn-sm"><i class="fas fa-edit"></i> Ubah</a>
+                                <a href="<?= base_url('category/edit/') . $category['id'] ?>" class="btn btn-info btn-sm"><i class="fas fa-edit"></i> Ubah</a>
                                 <a href="<?= base_url("category/delete/") . $category['id']; ?>" class="btn btn-danger btn-sm delete-button"> <i class="fas fa-trash-alt"></i> Hapus </a>
                             </td>
                         </tr>

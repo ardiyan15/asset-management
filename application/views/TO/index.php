@@ -1,8 +1,15 @@
 <!-- Begin Page Content -->
 <div class="container-fluid">
-    <!-- Page Heading -->
     <?php if ($asset) : ?>
-        <h3 class="mb-5 text-gray-800"><?= $title; ?></h3>
+        <div class="row">
+            <div class="col-md-6">
+                <h3 class="mb-5 text-gray-800"><?= $title; ?></h3>
+            </div>
+            <div class="text-right col-md-6">
+                <img class="mr-2" src="<?= base_url('assets/img/logo_raharja.png') ?>" width="50">
+                <img src="<?= base_url('assets/img/kampus_merdeka.png') ?>" width="50">
+            </div>
+        </div>
         <div class="row">
             <div class="col-lg-12">
                 <?= $this->session->flashdata('message') ?>

@@ -1,5 +1,13 @@
 <div class="container">
-    <h1 class="h3 mb-3 text-gray-800"><?= $title; ?></h1>
+    <div class="row">
+        <div class="col-md-6">
+            <h1 class="h3 mb-3 text-gray-800"><?= $title; ?></h1>
+        </div>
+        <div class="text-right col-md-6">
+            <img class="mr-2" src="<?= base_url('assets/img/logo_raharja.png') ?>" width="50">
+            <img src="<?= base_url('assets/img/kampus_merdeka.png') ?>" width="50">
+        </div>
+    </div>
     <form action="<?= base_url('user/store') ?>" method="POST" enctype="multipart/form-data">
         <div class="form-group">
             <label>Username</label>
@@ -20,7 +28,7 @@
             <label for="exampleInputPassword1">Building</label>
             <select name="building" required class="custom-select">
                 <option selected>-- Pilih Gedung --</option>
-                <?php foreach($buildings as $building): ?>
+                <?php foreach ($buildings as $building) : ?>
                     <option value="<?= $building['id'] ?>"><?= $building['name'] ?></option>
                 <?php endforeach ?>
             </select>
