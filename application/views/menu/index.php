@@ -119,6 +119,15 @@
 </div>
 
 <script>
+    function alphaOnly(event) {
+        var value = String.fromCharCode(event.which);
+        var pattern = new RegExp(/[a-zåäö ]/i);
+        return pattern.test(value);
+    }
+
+    $('#name').bind('keypress', alphaOnly);
+    $("#merk").bind('keypress', alphaOnly)
+
     $(document).ready(function() {
         var table = $("#mytable").DataTable({
             "scrollX": false,
