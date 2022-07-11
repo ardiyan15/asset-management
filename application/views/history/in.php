@@ -12,7 +12,7 @@
         <h1 class="h3 mb-4 text-gray-800"><?= $title; ?></h1>
         <div class="row">
             <div class="col-lg-12">
-                <table class="table table-hover" id="table-asset">
+                <table class="table table-hover" id="myTable">
                     <thead>
                         <tr>
                             <th class="text-center">No</th>
@@ -22,6 +22,7 @@
                             <th class="text-center">Sumber</th>
                             <th class="text-center">Tujuan</th>
                             <th class="text-center">Tanggal Penerimaan</th>
+                            <th class="text-center">Status</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -35,6 +36,14 @@
                                 <td class="text-center"><?= $ast['source']; ?></td>
                                 <td class="text-center"><?= $ast['name']; ?></td>
                                 <td class="text-center"><?= $ast['received']; ?></td>
+                                <td class="text-center">
+                                    <?php if ($ast['status'] == 1) : ?>
+                                        <span class="badge badge-success">Diterima</span>
+                                    <?php else : ?>
+                                        <span class="badge badge-danger">Ditolak</span>
+                                    <?php endif; ?>
+                                </td>
+
                             </tr>
                             <?php $i++; ?>
                         <?php endforeach; ?>

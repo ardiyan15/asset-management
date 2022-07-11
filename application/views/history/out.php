@@ -22,6 +22,7 @@
                             <th class="text-center" scope="col">Sumber</th>
                             <th class="text-center" scope="col">Tujuan</th>
                             <th class="text-center" scope="col">Tanggal Pengiriman</th>
+                            <th class="text-center" scope="col">Status</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -35,6 +36,13 @@
                                 <td class="text-center"><?= $ast['source']; ?></td>
                                 <td class="text-center"><?= $ast['name']; ?></td>
                                 <td class="text-center"><?= $ast['sent']; ?></td>
+                                <td class="text-center">
+                                    <?php if ($ast['status'] == 1) : ?>
+                                        <span class="badge badge-success">Diterima</span>
+                                    <?php else : ?>
+                                        <span class="badge badge-danger">Ditolak</span>
+                                    <?php endif; ?>
+                                </td>
                             </tr>
                             <?php $i++; ?>
                         <?php endforeach; ?>

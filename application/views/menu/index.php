@@ -1,24 +1,25 @@
 <div class="container-fluid">
-
     <div class="row">
         <div class="col-sm">
             <div class="row">
                 <div class="col-md-6">
                     <h1 class="h3 text-gray-800"><?= $title; ?></h1>
-                    <button type="button" class="btn btn-success btn-sm mb-3" data-toggle="modal" data-target="#addAsset">
-                        <i class="fas fa-plus mr-1"></i> Tambah Asset Baru
-                    </button>
-                    <button type="button" class="btn btn-warning btn-sm mb-3" data-toggle="modal" data-target="#import"><i class="fas fa-file-import"></i> Import File CSV</button>
-                    <a href="<?= base_url('asset/download') ?>" class="btn btn-primary btn-sm rounded mb-3"><i class="fa fa-download" aria-hidden="true"></i> Download Format CSV</a>
+                    <?php if ($user['role_id'] == 1) :  ?>
+                        <button type="button" class="btn btn-success btn-sm mb-3" data-toggle="modal" data-target="#addAsset">
+                            <i class="fas fa-plus mr-1"></i> Tambah Asset Baru
+                        </button>
+                        <button type="button" class="btn btn-warning btn-sm mb-3" data-toggle="modal" data-target="#import"><i class="fas fa-file-import"></i> Import File CSV</button>
+                        <a href="<?= base_url('asset/download') ?>" class="btn btn-primary btn-sm rounded mb-3"><i class="fa fa-download" aria-hidden="true"></i> Download Format CSV</a>
+                    <?php endif; ?>
                 </div>
-                <div class="text-right col-md-6">
+                <div class="text-right col-md-6 mb-3">
                     <img class="mr-2" src="<?= base_url('assets/img/logo_raharja.png') ?>" width="50">
                     <img src="<?= base_url('assets/img/kampus_merdeka.png') ?>" width="50">
                 </div>
             </div>
             <!-- Untuk Menampilkan pop up sweetalert -->
             <div class="flash-data" data-flashdata="<?= $this->session->flashdata('message'); ?>"></div>
-            <table class="table table-border table-sm table-hover" id="mytable">
+            <table class="mt-3 table table-border table-sm table-hover" id="mytable">
                 <thead>
                     <tr>
                         <th>No</th>
@@ -95,7 +96,6 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="exampleModalLabel">Upload File CSV</h5>
-
                 <div id="spinner" style="display: none;" class="spinner-border spinner-border-sm ml-2" role="status">
                     <span class="sr-only">Loading...</span>
                 </div>

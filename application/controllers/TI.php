@@ -26,6 +26,8 @@ class TI extends CI_Controller
     $this->load->view('templates/topbar', $data);
     $this->load->view('TI/index', $data);
     $this->load->view('templates/footer');
+
+    unset($_SESSION['message']);
   }
 
   public function acc($id)
@@ -35,48 +37,48 @@ class TI extends CI_Controller
     $update_asset       = $this->Assets->update_asset_location($transaction['asset_id'], $transaction['room_id']);
 
     if ($update_transaction > 0) {
-      if($update_asset) {
-        $this->session->set_flashdata('message','ti_success');
-        redirect('asset');
+      if ($update_asset) {
+        $this->session->set_flashdata('message', 'ti_success');
+        redirect('ti');
       } else {
-        $this->session->set_flashdata('message','failed');
-        redirect('asset');  
+        $this->session->set_flashdata('message', 'failed');
+        redirect('ti');
       }
     } else {
-      $this->session->set_flashdata('message','failed');
-      redirect('asset');
+      $this->session->set_flashdata('message', 'failed');
+      redirect('ti');
     }
   }
 
   public function reject($id)
   {
-    $data['user']   = $this->Assets->login_model($this->session->userdata('email'));
-    $data['asset']  = $this->Assets->acc_model($id);
+    // $data['user']   = $this->Assets->login_model($this->session->userdata('email'));
+    $data['asset']  = $this->Take_in->get_transaction_data_by_id($id);
 
     $location  = $data['asset']['source'];
     $assetId   = $data['asset']['asset_id'];
 
     if ($this->Assets->reject_model($location, $assetId, $id) > 0) {
-      $this->session->set_flashdata('message','reject');
-      redirect('asset');
+      $this->session->set_flashdata('message', 'reject');
+      redirect('ti');
     } else {
-      $this->session->set_flashdata('message','failed ');
-      redirect('asset');
+      $this->session->set_flashdata('message', 'failed ');
+      redirect('ti');
     }
   }
 
   public function bulk_acc()
   {
-      $asset_ids          = $this->input->post('asset_ids');
-      $rooms_ids          = $this->Transactions->get_transaction_room_id_by_asset_id($asset_ids);
-      $value_room_ids     = array_column($rooms_ids, 'room_id');
-      $asset_result       = $this->Assets->update_room_id_by_asset_id($value_room_ids, $asset_ids);
-      $result_transaction = $this->Transactions->bulk_update($asset_ids, $value_room_ids);
-      
-      if($asset_result && $result_transaction > 0){
-        echo json_encode(1);
-      } else {
-        echo json_encode(0);
-      }
+    $asset_ids          = $this->input->post('asset_ids');
+    $rooms_ids          = $this->Transactions->get_transaction_room_id_by_asset_id($asset_ids);
+    $value_room_ids     = array_column($rooms_ids, 'room_id');
+    $asset_result       = $this->Assets->update_room_id_by_asset_id($value_room_ids, $asset_ids);
+    $result_transaction = $this->Transactions->bulk_update($asset_ids, $value_room_ids);
+
+    if ($asset_result && $result_transaction > 0) {
+      echo json_encode(1);
+    } else {
+      echo json_encode(0);
+    }
   }
 }

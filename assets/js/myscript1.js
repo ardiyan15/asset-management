@@ -60,7 +60,7 @@ switch (flashData) {
 	case "reject":
 		Swal.fire({
 			title: "Success",
-			text: "You Reject The Asset",
+			text: "Aset ditolak",
 			icon: "info",
 			showConfirmButton: true,
 		});

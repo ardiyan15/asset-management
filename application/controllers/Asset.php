@@ -19,7 +19,6 @@ class Asset extends CI_Controller
   public function index()
   {
     $data['user'] = $this->Auth->get_active_user($this->session->userdata('username'));
-
     $data['title']      = 'Daftar Aset';
     $data['rooms']      = $this->Rooms->get_all_rooms();
     $data['categories'] = $this->Categories->get_all_categories();
@@ -245,7 +244,8 @@ class Asset extends CI_Controller
 
   public function import()
   {
-    $file_mimes = ['application/vnd.ms-excel'];
+    // $file_mimes = ['application/vnd.ms-excel'];
+    $file_mimes = ['text/csv'];
     if (isset($_FILES['import']['name']) && in_array($_FILES['import']['type'], $file_mimes)) {
 
       $reader = new \PhpOffice\PhpSpreadsheet\Reader\Csv();
@@ -328,7 +328,6 @@ class Asset extends CI_Controller
             'placement_status' => 1,
             'created' => date('Y-m-d')
           ];
-
           $this->db->insert('asset', $result);
         }
       }

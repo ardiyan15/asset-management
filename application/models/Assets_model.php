@@ -207,8 +207,10 @@ class Assets_model extends CI_Model
 
     public function reject_model($location, $assetId, $id)
     {
-        $this->db->delete('detail_process', ['id_detail_process' => $id]);
-        $this->db->set('asset_location', $location);
+        $this->db->set('status', 2);
+        $this->db->where('id', $id);
+        $this->db->update('transactions');
+        $this->db->set('placement_status', 1);
         $this->db->where('id_asset', $assetId);
         $this->db->update('asset');
         return $this->db->affected_rows();
@@ -256,7 +258,7 @@ class Assets_model extends CI_Model
     {
         // when user running the filter by room name
         if ($room_id == null) {
-            $query = "SELECT asset.asset_name, COUNT(*) AS total FROM asset INNER JOIN rooms ON asset.room_id = rooms.id INNER JOIN floors ON rooms.floor_id = floors.id INNER JOIN buildings ON floors.building_id = buildings.id WHERE buildings.id = $building_id GROUP BY asset_name";
+            $query = "SELECT asset.asset_name, COUNT(*) AS total FROM asset INNER JOIN rooms ON asset.room_id = rooms.id INNER JOIN floors ON rooms.floor_id = floors.id INNER JOIN buildings ON floors.building_id = buildings.id WHERE buildings.id = $building_id GROUP BY asset_name LIMIT 10";
             // if user login as administrator
             if ($role_id == '1') {
                 $query = "SELECT asset.asset_name, COUNT(*) AS total FROM asset INNER JOIN rooms ON asset.room_id = rooms.id INNER JOIN floors ON rooms.floor_id = floors.id INNER JOIN buildings ON floors.building_id = buildings.id GROUP BY asset_name ORDER BY RAND() LIMIT 10";
