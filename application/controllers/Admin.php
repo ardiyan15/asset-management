@@ -10,6 +10,7 @@ class Admin extends CI_Controller
         $this->load->model('Buildings_model', 'Buildings');
         $this->load->model('Rooms_model', 'Rooms');
         $this->load->model('Users_model', 'Users');
+		$this->load->model('Dashboard', 'Dashboard');
         is_logged_in();
     }
 
@@ -23,6 +24,8 @@ class Admin extends CI_Controller
         $data['assets']     = $this->Assets->filter_asset_by_room_id($role_id, $room_id, $building_id);
         $data['room_name']  = $this->Rooms->get_room_name_by_id($room_id);
         $data['rooms']      = $this->Rooms->get_room_by_building_id($role_id, $building_id);
+		$data['summaries'] = $this->Dashboard->summary_data();
+		
         $this->load->view('templates/header', $data);
         $this->load->view('templates/sidebar', $data);
         $this->load->view('templates/topbar', $data);

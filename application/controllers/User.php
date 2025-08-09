@@ -120,7 +120,7 @@ class User extends CI_Controller
                     $password_hash = password_hash($newPassword, PASSWORD_DEFAULT);
                     $this->Auth->change_password_model($password_hash, $data['user']['id_user']);
                     $this->session->set_flashdata(
-                        'message',
+                        'message', 
                         '<div class="alert alert-success" role="alert">
                           Password berhasil diubah
                         </div>'

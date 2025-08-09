@@ -185,7 +185,6 @@ class Assets_model extends CI_Model
             $this->datatables->or_like('rooms.name', $keyword);
             $this->datatables->order_by('id_asset', 'DESC');
             return $this->datatables->generate();
-            // return $this->db->get()->result_array();
         } else {
             $keyword = $this->input->post('keyword', true);
             $this->datatables->select('asset.asset_name, asset.merk, asset.serial_number, rooms.name, asset.placement_status, asset.created');
@@ -201,7 +200,6 @@ class Assets_model extends CI_Model
             $this->datatables->group_end();
             $this->datatables->where('buildings.id', $building_id);
             return $this->datatables->generate();
-            // return $this->db->get()->result_array();
         }
     }
 
