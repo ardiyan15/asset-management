@@ -1,165 +1,205 @@
 <?php
+defined('BASEPATH') or exit('No direct script access allowed');
 
 class Admin extends CI_Controller
 {
-    public function __construct()
-    {
-        parent::__construct();
-        $this->load->model('Assets_model', 'Assets');
-        $this->load->model('Auth_model', 'Auth');
-        $this->load->model('Buildings_model', 'Buildings');
-        $this->load->model('Rooms_model', 'Rooms');
-        $this->load->model('Users_model', 'Users');
+	public function __construct()
+	{
+		parent::__construct();
+		$this->load->model('Assets_model', 'Assets');
+		$this->load->model('Auth_model', 'Auth');
+		$this->load->model('Buildings_model', 'Buildings');
+		$this->load->model('Rooms_model', 'Rooms');
+		$this->load->model('Users_model', 'Users');
 		$this->load->model('Dashboard', 'Dashboard');
-        is_logged_in();
-    }
+		is_logged_in();
+	}
 
-    public function index()
-    {
-        $data['title']      = 'Dashboard';
-        $data['user']       = $this->Auth->get_active_user($this->session->userdata('username'));
-        $building_id        = $data['user']['building_id'];
-        $role_id            = $data['user']['role_id'];
-        $room_id            = $this->input->post('room_id');
-        $data['assets']     = $this->Assets->filter_asset_by_room_id($role_id, $room_id, $building_id);
-        $data['room_name']  = $this->Rooms->get_room_name_by_id($room_id);
-        $data['rooms']      = $this->Rooms->get_room_by_building_id($role_id, $building_id);
-		$data['summaries'] = $this->Dashboard->summary_data();
-		
-        $this->load->view('templates/header', $data);
-        $this->load->view('templates/sidebar', $data);
-        $this->load->view('templates/topbar', $data);
-        $this->load->view('admin/index', $data);
-        $this->load->view('templates/footer');
-    }
+	public function index()
+	{
+		$data['title']      = 'Dashboard';
+		$data['user']       = $this->Auth->get_active_user($this->session->userdata('username'));
+		$building_id        = $data['user']['building_id'];
+		$role_id            = $data['user']['role_id'];
+		$room_id            = $this->input->post('room_id');
+		$data["room_id"]    = $room_id;
+		$data['assets']     = $this->Assets->filter_asset_by_room_id($role_id, $room_id, $building_id);
+		$data['room_name']  = $this->Rooms->get_room_name_by_id($room_id);
+		$data['rooms']      = $this->Rooms->get_room_by_building_id($role_id, $building_id);
+		$data['summaries']  = $this->Dashboard->summary_data();
 
-    public function list_user()
-    {
-        $data['title']      = 'Daftar Pengguna';
-        $data['user']       = $this->Auth->get_active_user($this->session->userdata('username'));
-        $data['all_users']  = $this->Users->get_all_user();
+		$this->load->view('templates/header', $data);
+		$this->load->view('templates/sidebar', $data);
+		$this->load->view('templates/topbar', $data);
+		$this->load->view('admin/index', $data);
+		$this->load->view('templates/footer');
+	}
 
-        $this->load->view('templates/header', $data);
-        $this->load->view('templates/sidebar', $data);
-        $this->load->view('templates/topbar', $data);
-        $this->load->view('admin/list_user', $data);
-        $this->load->view('templates/footer');
-        unset($_SESSION['message']);
-    }
+	public function list_user()
+	{
+		$data['title']      = 'Daftar Pengguna';
+		$data['user']       = $this->Auth->get_active_user($this->session->userdata('username'));
+		$data['all_users']  = $this->Users->get_all_user();
 
-    public function activated($id)
-    {
-        $active = $this->Assets->activate_list_user($id);
+		$this->load->view('templates/header', $data);
+		$this->load->view('templates/sidebar', $data);
+		$this->load->view('templates/topbar', $data);
+		$this->load->view('admin/list_user', $data);
+		$this->load->view('templates/footer');
+		unset($_SESSION['message']);
+	}
 
-        if ($active > 0) {
-            $this->session->set_flashdata('message', 'activate');
-            redirect('admin/list_user');
-        } else {
-            $this->session->set_flashdata('message', 'not_activate');
-            redirect('admin/list_user');
-        }
-    }
+	public function activated($id)
+	{
+		$active = $this->Assets->activate_list_user($id);
 
-    public function deactivated($id)
-    {
-        $deactivate = $this->Assets->deactivate_list_user($id);
+		if ($active > 0) {
+			$this->session->set_flashdata('message', 'activate');
+			redirect('admin/list_user');
+		} else {
+			$this->session->set_flashdata('message', 'not_activate');
+			redirect('admin/list_user');
+		}
+	}
 
-        if ($deactivate > 0) {
-            $this->session->set_flashdata('message', 'deactivate');
-            redirect('admin/list_user');
-        } else {
-            $this->session->set_flashdata('message', 'not_deactivate');
-            redirect('admin/list_user');
-        }
-    }
+	public function deactivated($id)
+	{
+		$deactivate = $this->Assets->deactivate_list_user($id);
 
-    public function deleteUser($id)
-    {
-        $deleted = $this->Assets->delete_user($id);
+		if ($deactivate > 0) {
+			$this->session->set_flashdata('message', 'deactivate');
+			redirect('admin/list_user');
+		} else {
+			$this->session->set_flashdata('message', 'not_deactivate');
+			redirect('admin/list_user');
+		}
+	}
 
-        if ($deleted > 0) {
-            $this->session->set_flashdata('message', 'delete');
-            redirect('admin/list_user');
-        } else {
-            $this->session->set_flashdata('message', 'delete');
-            redirect('admin/list_user');
-        }
-    }
+	public function deleteUser($id)
+	{
+		$deleted = $this->Assets->delete_user($id);
 
-    public function add_building_location()
-    {
-        $data = [
-            'name'          => $this->input->post('name'),
-            'status'        => 1,
-            'created_at'    => date("Y-m-d H:i:s")
-        ];
+		if ($deleted > 0) {
+			$this->session->set_flashdata('message', 'delete');
+			redirect('admin/list_user');
+		} else {
+			$this->session->set_flashdata('message', 'delete');
+			redirect('admin/list_user');
+		}
+	}
 
-        $add_building = $this->Buildings->add_building($data);
+	public function add_building_location()
+	{
+		$data = [
+			'name'          => $this->input->post('name'),
+			'status'        => 1,
+			'created_at'    => date("Y-m-d H:i:s")
+		];
 
-        if ($add_building > 0) {
-            $this->session->set_flashdata('message', 'success');
-            redirect('buildings');
-        } else {
-            $this->session->set_flashdata('message', 'failed ');
-            redirect('buildings');
-        }
-    }
+		$add_building = $this->Buildings->add_building($data);
 
-    public function editStrLocation($id)
-    {
-        $data = [
-            'store_code'        => $this->input->post('strCode'),
-            'store_name'        => $this->input->post('strName'),
-            'address'           => $this->input->post('address'),
-            'handphone'         => $this->input->post('handphone'),
-            'status_location'   => 1
-        ];
+		if ($add_building > 0) {
+			$this->session->set_flashdata('message', 'success');
+			redirect('buildings');
+		} else {
+			$this->session->set_flashdata('message', 'failed ');
+			redirect('buildings');
+		}
+	}
 
-        $edit = $this->Assets->editStrLocationMdl($data, $id);
+	public function editStrLocation($id)
+	{
+		$data = [
+			'store_code'        => $this->input->post('strCode'),
+			'store_name'        => $this->input->post('strName'),
+			'address'           => $this->input->post('address'),
+			'handphone'         => $this->input->post('handphone'),
+			'status_location'   => 1
+		];
 
-        if ($edit > 0) {
-            $this->session->set_flashdata('message', 'edtStr');
-            redirect('admin/store_location');
-        } else {
-            $this->session->set_flashdata('message', 'failed ');
-            redirect('admin/store_location');
-        }
-    }
+		$edit = $this->Assets->editStrLocationMdl($data, $id);
 
-    public function activateStr($id)
-    {
-        $result = $this->Assets->activated_store($id);
+		if ($edit > 0) {
+			$this->session->set_flashdata('message', 'edtStr');
+			redirect('admin/store_location');
+		} else {
+			$this->session->set_flashdata('message', 'failed ');
+			redirect('admin/store_location');
+		}
+	}
 
-        if ($result > 0) {
-            $this->session->set_flashdata('message', 'actvtStr');
-            redirect('admin/store_location');
-        } else {
-            $this->session->set_flashdata('message', 'failed');
-            redirect('admin/store_location');
-        }
-    }
+	public function activateStr($id)
+	{
+		$result = $this->Assets->activated_store($id);
 
-    public function filter_asset()
-    {
-        $this->Assets->get_filter_asset();
-    }
+		if ($result > 0) {
+			$this->session->set_flashdata('message', 'actvtStr');
+			redirect('admin/store_location');
+		} else {
+			$this->session->set_flashdata('message', 'failed');
+			redirect('admin/store_location');
+		}
+	}
 
-    public function list_rooms()
-    {
-        $session = $this->session->userdata('email');
-        if ($session === null) {
-            redirect('auth');
-        }
-        $data['user'] = $this->Assets->login_model($this->session->userdata('email'));
+	public function filter_asset()
+	{
+		$this->Assets->get_filter_asset();
+	}
 
-        $building_id = $this->uri->segment(3);
-        $data['title'] = "Room Location";
-        $data['buildings'] = $this->Rooms->get_all_rooms_by_building_id($building_id);
+	public function list_rooms()
+	{
+		$session = $this->session->userdata('email');
+		if ($session === null) {
+			redirect('auth');
+		}
+		$data['user'] = $this->Assets->login_model($this->session->userdata('email'));
 
-        $this->load->view('templates/header', $data);
-        $this->load->view('templates/sidebar', $data);
-        $this->load->view('templates/topbar', $data);
-        $this->load->view('rooms/index', $data);
-        $this->load->view('templates/footer');
-    }
+		$building_id = $this->uri->segment(3);
+		$data['title'] = "Room Location";
+		$data['buildings'] = $this->Rooms->get_all_rooms_by_building_id($building_id);
+
+		$this->load->view('templates/header', $data);
+		$this->load->view('templates/sidebar', $data);
+		$this->load->view('templates/topbar', $data);
+		$this->load->view('rooms/index', $data);
+		$this->load->view('templates/footer');
+	}
+
+
+	public function export()
+	{
+		$data['user']       = $this->Auth->get_active_user($this->session->userdata('username'));
+		$building_id        = $data['user']['building_id'];
+		$role_id            = $data['user']['role_id'];
+
+		$room_id            = $this->input->post('room_id');
+
+		if ($room_id) {
+			$assets = $this->Assets->get_asset_by_room_id($room_id);
+			$filename = 'export_assets_room_' . $room_id . '.csv';
+		} else {
+			$assets = $this->Assets->menu_model($role_id, $building_id);
+			$filename = 'export_all_assets.csv';
+		}
+
+		header("Content-Type: text/csv");
+		header("Content-Disposition: attachment; filename=\"$filename\"");
+
+		$output = fopen("php://output", "w");
+		fputcsv($output, array('ID', 'Asset Name', 'Merk', 'Serial Number', 'Placement Status', 'Room Name', 'Created Date'));
+
+		foreach ($assets as $row) {
+			fputcsv($output, array(
+				$row['id_asset'],
+				$row['asset_name'],
+				$row['merk'],
+				$row['serial_number'],
+				$row['placement_status'] == 1 ? 'Active' : 'Inactive', // Example mapping
+				$row['name'], // Room name from join
+				$row['created'] ?? '' // created date might be missing in some queries? Check model.
+			));
+		}
+		fclose($output);
+	}
+
 }

@@ -20,6 +20,7 @@
     <link href="<?= base_url(); ?>assets/css/v_registration.css" rel="stylesheet">
 
     <link rel="stylesheet" href="<?= base_url('assets/'); ?>css/animate.css">
+    <link href="<?= base_url(); ?>assets/css/modern_login.css" rel="stylesheet">
 
 
 </head>

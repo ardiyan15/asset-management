@@ -84,10 +84,16 @@
 								<select id="order" name="room_id" class="pr-3 pl-3 filter-room">
 									<option value=""> -- Pilih Ruangan -- </option>
 									<?php foreach ($rooms as $room) : ?>
-										<option value="<?= $room['id']; ?>"> <?= $room['name'] ?> </option>
+										<?php if ($room_id == $room["id"]) : ?>
+											<option value="<?= $room['id']; ?>" selected> <?= $room['name'] ?> </option>
+										<?php else : ?>
+											<option value="<?= $room['id']; ?>"> <?= $room['name'] ?> </option>
+										<?php endif; ?>
 									<?php endforeach; ?>
 								</select>
-								<button class="btn btn-success btn-sm mt-2"> Filter </button>
+								<div class="d-flex">
+									<button class="btn btn-success btn-sm mt-2"> Filter </button>
+								</div>
 								<p class="ml-1 mt-3" style="font-size: 12px;"> Filter berdasarkan :
 									<?php if ($room_name == null) {
 										echo "<b> semua ruangan </b>";
@@ -103,6 +109,10 @@
 					</div>
 				</div>
 			</div>
+		</form>
+		<form method="POST" action="<?= base_url('admin/export') ?>">
+			<input type="hidden" name="room_id" value="<?= $room_id ?>">
+			<button type="submit" class="btn btn-secondary btn-sm mt-2 ml-2">Export To CSV</button>
 		</form>
 	</div>
 

@@ -1,0 +1,65 @@
+:root {
+    --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    --card-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    --card-border: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+/* Sidebar Gradient Override */
+.bg-gradient-primary {
+    background-image: var(--primary-gradient) !important;
+    background-size: cover;
+}
+
+/* Card Styling - Softer & Cleaner */
+.card {
+    border: var(--card-border) !important;
+    box-shadow: var(--card-shadow) !important;
+    border-radius: 0.75rem !important;
+    /* Rounded corners like login */
+    transition: transform 0.2s ease-in-out;
+}
+
+.card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05) !important;
+}
+
+/* Topbar Styling */
+.topbar {
+    background: #ffffff !important;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05) !important;
+}
+
+/* Sidebar Branding Text */
+.sidebar-brand-text {
+    font-weight: 700 !important;
+    letter-spacing: 0.05em;
+}
+
+/* Active Nav Item */
+.nav-item.active .nav-link {
+    font-weight: 700;
+    color: #fff !important;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 0.5rem;
+    margin: 0 1rem;
+    width: auto;
+}
+
+.nav-item .nav-link {
+    margin: 0 1rem;
+    width: auto;
+    border-radius: 0.5rem;
+}
+
+/* Buttons */
+.btn-primary {
+    background-image: var(--primary-gradient);
+    border: none;
+    box-shadow: 0 4px 6px -1px rgba(102, 126, 234, 0.4);
+}
+
+.btn-primary:hover {
+    filter: brightness(1.1);
+    background-image: var(--primary-gradient);
+}
