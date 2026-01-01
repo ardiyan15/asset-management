@@ -27,6 +27,8 @@ class Admin extends CI_Controller
 		$data['room_name']  = $this->Rooms->get_room_name_by_id($room_id);
 		$data['rooms']      = $this->Rooms->get_room_by_building_id($role_id, $building_id);
 		$data['summaries']  = $this->Dashboard->summary_data();
+		$data['recent_transactions'] = $this->Dashboard->get_recent_transactions(5);
+		$data['asset_categories'] = $this->Dashboard->get_assets_by_category(5);
 
 		$this->load->view('templates/header', $data);
 		$this->load->view('templates/sidebar', $data);
