@@ -24,26 +24,26 @@
     </li>
     <li class="nav-item <?= is_active('asset');  ?>">
         <a class="nav-link" href="<?= base_url('asset') ?>">
-            <i class="fas fa-fw fa-drafting-compass"></i>
+            <i class="fas fa-fw fa-box"></i>
             <span> Data Asset </span>
         </a>
     </li>
     <li class="nav-item <?= is_active('buildings');  ?>">
         <a class="nav-link" href="<?= base_url('buildings') ?>">
-            <i class="fas fa-fw fa-coins"></i>
+            <i class="fas fa-fw fa-building"></i>
             <span> Data Ruangan </span>
         </a>
     </li>
     <?php if($user['role_id'] == '1'): ?>
         <li class="nav-item <?= is_active('admin', 'list_user');  ?>">
             <a class="nav-link" href="<?= base_url('admin/list_user') ?>">
-                <i class="fas fa-fw fa-tachometer-alt"></i>
+                <i class="fas fa-fw fa-users"></i>
                 <span> Data Pengguna </span>
             </a>
         </li>    
         <li class="nav-item <?= is_active('category');  ?>">
             <a class="nav-link" href="<?= base_url('category') ?>">
-                <i class="fas fa-fw fa-coins"></i>
+                <i class="fas fa-fw fa-list"></i>
                 <span> Data Kategori </span>
             </a>
         </li>
@@ -51,56 +51,58 @@
     <hr class="sidebar-divider">
 
     <div class="sidebar-heading">
-        User
-    </div>
-    <li class="nav-item <?= is_active('user');  ?>">
-        <a class="nav-link" href="<?= base_url('user') ?>">
-            <i class="fas fa-fw fa-coins"></i>
-            <span> Profil Saya </span>
-        </a>
-    </li>
-    <li class="nav-item <?= is_active('user', 'editprofile');  ?>">
-        <a class="nav-link" href="<?= base_url('user/editprofile') ?>">
-            <i class="fas fa-fw fa-coins"></i>
-            <span> Ubah Profil </span>
-        </a>
-    </li>
-    <li class="nav-item <?= is_active('user', 'changepassword');  ?>">
-        <a class="nav-link" href="<?= base_url('user/changepassword') ?>">
-            <i class="fas fa-fw fa-coins"></i>
-            <span> Ganti Password </span>
-        </a>
-    </li>
-    <hr class="sidebar-divider">
-    <div class="sidebar-heading">
         Transaksi
     </div>
     <li class="nav-item <?= is_active('transaction');  ?>">
         <a class="nav-link" href="<?= base_url('transaction') ?>">
-            <i class="fas fa-fw fa-coins"></i>
+            <i class="fas fa-fw fa-exchange-alt"></i>
             <span> Transaksi Asset </span>
         </a>
     </li>
     <li class="nav-item <?= is_active('TO');  ?>">
         <a class="nav-link" href="<?= base_url('TO') ?>">
-            <i class="fas fa-fw fa-coins"></i>
+            <i class="fas fa-fw fa-minus"></i>
             <span> Transaksi Keluar </span>
         </a>
     </li>
     <li class="nav-item <?= is_active('TI');  ?>">
         <a class="nav-link" href="<?= base_url('TI') ?>">
-            <i class="fas fa-fw fa-coins"></i>
+            <i class="fas fa-fw fa-plus"></i>
             <span> Transaksi Masuk </span>
         </a>
     </li>
     <li class="nav-item <?= is_active('History');  ?>">
         <a class="nav-link" href="<?= base_url('History') ?>">
-            <i class="fas fa-fw fa-coins"></i>
+            <i class="fas fa-fw fa-history"></i>
             <span> Riwayat Transaksi </span>
         </a>
     </li>
     <hr class="sidebar-divider">
-    <li class="nav-item">
+
+    <div class="sidebar-heading">
+        User
+    </div>
+    <li class="nav-item <?= is_active('user');  ?>">
+        <a class="nav-link" href="<?= base_url('user') ?>">
+            <i class="fas fa-fw fa-user"></i>
+            <span> Profil Saya </span>
+        </a>
+    </li>
+    <li class="nav-item <?= is_active('user', 'editprofile');  ?>">
+        <a class="nav-link" href="<?= base_url('user/editprofile') ?>">
+            <i class="fas fa-fw fa-user-edit"></i>
+            <span> Ubah Profil </span>
+        </a>
+    </li>
+    <li class="nav-item <?= is_active('user', 'changepassword');  ?>">
+        <a class="nav-link" href="<?= base_url('user/changepassword') ?>">
+            <i class="fas fa-fw fa-key"></i>
+            <span> Ganti Password </span>
+        </a>
+    </li>
+    <hr class="sidebar-divider">
+
+     <li class="nav-item">
         <a class="nav-link" href="<?= base_url('auth/logout'); ?>">
             <i class="fas fa-fw fa-sign-out-alt"></i>
             <span>Logout</span>

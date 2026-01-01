@@ -15,7 +15,7 @@
     <div class="flash-data" data-flashdata="<?= $this->session->flashdata('message'); ?>"></div>
     <div class="row mt-3">
         <div class="col-sm">
-            <table class="table table-hover" id="table-asset">
+            <table class="table table-hover table-bordered" id="table-asset">
                 <thead>
                     <tr>
                         <th class="text-center"> No </th>
