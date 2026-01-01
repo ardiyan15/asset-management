@@ -46,7 +46,7 @@
 <script src="https://cdn.datatables.net/1.10.24/js/dataTables.bootstrap4.min.js"></script>
 <script src="<?= base_url('assets/') ?>js/sweetalert2.all.min.js"></script>
 <script src="<?= base_url('assets/') ?>js/ajax.js"></script>
-<script src="<?= base_url('assets/') ?>js/myscript1.js"></script>
+<script src="<?= base_url('assets/') ?>js/myscript1.js?v=<?= time(); ?>"></script>
 <script>
     $(document).ready(function() {
         $('#table-asset').DataTable();

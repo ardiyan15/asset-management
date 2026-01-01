@@ -40,6 +40,7 @@ class Admin extends CI_Controller
 		$data['title']      = 'Daftar Pengguna';
 		$data['user']       = $this->Auth->get_active_user($this->session->userdata('username'));
 		$data['all_users']  = $this->Users->get_all_user();
+		$data['buildings']  = $this->Buildings->get_all_buildings();
 
 		$this->load->view('templates/header', $data);
 		$this->load->view('templates/sidebar', $data);
@@ -86,6 +87,24 @@ class Admin extends CI_Controller
 			$this->session->set_flashdata('message', 'delete');
 			redirect('admin/list_user');
 		}
+	}
+
+	public function edit_user()
+	{
+		$data = [
+			'username' => $this->input->post('username')
+		];
+
+		$password = $this->input->post('password');
+		if (!empty($password)) {
+			$data['password'] = password_hash($password, PASSWORD_DEFAULT);
+		}
+
+		$id = $this->input->post('id_user');
+
+		$this->Users->update_user($id, $data);
+		$this->session->set_flashdata('message', 'editUser');
+		redirect('admin/list_user');
 	}
 
 	public function add_building_location()

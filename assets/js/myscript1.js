@@ -207,6 +207,15 @@ switch (flashData) {
 			icon: "success",
 			showConfirmButton: TextTrackCue,
 		});
+		break;
+	case "editUser":
+		Swal.fire({
+			title: "Berhasil",
+			text: "Berhasil mengubah data user",
+			icon: "success",
+			showConfirmButton: true,
+		});
+		break;
 }
 
 // Pop Up Delete
@@ -356,5 +365,16 @@ $(".actvt-button").on("click", function (e) {
 $(document).ready(function () {
 	$(".filter-room").select2({
 		theme: "bootstrap",
+	});
+
+	// Edit User Modal Population
+	$(document).on("click", ".btn-edit-user", function () {
+		const id = $(this).data("id");
+		const username = $(this).data("username");
+		const building = $(this).data("building");
+
+		$("#editUserModal #id_user").val(id);
+		$("#editUserModal #username").val(username);
+		$("#editUserModal #loc").val(building);
 	});
 });
