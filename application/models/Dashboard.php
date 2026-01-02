@@ -22,7 +22,7 @@ class Dashboard extends CI_Model
 
 	private function get_total_transactions()
 	{
-		return $this->db->count_all_results('transactions');
+		return $this->db->count_all_results('transaction_details');
 	}
 
 	private function get_total_assets()

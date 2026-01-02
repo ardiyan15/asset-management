@@ -1,0 +1,1 @@
+ALTER TABLE simanis.transaction_details ADD notes TEXT NULL;

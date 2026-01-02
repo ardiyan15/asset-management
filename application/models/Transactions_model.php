@@ -44,52 +44,52 @@ class Transactions_model extends CI_Model
 
     public function transaction_out_process($role_id, $building_id)
     {
-        $this->db->select('asset.asset_name, asset.merk, asset.serial_number, rooms.name, transactions.sent, source.name AS source_name');
-        $this->db->from('transactions');
-        $this->db->join('asset', 'asset.id_asset = transactions.asset_id');
-        $this->db->join('rooms', 'rooms.id = transactions.room_id');
-        $this->db->join('rooms AS source', 'source.id = transactions.source_id');
+        $this->db->select('asset.asset_name, asset.merk, asset.serial_number, rooms.name, transaction_details.sent, source.name AS source_name');
+        $this->db->from('transaction_details');
+        $this->db->join('asset', 'asset.id_asset = transaction_details.asset_id');
+        $this->db->join('rooms', 'rooms.id = transaction_details.room_id');
+        $this->db->join('rooms AS source', 'source.id = transaction_details.source_id');
         if ($role_id !== '1') {
             $this->db->join('floors', 'floors.id = source.floor_id');
             $this->db->join('buildings', 'buildings.id = floors.building_id');
             $this->db->where('buildings.id', $building_id);
         }
-        $this->db->where(['transactions.status' => 0]);
+        $this->db->where(['transaction_details.status' => 0]);
         return $this->db->get()->result_array();
     }
 
     public function transactions_complete_out($role_id, $building_id)
     {
-        $this->db->select('asset.asset_name, asset.merk, asset.serial_number, rooms.name, transactions.sent, source.name AS source, transactions.status');
-        $this->db->from('transactions');
-        $this->db->join('asset', 'asset.id_asset = transactions.asset_id');
-        $this->db->join('rooms', 'rooms.id = transactions.room_id');
-        $this->db->join('rooms AS source', 'source.id = transactions.source_id');
+        $this->db->select('asset.asset_name, asset.merk, asset.serial_number, rooms.name, transaction_details.sent, source.name AS source, transaction_details.status');
+        $this->db->from('transaction_details');
+        $this->db->join('asset', 'asset.id_asset = transaction_details.asset_id');
+        $this->db->join('rooms', 'rooms.id = transaction_details.room_id');
+        $this->db->join('rooms AS source', 'source.id = transaction_details.source_id');
         $this->db->join('floors', 'floors.id = source.floor_id');
         $this->db->join('buildings', 'buildings.id = floors.building_id');
         if ($role_id !== '1') {
-            $this->db->where('transactions.status != ', 0);
+            $this->db->where('transaction_details.status != ', 0);
             $this->db->where('buildings.id', $building_id);
         } else {
-            $this->db->where('transactions.status !=', 0);
+            $this->db->where('transaction_details.status !=', 0);
         }
         return $this->db->get()->result_array();
     }
 
     public function transactions_complete_in($role_id, $building_id)
     {
-        $this->db->select('asset.asset_name, asset.merk, asset.serial_number, rooms.name, transactions.sent, source.name AS source, transactions.received, transactions.status');
-        $this->db->from('transactions');
-        $this->db->join('asset', 'asset.id_asset = transactions.asset_id');
-        $this->db->join('rooms AS source', 'source.id = transactions.source_id');
-        $this->db->join('rooms', 'rooms.id = transactions.room_id');
+        $this->db->select('asset.asset_name, asset.merk, asset.serial_number, rooms.name, transaction_details.sent, source.name AS source, transaction_details.received, transaction_details.status');
+        $this->db->from('transaction_details');
+        $this->db->join('asset', 'asset.id_asset = transaction_details.asset_id');
+        $this->db->join('rooms AS source', 'source.id = transaction_details.source_id');
+        $this->db->join('rooms', 'rooms.id = transaction_details.room_id');
         $this->db->join('floors', 'floors.id = rooms.floor_id');
         $this->db->join('buildings', 'buildings.id = floors.building_id');
         if ($role_id != '1') {
-            $this->db->where('transactions.status != ', 0);
+            $this->db->where('transaction_details.status != ', 0);
             $this->db->where('buildings.id', $building_id);
         } else {
-            $this->db->where('transactions.status !=', 0);
+            $this->db->where('transaction_details.status !=', 0);
         }
         return $this->db->get()->result_array();
     }
