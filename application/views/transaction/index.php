@@ -1,41 +1,42 @@
 <div class="container-fluid">
-    <div class="row">
-        <div class="col-sm">
-            <div class="row">
-                <div class="col-md-6">
-                    <h1 class="h3 text-gray-800"><?= $title; ?></h1>
+    <div class="card p-3">
+        <div class="row">
+            <div class="col-sm">
+                <div class="row">
+                    <div class="col-md-6">
+                        <h1 class="h3 text-gray-800"><?= $title; ?></h1>
+                    </div>
+                    <div class="text-right col-md-6">
+                        <img class="mr-2" src="<?= base_url('assets/img/logo_raharja.png') ?>" width="50">
+                        <img src="<?= base_url('assets/img/kampus_merdeka.png') ?>" width="50">
+                    </div>
                 </div>
-                <div class="text-right col-md-6">
-                    <img class="mr-2" src="<?= base_url('assets/img/logo_raharja.png') ?>" width="50">
-                    <img src="<?= base_url('assets/img/kampus_merdeka.png') ?>" width="50">
+
+                <!-- Untuk Menampilkan pop up sweetalert -->
+                <div class="flash-data" data-flashdata="<?= $this->session->flashdata('message'); ?>"></div>
+
+                <div class="table mt-3 col-md-12">
+                    <table class="table table-border table-sm table-hover" id="mytable">
+                        <thead>
+                            <tr>
+                                <th>No</th>
+                                <th>Nama</th>
+                                <th>Merk</th>
+                                <th>Nomor Seri</th>
+                                <th>Lokasi Saat Ini</th>
+                                <th>Aksi</th>
+                                <th>
+                                    <button data-target="#bulk_takeout" data-toggle="modal" class="btn btn-success btn-sm">
+                                        Pindahkan
+                                    </button>
+                                </th>
+                            </tr>
+                        </thead>
+                    </table>
                 </div>
-            </div>
-
-            <!-- Untuk Menampilkan pop up sweetalert -->
-            <div class="flash-data" data-flashdata="<?= $this->session->flashdata('message'); ?>"></div>
-
-            <div class="table mt-3 col-md-12">
-                <table class="table table-border table-sm table-hover" id="mytable">
-                    <thead>
-                        <tr>
-                            <th>No</th>
-                            <th>Nama</th>
-                            <th>Merk</th>
-                            <th>Nomor Seri</th>
-                            <th>Lokasi Saat Ini</th>
-                            <th>Aksi</th>
-                            <th>
-                                <button data-target="#bulk_takeout" data-toggle="modal" class="btn btn-success btn-sm">
-                                    Pindahkan
-                                </button>
-                            </th>
-                        </tr>
-                    </thead>
-                </table>
             </div>
         </div>
     </div>
-</div>
 </div>
 
 <div class="modal fade" id="takeout" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel">
@@ -60,10 +61,14 @@
                             <?php endforeach; ?>
                         </select>
                     </div>
+                    <div class="form-group">
+                        <label for="note">Catatan</label>
+                        <textarea name="note" id="note" class="form-control" placeholder="Masukkan catatan" rows="3"></textarea>    
+                    </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="submit" class="btn btn-success btn-sm">Pindahkan</button>
-                    <button type="button" class="btn btn-danger btn-sm" data-dismiss="modal">Tutup</button>
+                    <button type="submit" class="btn btn-success btn-sm rounded">Pindahkan</button>
+                    <button type="button" class="btn btn-danger btn-sm rounded" data-dismiss="modal">Tutup</button>
                 </div>
             </form>
         </div>

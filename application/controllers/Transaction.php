@@ -76,6 +76,7 @@ class Transaction extends CI_Controller
     $id           = $this->input->post('asset_id');
     $room_id      = $this->input->post('room');
     $source_id    = $this->input->post('source');
+    $note         = $this->input->post('note');
 
     $data = [
       'asset_id'    => $id,
@@ -83,7 +84,8 @@ class Transaction extends CI_Controller
       'source_id'   => $source_id,
       'status'      => 0,
       'sent'        => date('Y-m-d'),
-      'created_at'  => date('Y-m-d')
+      'created_at'  => date('Y-m-d'),
+      'notes'        => $note
     ];
 
     $transaction      = $this->Transactions->create_transaction_asset($data);

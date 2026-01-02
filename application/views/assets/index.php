@@ -14,14 +14,6 @@
                     <img class="mr-2" src="<?= base_url('assets/img/logo_raharja.png') ?>" width="50">
                     <img src="<?= base_url('assets/img/kampus_merdeka.png') ?>" width="50">
                 </div>
-                <div class="col-sm">
-                    <!-- <form action="<?= base_url('asset/location/') . $room_id; ?>" method="post">
-                        <div class="input-group">
-                            <input type="text" name="keyword" class="form-control" placeholder="Filter asset" aria-describedby="basic-addon2">
-                            <button type="submit" class="ml-2 btn btn-success btn-sm"> <i class="fas fa-search"></i> Filter </button>
-                        </div>
-                    </form> -->
-                </div>
             </div>
             <!-- Untuk Menampilkan pop up sweetalert -->
             <div class="flash-data" data-flashdata="<?= $this->session->flashdata('message'); ?>"></div>

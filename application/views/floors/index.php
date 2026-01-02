@@ -5,9 +5,9 @@
         <div class="row">
             <div class="col-md-6">
                 <h4> <?= $title; ?> : <b><?= $building_name['name'] ?></b></h4>
-                <a href="<?= base_url('buildings') ?>" class="btn btn-sm btn-secondary">Kembali</a>
+                <a href="<?= base_url('buildings') ?>" class="btn btn-sm btn-secondary rounded">Kembali</a>
                 <?php if ($role_id == '1') : ?>
-                    <a href="" class="btn btn-success btn-sm" data-toggle="modal" data-target="#addStrLocation"> <i class="fas fa-plus mr-1"></i> Tambah Lantai Baru </a>
+                    <a href="" class="btn btn-success btn-sm rounded" data-toggle="modal" data-target="#addStrLocation"> <i class="fas fa-plus mr-1"></i> Tambah Lantai Baru </a>
                 <?php endif; ?>
             </div>
             <div class="text-right col-md-6">

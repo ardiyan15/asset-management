@@ -28,7 +28,7 @@
             <span> Data Asset </span>
         </a>
     </li>
-    <li class="nav-item <?= is_active('buildings');  ?>">
+    <li class="nav-item <?= is_active('buildings'); ?>">
         <a class="nav-link" href="<?= base_url('buildings') ?>">
             <i class="fas fa-fw fa-building"></i>
             <span> Data Ruangan </span>

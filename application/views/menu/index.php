@@ -1,37 +1,39 @@
 <div class="container-fluid">
-    <div class="row">
-        <div class="col-sm">
-            <div class="row">
-                <div class="col-md-6">
-                    <h1 class="h3 text-gray-800"><?= $title; ?></h1>
-                    <?php if ($user['role_id'] == 1) :  ?>
-                        <button type="button" class="btn btn-success btn-sm mb-3" data-toggle="modal" data-target="#addAsset">
-                            <i class="fas fa-plus mr-1"></i> Tambah Asset Baru
-                        </button>
-                        <button type="button" class="btn btn-warning btn-sm mb-3" data-toggle="modal" data-target="#import"><i class="fas fa-file-import"></i> Import File CSV</button>
-                        <a href="<?= base_url('asset/download') ?>" class="btn btn-primary btn-sm rounded mb-3"><i class="fa fa-download" aria-hidden="true"></i> Download Format CSV</a>
-                    <?php endif; ?>
+    <div class="card rounded p-3">
+        <div class="row">
+            <div class="col-sm">
+                <div class="row">
+                    <div class="col-md-6">
+                        <h1 class="h3 text-gray-800"><?= $title; ?></h1>
+                        <?php if ($user['role_id'] == 1) :  ?>
+                            <button type="button" class="btn btn-success btn-sm mb-3" data-toggle="modal" data-target="#addAsset">
+                                <i class="fas fa-plus mr-1"></i> Tambah Asset Baru
+                            </button>
+                            <button type="button" class="btn btn-warning btn-sm mb-3" data-toggle="modal" data-target="#import"><i class="fas fa-file-import"></i> Import File CSV</button>
+                            <a href="<?= base_url('asset/download') ?>" class="btn btn-primary btn-sm rounded mb-3"><i class="fa fa-download" aria-hidden="true"></i> Download Format CSV</a>
+                        <?php endif; ?>
+                    </div>
+                    <div class="text-right col-md-6 mb-3">
+                        <img class="mr-2" src="<?= base_url('assets/img/logo_raharja.png') ?>" width="50">
+                        <img src="<?= base_url('assets/img/kampus_merdeka.png') ?>" width="50">
+                    </div>
                 </div>
-                <div class="text-right col-md-6 mb-3">
-                    <img class="mr-2" src="<?= base_url('assets/img/logo_raharja.png') ?>" width="50">
-                    <img src="<?= base_url('assets/img/kampus_merdeka.png') ?>" width="50">
-                </div>
+                <!-- Untuk Menampilkan pop up sweetalert -->
+                <div class="flash-data" data-flashdata="<?= $this->session->flashdata('message'); ?>"></div>
+                <table class="mt-3 table table-border table-sm table-hover table-striped" id="mytable">
+                    <thead>
+                        <tr>
+                            <th>No</th>
+                            <th>Nama</th>
+                            <th>Merk</th>
+                            <th>Nomor Seri</th>
+                            <th>Lokasi Saat Ini</th>
+                            <th>Tahun Input</th>
+                            <th>Aksi</th>
+                        </tr>
+                    </thead>
+                </table>
             </div>
-            <!-- Untuk Menampilkan pop up sweetalert -->
-            <div class="flash-data" data-flashdata="<?= $this->session->flashdata('message'); ?>"></div>
-            <table class="mt-3 table table-border table-sm table-hover" id="mytable">
-                <thead>
-                    <tr>
-                        <th>No</th>
-                        <th>Nama</th>
-                        <th>Merk</th>
-                        <th>Nomor Seri</th>
-                        <th>Lokasi Saat Ini</th>
-                        <th>Tahun Input</th>
-                        <th>Aksi</th>
-                    </tr>
-                </thead>
-            </table>
         </div>
     </div>
 </div>
@@ -82,8 +84,8 @@
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="submit" class="btn btn-success">Simpan</button>
-                    <button type="button" class="btn btn-danger" data-dismiss="modal">Tutup</button>
+                    <button type="submit" class="btn btn-success btn-sm rounded">Simpan</button>
+                    <button type="button" class="btn btn-danger btn-sm rounded" data-dismiss="modal">Tutup</button>
                 </div>
             </form>
         </div>
@@ -106,12 +108,12 @@
             <form method="post" action="<?= base_url('Asset/import'); ?>" enctype="multipart/form-data">
                 <div class="modal-body">
                     <div class="form-group">
-                        <input type="file" class="form-control" id="import" name="import" required>
+                        <input type="file" class="form-control-file" id="import" name="import" required>
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="submit" id="upload" class="btn btn-success">Upload</button>
-                    <button type="button" class="btn btn-danger" data-dismiss="modal">Tutup</button>
+                    <button type="submit" id="upload" class="btn btn-success btn-sm rounded">Upload</button>
+                    <button type="button" class="btn btn-danger btn-sm rounded" data-dismiss="modal">Tutup</button>
                 </div>
             </form>
         </div>
