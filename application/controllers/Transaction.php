@@ -30,7 +30,7 @@ class Transaction extends CI_Controller
       $row[] = $field->serial_number;
       if ($field->placement_status == 1) {
         $row[] = $field->name;
-        $row[] = '<a href="javascript:;" class="btn btn-warning btn-sm rounded" data-toggle="modal" data-target="#takeout" onclick="takeout(' . $field->id_asset .  ','  . $field->room_id . ')">Pindahkan</a>';;
+        $row[] = '<a href="javascript:;" class="btn btn-primary btn-sm rounded" data-toggle="modal" data-target="#takeout" onclick="takeout(' . $field->id_asset .  ','  . $field->room_id . ')">Pindahkan</a>';;
       } else {
         $row[] = "Sedang Dipindahkan";
         $row[] = null;
@@ -91,8 +91,8 @@ class Transaction extends CI_Controller
     $transaction      = $this->Transactions->create_transaction_asset($data);
     $update_placement = $this->Assets->update_placement_status($data['asset_id']);
 
-    if ($transaction > 0) {
-      if ($update_placement > 0) {
+    if (!empty($transaction)) {
+      if ($update_placement == 'success') {
         $this->session->set_flashdata('message', 'take out');
         redirect('transaction');
       } else {

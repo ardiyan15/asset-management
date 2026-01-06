@@ -6,7 +6,7 @@
         <div class="sidebar-brand-icon rotate-n-15">
             <i class="fas fa-book"></i>
         </div>
-        <div class="sidebar-brand-text mx-3" style="font-size: 10px;"> Sistem Inventaris Universitas Raharja </div>
+        <div class="sidebar-brand-text mx-3" style="font-size: 10px;"> Asset Management </div>
     </a>
 
 

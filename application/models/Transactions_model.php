@@ -5,13 +5,43 @@ class Transactions_model extends CI_Model
 
     public function create_transaction_asset($data)
     {
-        $this->db->insert('transactions', $data);
-        return $this->db->affected_rows();
+
+        $this->db->trans_begin();
+
+        try {
+            $transactionId = generate_transaction_id('AST');
+
+            $transaction = [
+                'transaction_id' => $transactionId,
+                'created_at' => date('Y-m-d H:i:s'),
+                'updated_at' => date('Y-m-d H:i:s'),
+                'notes' => $data['notes'],
+            ];
+
+            $result = $this->db->insert('transaction', $transaction);
+
+            unset($data['notes']);
+            $data['transaction_id'] = $result['id'];
+
+            $this->db->insert('transaction_details', $data);
+
+            if ($this->db->trans_status() === FALSE) {
+                throw new Exception('DB Transaction Failed');
+            }
+
+            $this->db->trans_commit();
+
+            // return $this->db->affected_rows();
+            return $transactionId;
+        } catch (\Throwable $e) {
+            $this->db->trans_rollback();
+            throw $e;
+        }
     }
 
     public function get_data_transaction_by_id($id)
     {
-        return $this->db->get_where('transactions', ['id' => $id])->row_array();
+        return $this->db->get_where('transaction_details', ['id' => $id])->row_array();
     }
 
     public function update_status_transaction_by_id($id)
@@ -22,7 +52,7 @@ class Transactions_model extends CI_Model
         $this->db->set('received', date('Y-m-d'));
         $this->db->set('updated_at', date('Y-m-d H:i:s'));
         $this->db->where('id', $id);
-        $this->db->update('transactions');
+        $this->db->update('transaction_details');
         return $this->db->affected_rows();
     }
 
@@ -30,12 +60,12 @@ class Transactions_model extends CI_Model
     {
         foreach (array_combine($asset_ids, $source_ids) as $asset_id => $source_id) {
             $result[] = [
-                'asset_id'      => $asset_id,
-                'room_id'       => $room_id,
-                'source_id'     => $source_id,
-                'status'        => 0,
-                'sent'          => date('Y-m-d'),
-                'created_at'    => date('Y-m-d'),
+                'asset_id' => $asset_id,
+                'room_id' => $room_id,
+                'source_id' => $source_id,
+                'status' => 0,
+                'sent' => date('Y-m-d'),
+                'created_at' => date('Y-m-d'),
             ];
         }
         $this->db->insert_batch('transactions', $result);

@@ -376,10 +376,14 @@ class Assets_model extends CI_Model
 
     public function update_placement_status($id)
     {
-        $this->db->set('placement_status', 0);
-        $this->db->where('id_asset', $id);
-        $this->db->update('asset');
-        return $this->db->affected_rows();
+        try {
+            $this->db->set('placement_status', 0);
+            $this->db->where('id_asset', $id);
+            $this->db->update('asset');
+            return 'success';
+        } catch(\Throwable $e) {
+            return 'failed';
+        }
     }
 
     public function update_asset_location($id, $room_id)

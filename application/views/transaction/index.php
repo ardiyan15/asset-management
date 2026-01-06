@@ -16,7 +16,7 @@
                 <div class="flash-data" data-flashdata="<?= $this->session->flashdata('message'); ?>"></div>
 
                 <div class="table mt-3 col-md-12">
-                    <table class="table table-border table-sm table-hover" id="mytable">
+                    <table class="table table-border table-sm table-hover table-striped" id="mytable">
                         <thead>
                             <tr>
                                 <th>No</th>
@@ -26,7 +26,7 @@
                                 <th>Lokasi Saat Ini</th>
                                 <th>Aksi</th>
                                 <th>
-                                    <button data-target="#bulk_takeout" data-toggle="modal" class="btn btn-success btn-sm">
+                                    <button data-target="#bulk_takeout" data-toggle="modal" class="btn btn-success btn-sm rounded">
                                         Pindahkan
                                     </button>
                                 </th>
