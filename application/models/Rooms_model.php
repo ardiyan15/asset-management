@@ -77,4 +77,14 @@ class Rooms_model extends CI_Model
         $this->db->where('name', $name);
         return $this->db->get()->row_array();
     }
+    public function get_rooms_by_building($building_id)
+    {
+        $this->db->select('rooms.id, rooms.name');
+        $this->db->from('rooms');
+        $this->db->join('floors', 'floors.id = rooms.floor_id');
+        $this->db->join('buildings', 'buildings.id = floors.building_id');
+        $this->db->where(['buildings.id' => $building_id, 'rooms.status' => 1]);
+        $this->db->order_by('rooms.name', 'ASC');
+        return $this->db->get()->result_array();
+    }
 }

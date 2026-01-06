@@ -6,10 +6,6 @@
                     <div class="col-md-6">
                         <h1 class="h3 text-gray-800"><?= $title; ?></h1>
                     </div>
-                    <div class="text-right col-md-6">
-                        <img class="mr-2" src="<?= base_url('assets/img/logo_raharja.png') ?>" width="50">
-                        <img src="<?= base_url('assets/img/kampus_merdeka.png') ?>" width="50">
-                    </div>
                 </div>
 
                 <!-- Untuk Menampilkan pop up sweetalert -->
@@ -26,7 +22,8 @@
                                 <th>Lokasi Saat Ini</th>
                                 <th>Aksi</th>
                                 <th>
-                                    <button data-target="#bulk_takeout" data-toggle="modal" class="btn btn-success btn-sm rounded">
+                                    <button data-target="#bulk_takeout" data-toggle="modal"
+                                        class="btn btn-success btn-sm rounded">
                                         Pindahkan
                                     </button>
                                 </th>
@@ -53,17 +50,27 @@
                     <div class="form-group">
                         <input type="hidden" name="asset_id" id="assetId" value="">
                         <input type="hidden" name="source" id="source" value="">
-                        <label for="room">Lokasi</label>
-                        <select class="form-control filter-room" name="room">
-                            <option value=""> -- Pilih Lokasi -- </option>
-                            <?php foreach ($rooms as $room) : ?>
-                                <option value="<?= $room['id']; ?>"> <?= $room['name'] ?></option>
+                        <label for="building">Gedung</label>
+                        <select class="form-control filter-building mb-3" name="building">
+                            <option value=""> -- Pilih Gedung -- </option>
+                            <?php foreach ($buildings as $building): ?>
+                                <option value="<?= $building['id']; ?>"> <?= $building['name'] ?></option>
                             <?php endforeach; ?>
                         </select>
+                        <div class="rooms d-none">
+                            <label for="room">Lokasi</label>
+                            <select class="form-control filter-room" name="room">
+                                <option value=""> -- Pilih Lokasi -- </option>
+                                <?php foreach ($rooms as $room): ?>
+                                    <option value="<?= $room['id']; ?>"> <?= $room['name'] ?></option>
+                                <?php endforeach; ?>
+                            </select>
+                        </div>
                     </div>
                     <div class="form-group">
                         <label for="note">Catatan</label>
-                        <textarea name="note" id="note" class="form-control" placeholder="Masukkan catatan" rows="3"></textarea>    
+                        <textarea name="note" id="note" class="form-control" placeholder="Masukkan catatan"
+                            rows="3"></textarea>
                     </div>
                 </div>
                 <div class="modal-footer">
@@ -90,7 +97,7 @@
                     <label for="room">Lokasi</label>
                     <select class="form-control filter-room" name="room" id="room_bulk_transaction">
                         <option value=""> -- Pilih Lokasi -- </option>
-                        <?php foreach ($rooms as $room) : ?>
+                        <?php foreach ($rooms as $room): ?>
                             <option value="<?= $room['id']; ?>"> <?= $room['name'] ?></option>
                         <?php endforeach; ?>
                     </select>
@@ -105,7 +112,7 @@
 </div>
 
 <script>
-    $(document).ready(function() {
+    $(document).ready(function () {
         var table = $("#mytable").DataTable({
             processing: true,
             serverSide: true,
@@ -147,4 +154,33 @@
         $("#assetId").val(assetId)
         $("#source").val(roomId)
     }
+
+    $('.filter-building').change(function () {
+        const buildingId = $(this).val();
+        const roomSelect = $(this).closest('.form-group').find('.filter-room');
+        const roomContainer = $(this).closest('.form-group').find('.rooms');
+
+        if (buildingId) {
+            $.ajax({
+                url: "<?= base_url('Transaction/get_rooms_ajax'); ?>",
+                type: "POST",
+                data: {
+                    building_id: buildingId
+                },
+                dataType: "json",
+                success: function (data) {
+                    roomSelect.empty();
+                    roomSelect.append('<option value=""> -- Pilih Lokasi -- </option>');
+                    $.each(data, function (key, value) {
+                        roomSelect.append('<option value="' + value.id + '">' + value.name + '</option>');
+                    });
+                    roomContainer.removeClass('d-none');
+                }
+            });
+        } else {
+            roomContainer.addClass('d-none');
+            roomSelect.empty();
+            roomSelect.append('<option value=""> -- Pilih Lokasi -- </option>');
+        }
+    });
 </script>

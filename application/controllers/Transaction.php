@@ -30,7 +30,8 @@ class Transaction extends CI_Controller
       $row[] = $field->serial_number;
       if ($field->placement_status == 1) {
         $row[] = $field->name;
-        $row[] = '<a href="javascript:;" class="btn btn-primary btn-sm rounded" data-toggle="modal" data-target="#takeout" onclick="takeout(' . $field->id_asset .  ','  . $field->room_id . ')">Pindahkan</a>';;
+        $row[] = '<a href="javascript:;" class="btn btn-primary btn-sm rounded" data-toggle="modal" data-target="#takeout" onclick="takeout(' . $field->id_asset . ',' . $field->room_id . ')">Pindahkan</a>';
+        ;
       } else {
         $row[] = "Sedang Dipindahkan";
         $row[] = null;
@@ -58,9 +59,10 @@ class Transaction extends CI_Controller
 
   public function index()
   {
-    $data['user']       = $this->Auth->get_active_user($this->session->userdata('username'));
-    $data['title']      = 'Transaksi Aset';
-    $data['rooms']      = $this->Rooms->get_all_rooms();
+    $data['user'] = $this->Auth->get_active_user($this->session->userdata('username'));
+    $data['title'] = 'Transaksi Aset';
+    $data['rooms'] = $this->Rooms->get_all_rooms();
+    $data['buildings'] = $this->Buildings->get_active_buildings('1');
 
     $this->load->view('templates/header', $data);
     $this->load->view('templates/sidebar', $data);
@@ -73,22 +75,22 @@ class Transaction extends CI_Controller
 
   public function store()
   {
-    $id           = $this->input->post('asset_id');
-    $room_id      = $this->input->post('room');
-    $source_id    = $this->input->post('source');
-    $note         = $this->input->post('note');
+    $id = $this->input->post('asset_id');
+    $room_id = $this->input->post('room');
+    $source_id = $this->input->post('source');
+    $note = $this->input->post('note');
 
     $data = [
-      'asset_id'    => $id,
-      'room_id'     => $room_id,
-      'source_id'   => $source_id,
-      'status'      => 0,
-      'sent'        => date('Y-m-d'),
-      'created_at'  => date('Y-m-d'),
-      'notes'        => $note
+      'asset_id' => $id,
+      'room_id' => $room_id,
+      'source_id' => $source_id,
+      'status' => 0,
+      'sent' => date('Y-m-d'),
+      'created_at' => date('Y-m-d'),
+      'notes' => $note
     ];
 
-    $transaction      = $this->Transactions->create_transaction_asset($data);
+    $transaction = $this->Transactions->create_transaction_asset($data);
     $update_placement = $this->Assets->update_placement_status($data['asset_id']);
 
     if (!empty($transaction)) {
@@ -107,12 +109,12 @@ class Transaction extends CI_Controller
 
   public function bulk_transaction()
   {
-    $asset_ids      = $this->input->post('asset_id');
-    $room_id        = $this->input->post('room_id');
-    $assets         = $this->Assets->bulk_asset_transaction($asset_ids);
-    $source_id      = $this->Rooms->get_room_by_asset_id($asset_ids);
-    $new_source_id  = array_column($source_id, 'room_id');
-    $transactions   = $this->Transactions->bulk_transaction($asset_ids, $room_id, $new_source_id);
+    $asset_ids = $this->input->post('asset_id');
+    $room_id = $this->input->post('room_id');
+    $assets = $this->Assets->bulk_asset_transaction($asset_ids);
+    $source_id = $this->Rooms->get_room_by_asset_id($asset_ids);
+    $new_source_id = array_column($source_id, 'room_id');
+    $transactions = $this->Transactions->bulk_transaction($asset_ids, $room_id, $new_source_id);
     if ($assets > 0) {
       if ($transactions > 0) {
         echo json_encode(1);
@@ -127,5 +129,12 @@ class Transaction extends CI_Controller
   public function get_room_id($assetId)
   {
     echo $assetId;
+  }
+
+  public function get_rooms_ajax()
+  {
+    $building_id = $this->input->post('building_id');
+    $rooms = $this->Rooms->get_rooms_by_building($building_id);
+    echo json_encode($rooms);
   }
 }

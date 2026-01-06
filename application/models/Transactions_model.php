@@ -18,10 +18,12 @@ class Transactions_model extends CI_Model
                 'notes' => $data['notes'],
             ];
 
-            $result = $this->db->insert('transaction', $transaction);
+            $this->db->insert('transaction', $transaction);
+
+            $id = $this->db->insert_id();
 
             unset($data['notes']);
-            $data['transaction_id'] = $result['id'];
+            $data['transaction_id'] = $id;
 
             $this->db->insert('transaction_details', $data);
 
