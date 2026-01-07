@@ -110,19 +110,22 @@ class Transactions_model extends CI_Model
 
     public function transactions_complete_in($role_id, $building_id)
     {
-        $this->db->select('asset.asset_name, asset.merk, asset.serial_number, rooms.name, transaction_details.sent, source.name AS source, transaction_details.received, transaction_details.status');
-        $this->db->from('transaction_details');
+        $this->db->select('transaction.transaction_id, transaction.created_at, transaction.notes');
+        $this->db->from('transaction');
+        $this->db->join('transaction_details', 'transaction_details.transaction_id = transaction.id');
         $this->db->join('asset', 'asset.id_asset = transaction_details.asset_id');
         $this->db->join('rooms AS source', 'source.id = transaction_details.source_id');
         $this->db->join('rooms', 'rooms.id = transaction_details.room_id');
         $this->db->join('floors', 'floors.id = rooms.floor_id');
         $this->db->join('buildings', 'buildings.id = floors.building_id');
+
         if ($role_id != '1') {
             $this->db->where('transaction_details.status != ', 0);
             $this->db->where('buildings.id', $building_id);
         } else {
             $this->db->where('transaction_details.status !=', 0);
         }
+
         return $this->db->get()->result_array();
     }
 
@@ -144,4 +147,32 @@ class Transactions_model extends CI_Model
         $this->db->update('transactions');
         return $this->db->affected_rows();
     }
+
+    public function get_transaction_in_by_id($transaction_id)
+    {
+        // Get transaction basic info
+        $this->db->select('transaction.transaction_id, transaction.created_at, transaction.notes');
+        $this->db->from('transaction');
+        $this->db->where('transaction.transaction_id', $transaction_id);
+        $transaction = $this->db->get()->row_array();
+
+        if (!$transaction) {
+            return null;
+        }
+
+        // Get assets in this transaction
+        $this->db->select('asset.asset_name, asset.merk, asset.serial_number, transaction_details.status, source.name AS source_name, rooms.name AS destination_name');
+        $this->db->from('transaction_details');
+        $this->db->join('transaction', 'transaction.id = transaction_details.transaction_id');
+        $this->db->join('asset', 'asset.id_asset = transaction_details.asset_id');
+        $this->db->join('rooms AS source', 'source.id = transaction_details.source_id');
+        $this->db->join('rooms', 'rooms.id = transaction_details.room_id');
+        $this->db->where('transaction.transaction_id', $transaction_id);
+        $assets = $this->db->get()->result_array();
+
+        $transaction['assets'] = $assets;
+
+        return $transaction;
+    }
 }
+
