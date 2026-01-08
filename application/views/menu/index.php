@@ -13,10 +13,6 @@
                             <a href="<?= base_url('asset/download') ?>" class="btn btn-primary btn-sm rounded mb-3"><i class="fa fa-download" aria-hidden="true"></i> Download Format CSV</a>
                         <?php endif; ?>
                     </div>
-                    <div class="text-right col-md-6 mb-3">
-                        <img class="mr-2" src="<?= base_url('assets/img/logo_raharja.png') ?>" width="50">
-                        <img src="<?= base_url('assets/img/kampus_merdeka.png') ?>" width="50">
-                    </div>
                 </div>
                 <!-- Untuk Menampilkan pop up sweetalert -->
                 <div class="flash-data" data-flashdata="<?= $this->session->flashdata('message'); ?>"></div>

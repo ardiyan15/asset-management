@@ -10,10 +10,6 @@
                         <a target="_blank" href="<?= base_url('asset/print_report/') . $room_id ?>" class="btn btn-primary btn-sm rounded">Print Laporan PDF</a><br />
                     </div>
                 </div>
-                <div class="text-right col-md-6">
-                    <img class="mr-2" src="<?= base_url('assets/img/logo_raharja.png') ?>" width="50">
-                    <img src="<?= base_url('assets/img/kampus_merdeka.png') ?>" width="50">
-                </div>
             </div>
             <!-- Untuk Menampilkan pop up sweetalert -->
             <div class="flash-data" data-flashdata="<?= $this->session->flashdata('message'); ?>"></div>
