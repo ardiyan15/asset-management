@@ -35,10 +35,32 @@ class History extends CI_Controller
         $building_id = $data['user']['building_id'];
         $data['asset'] = $this->Transactions->transactions_complete_out($role_id, $building_id);
 
+        foreach ($data['asset'] as &$row) {
+            $cipher = $this->encryption->encrypt($row['transaction_id']);
+            $row['trx_token'] = urlsafe_b64encode($cipher);
+        }
+
         $this->load->view('templates/header', $data);
         $this->load->view('templates/sidebar', $data);
         $this->load->view('templates/topbar', $data);
         $this->load->view('history/out', $data);
+        $this->load->view('templates/footer');
+    }
+
+    public function detail_out($transaction_id)
+    {
+        $data['title'] = 'Detail Transaksi Keluar';
+        $data['user'] = $this->Auth->get_active_user($this->session->userdata('username'));
+
+        $cipher = urlsafe_b64decode($transaction_id);
+        $trxId = $this->encryption->decrypt($cipher);
+
+        $data['asset'] = $this->Transactions->get_transaction_out_by_id($trxId);
+
+        $this->load->view('templates/header', $data);
+        $this->load->view('templates/sidebar', $data);
+        $this->load->view('templates/topbar', $data);
+        $this->load->view('history/detail_out', $data);
         $this->load->view('templates/footer');
     }
 
