@@ -13,6 +13,7 @@
  */
 
 use Dompdf\Dompdf;
+use Dompdf\Options;
 
 class Pdf extends Dompdf
 {
@@ -23,7 +24,12 @@ class Pdf extends Dompdf
     public $filename;
     public function __construct()
     {
-        parent::__construct();
+
+        $options = new Options();
+        $options->set('isRemoteEnabled', true);
+        $options->set('chroot', FCPATH);
+
+        parent::__construct($options);
         $this->filename = "laporan.pdf";
     }
     /**

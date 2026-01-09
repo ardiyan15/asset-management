@@ -93,6 +93,9 @@
 
                 <div class="mt-3">
                     <a href="<?= base_url('history/asset_out'); ?>" class="btn btn-secondary rounded btn-sm">Back</a>
+                    <a href="<?= base_url('history/print_bast/') . $trx_token; ?>"
+                        class="btn btn-primary rounded btn-sm" target="_blank"><i class="fas fa-print"></i> Print
+                        BAST</a>
                 </div>
             </div>
         </div>
