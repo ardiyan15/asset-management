@@ -53,7 +53,7 @@ class Pdf extends Dompdf
     public function load_view($view, $data = array())
     {
         $html = $this->ci()->load->view($view, $data, TRUE);
-        $this->load_html($html);
+        $this->loadHtml($html);
         // Render the PDF
         $this->render();
         // Output the generated PDF to Browser

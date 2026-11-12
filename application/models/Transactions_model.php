@@ -60,6 +60,12 @@ class Transactions_model extends CI_Model
 
     public function bulk_transaction($asset_ids, $room_id, $source_ids)
     {
+        // PHP 8: array_combine() throws ValueError when the arrays differ in length
+        if (empty($asset_ids) || count($asset_ids) !== count($source_ids)) {
+            return 0;
+        }
+
+        $result = [];
         foreach (array_combine($asset_ids, $source_ids) as $asset_id => $source_id) {
             $result[] = [
                 'asset_id' => $asset_id,

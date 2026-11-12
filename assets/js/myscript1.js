@@ -200,12 +200,13 @@ switch (flashData) {
 			icon: "error",
 			showConfirmButton: true,
 		});
+		break;
 	case "delete":
 		Swal.fire({
 			title: "Berhasil",
 			text: "User Berhasil Dihapus",
 			icon: "success",
-			showConfirmButton: TextTrackCue,
+			showConfirmButton: true,
 		});
 		break;
 	case "editUser":

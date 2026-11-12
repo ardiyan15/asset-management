@@ -410,6 +410,12 @@ class Assets_model extends CI_Model
 
     public function update_room_id_by_asset_id($room_ids, $asset_ids)
     {
+        // PHP 8: array_combine() throws ValueError when the arrays differ in length
+        if (empty($asset_ids) || count($asset_ids) !== count($room_ids)) {
+            return 0;
+        }
+
+        $result = [];
         foreach (array_combine($asset_ids, $room_ids) as $asset_id => $room_id) {
             $result[] = [
                 'id_asset' => $asset_id,

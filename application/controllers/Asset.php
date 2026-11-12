@@ -40,7 +40,7 @@ class Asset extends CI_Controller
 
     $list = $this->Assets->get_datatables($role_id, $data['user']['building_id']);
     $result = [];
-    $no = $_POST['start'];
+    $no = (int) $this->input->post('start');
     foreach ($list as $field) {
       $no++;
       $row = [];
@@ -58,7 +58,7 @@ class Asset extends CI_Controller
       'rooms' => $this->Rooms->get_all_rooms(),
       'categories' => $this->Categories->get_all_categories(),
       'buldings' => $this->Buildings->get_all_buildings(),
-      'draw' => $_POST['draw'],
+      'draw' => (int) $this->input->post('draw'),
       'recordsTotal' => $this->Assets->count_all($role_id, $data['user']['building_id']),
       'recordsFiltered' => $this->Assets->count_filtered($role_id, $data['user']['building_id']),
       'data' => $result
@@ -341,7 +341,7 @@ class Asset extends CI_Controller
 
   public function download()
   {
-    force_download('csv_file/base_import_format.xls', NULL);
+    force_download('csv_file/base_import_format.csv', NULL);
   }
 
   public function print_report($room_id)
