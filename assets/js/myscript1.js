@@ -57,9 +57,17 @@ switch (flashData) {
 			showConfirmButton: true,
 		});
 		break;
+	case "ti_failed":
+		Swal.fire({
+			title: "Gagal",
+			text: "Transaksi tidak ditemukan atau sudah diproses sebelumnya",
+			icon: "error",
+			showConfirmButton: true,
+		});
+		break;
 	case "reject":
 		Swal.fire({
-			title: "Success",
+			title: "Berhasil",
 			text: "Aset ditolak",
 			icon: "info",
 			showConfirmButton: true,

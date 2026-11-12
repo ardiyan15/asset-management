@@ -79,48 +79,65 @@ $("#room_bulk_transaction").change(function () {
 });
 
 $("#btn-acc").click(function () {
-	let asset_ids = [];
-	$('input:checkbox[name="check_in"]:checked').each(function () {
-		asset_ids.push($(this).val());
+	const asset_ids = $('input:checkbox[name="check_in"]:checked')
+		.map(function () {
+			return $(this).val();
+		})
+		.get();
+
+	if (asset_ids.length === 0) {
 		Swal.fire({
-			title: "Terima Aset",
-			text: "Anda ingin menerima aset yang dipilih",
-			icon: "question",
-			showCancelButton: true,
-			confirmButtonColor: "#3085d6",
-			cancelButtonColor: "#d33",
-			confirmButtonText: "Ya",
-			cancelButtonText: "Tidak",
-		}).then((result) => {
-			if (result.value) {
-				$.ajax({
-					method: "POST",
-					url: baseUrl + "TI/bulk_acc",
-					data: {
-						asset_ids: asset_ids,
-					},
-					success: function (results) {
-						if (results > 0) {
-							Swal.fire({
-								title: "Berhasil",
-								text: "Berhasil menerima aset",
-								icon: "success",
-							}).then(function () {
-								location.reload();
-							});
-						} else {
-							Swal.fire({
-								title: "Gagal",
-								text: "Gagal memindahkan aset",
-								icon: "error",
-							});
-						}
-					},
-					error: function (err, XMLHttpRequest, textStatus, errorThrown) {
-						console.log(err);
-					},
+			title: "Belum ada aset dipilih",
+			text: "Centang aset yang ingin diterima terlebih dahulu",
+			icon: "info",
+		});
+		return;
+	}
+
+	Swal.fire({
+		title: "Terima Aset",
+		text: "Anda ingin menerima " + asset_ids.length + " aset yang dipilih?",
+		icon: "question",
+		showCancelButton: true,
+		confirmButtonColor: "#3085d6",
+		cancelButtonColor: "#d33",
+		confirmButtonText: "Ya",
+		cancelButtonText: "Tidak",
+	}).then((result) => {
+		if (!result.value) return;
+
+		$.ajax({
+			method: "POST",
+			url: baseUrl + "TI/bulk_acc",
+			dataType: "json",
+			data: {
+				asset_ids: asset_ids,
+			},
+			success: function (results) {
+				if (results > 0) {
+					Swal.fire({
+						title: "Berhasil",
+						text: results + " aset berhasil diterima",
+						icon: "success",
+					}).then(function () {
+						location.reload();
+					});
+				} else {
+					Swal.fire({
+						title: "Gagal",
+						text: "Gagal menerima aset",
+						icon: "error",
+					});
+				}
+			},
+			error: function (err) {
+				console.log(err);
+				Swal.fire({
+					title: "Gagal",
+					text: "Terjadi kesalahan pada server",
+					icon: "error",
 				});
-			}
+			},
 		});
 	});
 });

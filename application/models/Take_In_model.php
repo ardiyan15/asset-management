@@ -23,14 +23,6 @@ class Take_In_model extends CI_Model
         return $this->db->get()->result_array();
     }
 
-    public function get_transaction_data_by_id($id)
-    {
-        $this->db->select('*');
-        $this->db->from('transactions');
-        $this->db->where('id', $id);
-        return $this->db->get()->row_array();
-    }
-
     public function get_detail_take_in($id)
     {
         $this->db->select('asset.id_asset, asset.asset_name, asset.merk, asset.serial_number, source.name AS source_room, transaction_details.id, rooms.name AS destination, transaction.transaction_id, transaction.created_at, transaction.notes, transaction_details.status');

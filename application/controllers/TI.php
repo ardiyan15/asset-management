@@ -24,9 +24,11 @@ class TI extends CI_Controller
     $data['asset'] = $this->Take_in->get_asset_take_in_by_building_id($role_id, $building_id);
 
     foreach ($data['asset'] as &$row) {
-      $cipher = $this->encryption->encrypt($row['transaction_id']);
-      $row['trx_token'] = urlsafe_b64encode($cipher);
+      $row['trx_token'] = urlsafe_b64encode($this->encryption->encrypt($row['transaction_id']));
+      // token per detail transaksi untuk tombol Terima / Tolak
+      $row['detail_token'] = urlsafe_b64encode($this->encryption->encrypt($row['id']));
     }
+    unset($row);
 
     $this->load->view('templates/header', $data);
     $this->load->view('templates/sidebar', $data);
@@ -59,57 +61,63 @@ class TI extends CI_Controller
     $this->load->view('templates/footer');
   }
 
-  public function acc($id)
+  public function acc($token = null)
   {
-    $cipher = urlsafe_b64decode($id);
-    $asset_id = $this->encryption->decrypt($cipher);
+    $detail = $this->_pending_detail_from_token($token);
 
-    $transaction = $this->Transactions->get_data_transaction_by_id($asset_id);
-    $update_transaction = $this->Transactions->update_status_transaction_by_id($transaction['id']);
-    $update_asset = $this->Assets->update_asset_location($transaction['asset_id'], $transaction['room_id']);
-
-    if ($update_transaction > 0) {
-      if ($update_asset) {
-        $this->session->set_flashdata('message', 'ti_success');
-        redirect('ti');
-      } else {
-        $this->session->set_flashdata('message', 'failed');
-        redirect('ti');
-      }
+    if ($detail && $this->Transactions->accept_details([$detail])) {
+      $this->session->set_flashdata('message', 'ti_success');
     } else {
-      $this->session->set_flashdata('message', 'failed');
-      redirect('ti');
+      $this->session->set_flashdata('message', 'ti_failed');
     }
+    redirect('ti');
   }
 
-  public function reject($id)
+  public function reject($token = null)
   {
-    $data['asset'] = $this->Take_in->get_transaction_data_by_id($id);
+    $detail = $this->_pending_detail_from_token($token);
 
-    $location = $data['asset']['source'];
-    $assetId = $data['asset']['asset_id'];
-
-    if ($this->Assets->reject_model($location, $assetId, $id) > 0) {
+    if ($detail && $this->Transactions->reject_detail($detail)) {
       $this->session->set_flashdata('message', 'reject');
-      redirect('ti');
     } else {
-      $this->session->set_flashdata('message', 'failed ');
-      redirect('ti');
+      $this->session->set_flashdata('message', 'ti_failed');
     }
+    redirect('ti');
   }
 
   public function bulk_acc()
   {
-    $asset_ids = $this->input->post('asset_ids');
-    $rooms_ids = $this->Transactions->get_transaction_room_id_by_asset_id($asset_ids);
-    $value_room_ids = array_column($rooms_ids, 'room_id');
-    $asset_result = $this->Assets->update_room_id_by_asset_id($value_room_ids, $asset_ids);
-    $result_transaction = $this->Transactions->bulk_update($asset_ids, $value_room_ids);
-
-    if ($asset_result && $result_transaction > 0) {
-      echo json_encode(1);
-    } else {
+    $asset_ids = array_filter((array) $this->input->post('asset_ids'), 'ctype_digit');
+    if (empty($asset_ids)) {
       echo json_encode(0);
+      return;
     }
+
+    $user = $this->Auth->get_active_user($this->session->userdata('username'));
+    $details = $this->Transactions->get_pending_details($user['role_id'], $user['building_id'], [], $asset_ids);
+
+    echo json_encode($this->Transactions->accept_details($details) ? count($details) : 0);
+  }
+
+  /**
+   * Token terenkripsi (urlsafe base64) -> detail transaksi yang masih pending, atau null.
+   */
+  private function _pending_detail_from_token($token)
+  {
+    $cipher = urlsafe_b64decode((string) $token);
+    $detail_id = $cipher ? $this->encryption->decrypt($cipher) : false;
+
+    if (!$detail_id || !ctype_digit((string) $detail_id)) {
+      return null;
+    }
+
+    $user = $this->Auth->get_active_user($this->session->userdata('username'));
+    $details = $this->Transactions->get_pending_details(
+      $user['role_id'],
+      $user['building_id'],
+      ['transaction_details.id' => (int) $detail_id]
+    );
+
+    return $details[0] ?? null;
   }
 }

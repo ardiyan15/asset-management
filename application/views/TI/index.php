@@ -35,10 +35,10 @@
                                 <td class="text-center" scope="col"> <?= $ast['created_at']; ?> </td>
                                 <td class="text-center" scope="col"> <?= $ast['notes'] ?? '-' ?> </td>
                                 <td class="text-center" scope="col">
-                                    <a href="<?= base_url('TI/acc/') . $ast['id'] ?>"
+                                    <a href="<?= base_url('TI/acc/') . $ast['detail_token'] ?>"
                                         class="btn btn-success btn-sm takein-button rounded"> <i class="fas fa-check"></i>
                                         Terima </a>
-                                    <a href="<?= base_url('TI/reject/') . $ast['id'] ?>"
+                                    <a href="<?= base_url('TI/reject/') . $ast['detail_token'] ?>"
                                         class="btn btn-danger btn-sm reject-button rounded"> <i class=" fas fa-times"></i>
                                         Tolak </a>
                                 </td>

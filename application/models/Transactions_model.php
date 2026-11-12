@@ -41,21 +41,93 @@ class Transactions_model extends CI_Model
         }
     }
 
-    public function get_data_transaction_by_id($id)
+    /**
+     * Detail transaksi yang masih menunggu diterima (status 0).
+     * Non-admin hanya boleh memproses kiriman ke ruangan di gedungnya sendiri.
+     *
+     * @param array $where  kondisi tambahan, mis. ['transaction_details.id' => 5]
+     * @param array|null $asset_ids  filter where_in asset_id
+     */
+    public function get_pending_details($role_id, $building_id, array $where = [], $asset_ids = null)
     {
-        return $this->db->get_where('transaction_details', ['id' => $id])->row_array();
+        $this->db->select('transaction_details.id, transaction_details.asset_id, transaction_details.room_id, transaction_details.source_id');
+        $this->db->from('transaction_details');
+        $this->db->where('transaction_details.status', 0);
+        $this->db->where($where);
+
+        if ($asset_ids !== null) {
+            $this->db->where_in('transaction_details.asset_id', $asset_ids);
+        }
+
+        if ($role_id !== '1') {
+            $this->db->join('rooms', 'rooms.id = transaction_details.room_id');
+            $this->db->join('floors', 'floors.id = rooms.floor_id');
+            $this->db->where('floors.building_id', $building_id);
+        }
+
+        return $this->db->get()->result_array();
     }
 
-    public function update_status_transaction_by_id($id)
+    /**
+     * Terima kiriman: detail jadi status 1 dan aset pindah ke ruangan tujuan.
+     */
+    public function accept_details(array $details)
     {
-        date_default_timezone_set('Asia/Jakarta');
+        if (empty($details)) {
+            return false;
+        }
 
-        $this->db->set('status', 1);
-        $this->db->set('received', date('Y-m-d'));
+        $now = date('Y-m-d H:i:s');
+
+        $this->db->trans_begin();
+
+        foreach ($details as $detail) {
+            $this->db->set('status', 1);
+            $this->db->set('received', date('Y-m-d'));
+            $this->db->set('updated_at', $now);
+            $this->db->where('id', $detail['id']);
+            $this->db->where('status', 0);
+            $this->db->update('transaction_details');
+
+            $this->db->set('room_id', $detail['room_id']);
+            $this->db->set('placement_status', 1);
+            $this->db->where('id_asset', $detail['asset_id']);
+            $this->db->update('asset');
+        }
+
+        if ($this->db->trans_status() === FALSE) {
+            $this->db->trans_rollback();
+            return false;
+        }
+
+        $this->db->trans_commit();
+        return true;
+    }
+
+    /**
+     * Tolak kiriman: detail jadi status 2, aset tetap di ruangan asal dan bisa dipindah lagi.
+     */
+    public function reject_detail(array $detail)
+    {
+        $this->db->trans_begin();
+
+        $this->db->set('status', 2);
         $this->db->set('updated_at', date('Y-m-d H:i:s'));
-        $this->db->where('id', $id);
+        $this->db->where('id', $detail['id']);
+        $this->db->where('status', 0);
         $this->db->update('transaction_details');
-        return $this->db->affected_rows();
+
+        $this->db->set('placement_status', 1);
+        $this->db->where('id_asset', $detail['asset_id']);
+        $this->db->update('asset');
+
+        if ($this->db->trans_status() === FALSE) {
+            $this->db->trans_rollback();
+            return false;
+        }
+
+        $this->db->trans_commit();
+        return true;
     }
 
     public function bulk_transaction($asset_ids, $room_id, $source_ids)
@@ -137,25 +209,6 @@ class Transactions_model extends CI_Model
         }
 
         return $this->db->get()->result_array();
-    }
-
-    public function get_transaction_room_id_by_asset_id($asset_ids)
-    {
-        $this->db->select('room_id');
-        $this->db->from('transactions');
-        $this->db->where('status', 0);
-        $this->db->where_in('asset_id', $asset_ids);
-        return $this->db->get()->result_array();
-    }
-
-    public function bulk_update($asset_ids)
-    {
-        $this->db->set('status', 1);
-        $this->db->set('updated_at', date('Y-m-d H:i:s'));
-        $this->db->set('received', date('Y-m-d'));
-        $this->db->where_in('asset_id', $asset_ids);
-        $this->db->update('transactions');
-        return $this->db->affected_rows();
     }
 
     public function get_transaction_in_by_id($transaction_id)

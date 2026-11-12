@@ -203,17 +203,6 @@ class Assets_model extends CI_Model
         }
     }
 
-    public function reject_model($location, $assetId, $id)
-    {
-        $this->db->set('status', 2);
-        $this->db->where('id', $id);
-        $this->db->update('transactions');
-        $this->db->set('placement_status', 1);
-        $this->db->where('id_asset', $assetId);
-        $this->db->update('asset');
-        return $this->db->affected_rows();
-    }
-
     public function get_total_row($role, $room_id)
     {
         if ($role == '1') {
@@ -386,15 +375,6 @@ class Assets_model extends CI_Model
         }
     }
 
-    public function update_asset_location($id, $room_id)
-    {
-        $this->db->set('room_id', $room_id);
-        $this->db->set('placement_status', 1);
-        $this->db->where('id_asset', $id);
-        $this->db->update('asset');
-        return $this->db->affected_rows();
-    }
-
     public function bulk_asset_transaction($asset_ids)
     {
         $this->db->set('placement_status', 0);
@@ -406,25 +386,6 @@ class Assets_model extends CI_Model
     public function get_asset_by_id($id)
     {
         return $this->db->get_where('asset', ['id_asset' => $id])->row_array();
-    }
-
-    public function update_room_id_by_asset_id($room_ids, $asset_ids)
-    {
-        // PHP 8: array_combine() throws ValueError when the arrays differ in length
-        if (empty($asset_ids) || count($asset_ids) !== count($room_ids)) {
-            return 0;
-        }
-
-        $result = [];
-        foreach (array_combine($asset_ids, $room_ids) as $asset_id => $room_id) {
-            $result[] = [
-                'id_asset' => $asset_id,
-                'room_id' => $room_id,
-                'placement_status' => 1,
-            ];
-        }
-        $this->db->update_batch('asset', $result, 'id_asset');
-        return $this->db->affected_rows();
     }
 
     public function delete_user($id)
