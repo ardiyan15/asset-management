@@ -363,25 +363,7 @@ class Assets_model extends CI_Model
         return $this->db->get()->result_array();
     }
 
-    public function update_placement_status($id)
-    {
-        try {
-            $this->db->set('placement_status', 0);
-            $this->db->where('id_asset', $id);
-            $this->db->update('asset');
-            return 'success';
-        } catch(\Throwable $e) {
-            return 'failed';
-        }
-    }
 
-    public function bulk_asset_transaction($asset_ids)
-    {
-        $this->db->set('placement_status', 0);
-        $this->db->where_in('id_asset', $asset_ids);
-        $this->db->update('asset');
-        return $result = $this->db->affected_rows();
-    }
 
     public function get_asset_by_id($id)
     {

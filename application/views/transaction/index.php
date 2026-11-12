@@ -94,13 +94,23 @@
             </div>
             <div class="modal-body">
                 <div class="form-group">
-                    <label for="room">Lokasi</label>
-                    <select class="form-control filter-room" name="room" id="room_bulk_transaction">
-                        <option value=""> -- Pilih Lokasi -- </option>
-                        <?php foreach ($rooms as $room): ?>
-                            <option value="<?= $room['id']; ?>"> <?= $room['name'] ?></option>
+                    <label for="building">Gedung</label>
+                    <select class="form-control filter-building mb-3" name="building">
+                        <option value=""> -- Pilih Gedung -- </option>
+                        <?php foreach ($buildings as $building): ?>
+                            <option value="<?= $building['id']; ?>"> <?= $building['name'] ?></option>
                         <?php endforeach; ?>
                     </select>
+                    <div class="rooms d-none">
+                        <label for="room_bulk_transaction">Lokasi</label>
+                        <select class="form-control filter-room" name="room" id="room_bulk_transaction">
+                            <option value=""> -- Pilih Lokasi -- </option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="bulk_note">Catatan</label>
+                    <textarea id="bulk_note" class="form-control" placeholder="Masukkan catatan" rows="3"></textarea>
                 </div>
             </div>
             <div class="modal-footer">

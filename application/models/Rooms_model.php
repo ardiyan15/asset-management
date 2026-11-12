@@ -47,13 +47,6 @@ class Rooms_model extends CI_Model
         return $this->db->affected_rows();
     }
 
-    public function get_room_by_asset_id($asset_ids)
-    {
-        $this->db->select('room_id');
-        $this->db->from('asset');
-        $this->db->where_in('id_asset', $asset_ids);
-        return $this->db->get()->result_array();
-    }
 
     public function get_single_room_by_id($id)
     {

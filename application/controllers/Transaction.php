@@ -11,6 +11,7 @@ class Transaction extends CI_Controller
     $this->load->model('Transactions_model', 'Transactions');
     $this->load->model('Categories_model', 'Categories');
     $this->load->model('Buildings_model', 'Buildings');
+    is_logged_in();
   }
 
   function get_data_asset()
@@ -75,55 +76,45 @@ class Transaction extends CI_Controller
 
   public function store()
   {
-    $id = $this->input->post('asset_id');
-    $room_id = $this->input->post('room');
-    $source_id = $this->input->post('source');
-    $note = $this->input->post('note');
+    $count = $this->_move_assets(
+      [$this->input->post('asset_id')],
+      $this->input->post('room'),
+      $this->input->post('note', true)
+    );
 
-    $data = [
-      'asset_id' => $id,
-      'room_id' => $room_id,
-      'source_id' => $source_id,
-      'status' => 0,
-      'sent' => date('Y-m-d'),
-      'created_at' => date('Y-m-d'),
-      'notes' => $note
-    ];
-
-    $transaction = $this->Transactions->create_transaction_asset($data);
-    $update_placement = $this->Assets->update_placement_status($data['asset_id']);
-
-    if (!empty($transaction)) {
-      if ($update_placement == 'success') {
-        $this->session->set_flashdata('message', 'take out');
-        redirect('transaction');
-      } else {
-        $this->session->set_flashdata('message', 'failed');
-        redirect('transaction');
-      }
-    } else {
-      $this->session->set_flashdata('message', 'failed');
-      redirect('transaction');
-    }
+    $this->session->set_flashdata('message', $count > 0 ? 'take out' : 'move_failed');
+    redirect('transaction');
   }
 
   public function bulk_transaction()
   {
-    $asset_ids = $this->input->post('asset_id');
-    $room_id = $this->input->post('room_id');
-    $assets = $this->Assets->bulk_asset_transaction($asset_ids);
-    $source_id = $this->Rooms->get_room_by_asset_id($asset_ids);
-    $new_source_id = array_column($source_id, 'room_id');
-    $transactions = $this->Transactions->bulk_transaction($asset_ids, $room_id, $new_source_id);
-    if ($assets > 0) {
-      if ($transactions > 0) {
-        echo json_encode(1);
-      } else {
-        echo json_encode(0);
-      }
-    } else {
-      echo json_encode(0);
+    // response: jumlah aset yang dipindahkan (0 = gagal)
+    echo json_encode($this->_move_assets(
+      (array) $this->input->post('asset_id'),
+      $this->input->post('room_id'),
+      $this->input->post('note', true)
+    ));
+  }
+
+  /**
+   * Pindahkan aset ke ruangan tujuan dalam satu transaksi (TRX/AST/...).
+   * Aset yang sedang dipindahkan, sudah di ruangan tujuan, atau di luar gedung user dilewati.
+   *
+   * @return int jumlah aset yang masuk ke transaksi
+   */
+  private function _move_assets(array $asset_ids, $room_id, $note)
+  {
+    $asset_ids = array_values(array_unique(array_filter(array_map('strval', $asset_ids), 'ctype_digit')));
+    $room_id   = ctype_digit((string) $room_id) ? (int) $room_id : 0;
+
+    if (empty($asset_ids) || !$room_id || !$this->Rooms->get_single_room_by_id($room_id)) {
+      return 0;
     }
+
+    $user   = $this->Auth->get_active_user($this->session->userdata('username'));
+    $assets = $this->Transactions->get_movable_assets($user['role_id'], $user['building_id'], $asset_ids, $room_id);
+
+    return $this->Transactions->create_transaction($assets, $room_id, $note) ? count($assets) : 0;
   }
 
   public function get_room_id($assetId)

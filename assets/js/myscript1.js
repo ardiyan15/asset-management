@@ -57,6 +57,14 @@ switch (flashData) {
 			showConfirmButton: true,
 		});
 		break;
+	case "move_failed":
+		Swal.fire({
+			title: "Gagal",
+			text: "Aset gagal dipindahkan. Pastikan lokasi tujuan dipilih dan berbeda dari lokasi saat ini.",
+			icon: "error",
+			showConfirmButton: true,
+		});
+		break;
 	case "ti_failed":
 		Swal.fire({
 			title: "Gagal",

@@ -3,41 +3,88 @@
 class Transactions_model extends CI_Model
 {
 
-    public function create_transaction_asset($data)
+    /**
+     * Aset yang boleh dipindahkan ke $dest_room_id: ada di ruangan (placement_status 1),
+     * belum berada di ruangan tujuan, dan untuk non-admin berada di gedung user.
+     * Ruangan asal selalu diambil dari database, bukan dari input form.
+     */
+    public function get_movable_assets($role_id, $building_id, array $asset_ids, $dest_room_id)
     {
+        if (empty($asset_ids)) {
+            return [];
+        }
+
+        $this->db->select('asset.id_asset, asset.room_id');
+        $this->db->from('asset');
+        $this->db->where_in('asset.id_asset', $asset_ids);
+        $this->db->where('asset.placement_status', 1);
+        $this->db->where('asset.room_id !=', $dest_room_id);
+
+        if ($role_id !== '1') {
+            $this->db->join('rooms', 'rooms.id = asset.room_id');
+            $this->db->join('floors', 'floors.id = rooms.floor_id');
+            $this->db->where('floors.building_id', $building_id);
+        }
+
+        return $this->db->get()->result_array();
+    }
+
+    /**
+     * Buat satu transaksi pemindahan (header + detail per aset) dan tandai aset
+     * sedang dipindahkan. Dipakai untuk pindah satuan maupun massal.
+     *
+     * @param array $assets  hasil get_movable_assets(): [['id_asset' => .., 'room_id' => ..], ...]
+     * @return string|false  kode transaksi (TRX/AST/...) atau false jika gagal
+     */
+    public function create_transaction(array $assets, $dest_room_id, $notes = null)
+    {
+        if (empty($assets)) {
+            return false;
+        }
+
+        $now = date('Y-m-d H:i:s');
 
         $this->db->trans_begin();
 
         try {
-            $transactionId = generate_transaction_id('AST');
+            $code = generate_transaction_id('AST');
 
-            $transaction = [
-                'transaction_id' => $transactionId,
-                'created_at' => date('Y-m-d H:i:s'),
-                'updated_at' => date('Y-m-d H:i:s'),
-                'notes' => $data['notes'],
-            ];
+            $this->db->insert('transaction', [
+                'transaction_id' => $code,
+                'created_at'     => $now,
+                'updated_at'     => $now,
+                'notes'          => ($notes !== null && trim($notes) !== '') ? trim($notes) : null,
+            ]);
+            $header_id = $this->db->insert_id();
 
-            $this->db->insert('transaction', $transaction);
+            $details = [];
+            foreach ($assets as $asset) {
+                $details[] = [
+                    'transaction_id' => $header_id,
+                    'asset_id'       => $asset['id_asset'],
+                    'source_id'      => $asset['room_id'],
+                    'room_id'        => $dest_room_id,
+                    'status'         => 0,
+                    'sent'           => date('Y-m-d'),
+                    'created_at'     => $now,
+                ];
+            }
+            $this->db->insert_batch('transaction_details', $details);
 
-            $id = $this->db->insert_id();
-
-            unset($data['notes']);
-            $data['transaction_id'] = $id;
-
-            $this->db->insert('transaction_details', $data);
+            $this->db->set('placement_status', 0);
+            $this->db->where_in('id_asset', array_column($assets, 'id_asset'));
+            $this->db->update('asset');
 
             if ($this->db->trans_status() === FALSE) {
                 throw new Exception('DB Transaction Failed');
             }
 
             $this->db->trans_commit();
-
-            // return $this->db->affected_rows();
-            return $transactionId;
+            return $code;
         } catch (\Throwable $e) {
             $this->db->trans_rollback();
-            throw $e;
+            log_message('error', 'create_transaction: ' . $e->getMessage());
+            return false;
         }
     }
 
@@ -128,28 +175,6 @@ class Transactions_model extends CI_Model
 
         $this->db->trans_commit();
         return true;
-    }
-
-    public function bulk_transaction($asset_ids, $room_id, $source_ids)
-    {
-        // PHP 8: array_combine() throws ValueError when the arrays differ in length
-        if (empty($asset_ids) || count($asset_ids) !== count($source_ids)) {
-            return 0;
-        }
-
-        $result = [];
-        foreach (array_combine($asset_ids, $source_ids) as $asset_id => $source_id) {
-            $result[] = [
-                'asset_id' => $asset_id,
-                'room_id' => $room_id,
-                'source_id' => $source_id,
-                'status' => 0,
-                'sent' => date('Y-m-d'),
-                'created_at' => date('Y-m-d'),
-            ];
-        }
-        $this->db->insert_batch('transactions', $result);
-        return $this->db->affected_rows();
     }
 
     public function transaction_out_process($role_id, $building_id)
