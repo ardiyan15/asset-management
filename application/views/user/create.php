@@ -8,10 +8,13 @@
             <img src="<?= base_url('assets/img/kampus_merdeka.png') ?>" width="50">
         </div>
     </div>
+    <?php if (!empty($error)) : ?>
+        <div class="alert alert-danger" role="alert"><?= $error ?></div>
+    <?php endif ?>
     <form action="<?= base_url('user/store') ?>" method="POST" enctype="multipart/form-data">
         <div class="form-group">
             <label>Username</label>
-            <input type="text" class="form-control" name="username" placeholder="Username">
+            <input type="text" class="form-control" name="username" placeholder="Username" value="<?= html_escape((string) $this->input->post('username')) ?>">
         </div>
         <div class="form-group">
             <label>Password</label>
@@ -20,14 +23,14 @@
         <div class="form-group">
             <label for="exampleInputPassword1">Role</label>
             <select name="role" class="custom-select">
-                <option selected>-- Pilih Role --</option>
+                <option value="" selected>-- Pilih Role --</option>
                 <option value="2">User</option>
             </select>
         </div>
         <div class="form-group">
             <label for="exampleInputPassword1">Building</label>
             <select name="building" required class="custom-select">
-                <option selected>-- Pilih Gedung --</option>
+                <option value="" selected>-- Pilih Gedung --</option>
                 <?php foreach ($buildings as $building) : ?>
                     <option value="<?= $building['id'] ?>"><?= $building['name'] ?></option>
                 <?php endforeach ?>
