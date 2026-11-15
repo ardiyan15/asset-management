@@ -52,5 +52,7 @@ defined('BASEPATH') or exit('No direct script access allowed');
 $route['default_controller'] = 'auth';
 $route['floors/(:any)'] = 'floors/index/$1';
 $route['room/(:any)'] = 'room/index/$1';
+$route['scan/login/(:any)'] = 'scan/login/$1';
+$route['scan/(:any)'] = 'scan/index/$1';
 $route['404_override'] = '';
 $route['translate_uri_dashes'] = FALSE;

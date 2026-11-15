@@ -28,6 +28,9 @@
                             <label style="font-size: 12px;">( Jumlah Aset: </label> <label class="font-weight-bold" style="font-size: 12px;"><?= $room['total'] ?></label> )
                             <p><?= $room['description'] ?></p>
                             <a href="<?= base_url('room/edit/') . $room['id'] ?>" class="btn btn-default btn-sm"> <i class="fas fa-edit"></i> Edit </a>
+                            <?php if ($room['total'] > 0) : ?>
+                                <a href="<?= base_url('asset/print_labels/') . $room['id'] ?>" target="_blank" class="btn btn-default btn-sm"> <i class="fas fa-qrcode"></i> Label QR </a>
+                            <?php endif; ?>
                             <!-- <?php if ($room['status'] == 1) : ?>
                                 <a href="<?= base_url('admin/deactivateStr/') . $room['id']; ?>" class="btn btn-sm deactStr-button"> <i class=" fas fa-times"></i> List Room's </a>
                             <?php else : ?>

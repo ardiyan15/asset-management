@@ -7,7 +7,9 @@
                     <p class="mt-2 font-weight-bold"><?= $room['name'] ?> ( <?= $room['description'] ?> )</p>
                     <div class="row" style="margin-left: 2px;">
                         <a href="<?= base_url('room/') . $room['floor_id'] ?>" style="margin-right: 10px;">Kembali</a>
-                        <a target="_blank" href="<?= base_url('asset/print_report/') . $room_id ?>" class="btn btn-primary btn-sm rounded">Print Laporan PDF</a><br />
+                        <a target="_blank" href="<?= base_url('asset/print_report/') . $room_id ?>" class="btn btn-primary btn-sm rounded mr-2">Print Laporan PDF</a>
+                        <a target="_blank" href="<?= base_url('asset/print_labels/') . $room_id ?>" class="btn btn-dark btn-sm rounded mr-2"><i class="fas fa-qrcode mr-1"></i> Cetak Label QR Ruangan</a>
+                        <button type="button" id="print_selected_labels" class="btn btn-outline-dark btn-sm rounded"><i class="fas fa-qrcode mr-1"></i> Cetak Label Terpilih</button><br />
                     </div>
                 </div>
             </div>
@@ -38,7 +40,9 @@
                                     <td scope="row"> <?= $i; ?></td>
                                     <td scope="row"><?= $asset['asset_name']; ?></td>
                                     <td scope="row"><?= $asset['merk']; ?></td>
-                                    <td scope="row"><?= $asset['serial_number']; ?></td>
+                                    <td scope="row">
+                                        <a href="<?= base_url('scan/' . rawurlencode($asset['serial_number'])) ?>" target="_blank" title="Lihat halaman scan QR"><i class="fas fa-qrcode mr-1"></i><?= $asset['serial_number']; ?></a>
+                                    </td>
                                     <?php if ($asset['placement_status'] == 1) : ?>
                                         <td scope="row"><?= $asset['name']; ?></td>
                                         <td>
@@ -135,6 +139,22 @@ foreach ($assets as $asset) :
 </div>
 
 <script>
+    $('#print_selected_labels').on('click', function() {
+        const ids = $('input:checkbox[name="check"]:checked').map(function() {
+            return $(this).val();
+        }).get();
+
+        if (ids.length === 0) {
+            Swal.fire({
+                title: 'Belum ada aset dipilih',
+                text: 'Centang aset yang ingin dicetak labelnya terlebih dahulu',
+                icon: 'info',
+            });
+            return;
+        }
+        window.open(baseUrl + 'asset/print_labels?ids=' + ids.join(','), '_blank');
+    });
+
     function takeout(assetId, roomId) {
         $("#assetId").val(assetId)
         $("#source").val(roomId)

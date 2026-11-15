@@ -29,6 +29,13 @@ date_default_timezone_set('Asia/Jakarta');
 $config['base_url'] = 'http://asset-management.test/';
 
 /*
+| URL dasar yang ditanam di QR label aset (halaman scan/<serial>).
+| Kosongkan untuk memakai base_url. Isi dengan alamat yang bisa dibuka dari HP,
+| mis. 'http://192.168.1.10/asset-management/' saat demo di jaringan lokal.
+*/
+$config['qr_base_url'] = '';
+
+/*
 |--------------------------------------------------------------------------
 | Index File
 |--------------------------------------------------------------------------

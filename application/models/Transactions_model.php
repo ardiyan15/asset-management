@@ -289,5 +289,23 @@ class Transactions_model extends CI_Model
 
         return $transaction;
     }
+
+    /**
+     * Riwayat perpindahan satu aset (terbaru dulu), dipakai halaman scan QR.
+     * status detail: 0 = dikirim, 1 = diterima, 2 = ditolak.
+     */
+    public function get_asset_movements($asset_id)
+    {
+        $this->db->select('transaction.transaction_id AS trx_code, transaction.notes,
+            transaction_details.status, transaction_details.sent, transaction_details.received,
+            source.name AS source_name, rooms.name AS destination_name');
+        $this->db->from('transaction_details');
+        $this->db->join('transaction', 'transaction.id = transaction_details.transaction_id', 'left');
+        $this->db->join('rooms AS source', 'source.id = transaction_details.source_id', 'left');
+        $this->db->join('rooms', 'rooms.id = transaction_details.room_id', 'left');
+        $this->db->where('transaction_details.asset_id', $asset_id);
+        $this->db->order_by('transaction_details.id', 'DESC');
+        return $this->db->get()->result_array();
+    }
 }
 

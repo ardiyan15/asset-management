@@ -365,6 +365,52 @@ class Assets_model extends CI_Model
 
 
 
+    /**
+     * Detail aset lengkap dengan lokasi (ruangan → lantai → gedung) berdasarkan nomor seri.
+     */
+    public function get_asset_detail_by_serial($serial_number)
+    {
+        $this->db->select('asset.id_asset, asset.asset_name, asset.merk, asset.serial_number,
+            asset.placement_status, asset.created,
+            rooms.id AS room_id, rooms.name AS room_name, rooms.description AS room_description,
+            floors.name AS floor_name, buildings.id AS building_id, buildings.name AS building_name');
+        $this->db->from('asset');
+        $this->db->join('rooms', 'rooms.id = asset.room_id');
+        $this->db->join('floors', 'floors.id = rooms.floor_id');
+        $this->db->join('buildings', 'buildings.id = floors.building_id');
+        $this->db->where('asset.serial_number', $serial_number);
+        $this->db->limit(1);
+        return $this->db->get()->row_array();
+    }
+
+    /**
+     * Data aset untuk cetak label QR, di-scope per gedung untuk non-admin.
+     * Filter berdasarkan ruangan dan/atau daftar id aset tertentu.
+     */
+    public function get_label_assets($role_id, $building_id, $room_id = null, array $asset_ids = [])
+    {
+        $this->db->select('asset.id_asset, asset.asset_name, asset.merk, asset.serial_number,
+            rooms.name AS room_name, floors.name AS floor_name, buildings.name AS building_name');
+        $this->db->from('asset');
+        $this->db->join('rooms', 'rooms.id = asset.room_id');
+        $this->db->join('floors', 'floors.id = rooms.floor_id');
+        $this->db->join('buildings', 'buildings.id = floors.building_id');
+
+        if ($role_id !== '1') {
+            $this->db->where('buildings.id', $building_id);
+        }
+        if ($room_id !== null) {
+            $this->db->where('asset.room_id', $room_id);
+        }
+        if (!empty($asset_ids)) {
+            $this->db->where_in('asset.id_asset', $asset_ids);
+        }
+
+        $this->db->order_by('rooms.name', 'ASC');
+        $this->db->order_by('asset.serial_number', 'ASC');
+        return $this->db->get()->result_array();
+    }
+
     public function get_asset_by_id($id)
     {
         return $this->db->get_where('asset', ['id_asset' => $id])->row_array();
