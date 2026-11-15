@@ -50,7 +50,9 @@ class Asset extends CI_Controller
       $row[] = $field->serial_number;
       $row[] = $field->name;
       $row[] = $field->created;
-      $row[] = '<a href="' . site_url('asset/update/' . $field->id_asset) . '" class="btn btn-info btn-sm rounded mr-1"><i class="fas fa-edit"></i></a><a href="javascript:;" class="btn btn-danger btn-sm" onclick="hapus(' . $field->id_asset . ')"><i class="fas fa-trash-alt"></i></a>';;
+      $row[] = '<a href="' . site_url('scan/' . rawurlencode($field->serial_number)) . '" target="_blank" class="btn btn-secondary btn-sm rounded mr-1" title="Halaman scan QR"><i class="fas fa-qrcode"></i></a>'
+        . '<a href="' . site_url('asset/print_labels?ids=' . $field->id_asset) . '" target="_blank" class="btn btn-dark btn-sm rounded mr-1" title="Cetak label QR"><i class="fas fa-print"></i></a>'
+        . '<a href="' . site_url('asset/update/' . $field->id_asset) . '" class="btn btn-info btn-sm rounded mr-1"><i class="fas fa-edit"></i></a><a href="javascript:;" class="btn btn-danger btn-sm" onclick="hapus(' . $field->id_asset . ')"><i class="fas fa-trash-alt"></i></a>';
       $result[] = $row;
     }
     $data = [
@@ -342,6 +344,50 @@ class Asset extends CI_Controller
   public function download()
   {
     force_download('csv_file/base_import_format.csv', NULL);
+  }
+
+  /**
+   * Cetak label QR aset ke PDF (A4, 3 kolom x 7 baris).
+   *  - asset/print_labels/<room_id>        : semua aset di ruangan
+   *  - asset/print_labels?ids=1,2,3         : aset terpilih (GET/POST, boleh array ids[])
+   * Non-admin hanya bisa mencetak aset di gedungnya sendiri.
+   */
+  public function print_labels($room_id = null)
+  {
+    $user = $this->Auth->get_active_user($this->session->userdata('username'));
+
+    $ids = $this->input->get_post('ids');
+    if (is_string($ids)) {
+      $ids = explode(',', $ids);
+    }
+    $ids = array_values(array_filter(array_map('intval', (array) $ids)));
+
+    if ($room_id === null && empty($ids)) {
+      $this->session->set_flashdata('message', 'labelEmpty');
+      redirect('asset');
+    }
+
+    $room_id = $room_id !== null ? (int) $room_id : null;
+    $assets  = $this->Assets->get_label_assets($user['role_id'], $user['building_id'], $room_id, $ids);
+
+    if (empty($assets)) {
+      $this->session->set_flashdata('message', 'labelEmpty');
+      redirect($room_id !== null ? 'asset/location/' . $room_id : 'asset');
+    }
+
+    $this->load->library('qr');
+    foreach ($assets as &$asset) {
+      $asset['qr'] = $this->qr->png_data_uri($this->qr->asset_url($asset['serial_number']), 5);
+    }
+    unset($asset);
+
+    $data['assets'] = $assets;
+    $data['title']  = 'Label QR Aset';
+
+    $this->load->library('pdf');
+    $this->pdf->setPaper('A4', 'portrait');
+    $this->pdf->filename = 'label-qr-aset-' . date('YmdHis') . '.pdf';
+    $this->pdf->load_view('assets/print_labels', $data);
   }
 
   public function print_report($room_id)

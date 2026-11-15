@@ -225,6 +225,14 @@ switch (flashData) {
 			showConfirmButton: true,
 		});
 		break;
+	case "labelEmpty":
+		Swal.fire({
+			title: "Tidak ada label",
+			text: "Tidak ada aset yang bisa dicetak labelnya",
+			icon: "info",
+			showConfirmButton: true,
+		});
+		break;
 	case "editUser":
 		Swal.fire({
 			title: "Berhasil",

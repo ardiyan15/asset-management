@@ -50,6 +50,13 @@ class Auth extends CI_Controller
                         'role_id'   => $user['role_id'],
                     ];
                     $this->session->set_userdata($data);
+
+                    // Kembali ke halaman scan QR kalau login dipicu dari sana
+                    $redirect = (string) $this->session->userdata('redirect_after_login');
+                    $this->session->unset_userdata('redirect_after_login');
+                    if (strpos($redirect, 'scan/') === 0) {
+                        redirect($redirect);
+                    }
                     redirect('admin');
                 } else {
                     $this->session->set_flashdata(
