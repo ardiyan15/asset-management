@@ -225,6 +225,46 @@ switch (flashData) {
 			showConfirmButton: true,
 		});
 		break;
+	case "opnameStarted":
+		Swal.fire({
+			title: "Opname dimulai",
+			text: "Scan label QR atau centang aset yang ada di ruangan",
+			icon: "success",
+			showConfirmButton: true,
+		});
+		break;
+	case "opname_exists":
+		Swal.fire({
+			title: "Opname masih berjalan",
+			text: "Ruangan ini sudah punya opname yang belum selesai, lanjutkan sesi ini",
+			icon: "info",
+			showConfirmButton: true,
+		});
+		break;
+	case "opnameFinished":
+		Swal.fire({
+			title: "Opname selesai",
+			text: "Hasil opname tersimpan, berita acara siap dicetak",
+			icon: "success",
+			showConfirmButton: true,
+		});
+		break;
+	case "opnameCanceled":
+		Swal.fire({
+			title: "Opname dibatalkan",
+			text: "Sesi opname dan hasil scan-nya sudah dihapus",
+			icon: "success",
+			showConfirmButton: true,
+		});
+		break;
+	case "opname_failed":
+		Swal.fire({
+			title: "Gagal",
+			text: "Opname tidak ditemukan atau Anda tidak punya akses",
+			icon: "error",
+			showConfirmButton: true,
+		});
+		break;
 	case "labelEmpty":
 		Swal.fire({
 			title: "Tidak ada label",

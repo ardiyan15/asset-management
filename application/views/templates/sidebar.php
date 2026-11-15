@@ -80,6 +80,17 @@
     <hr class="sidebar-divider">
 
     <div class="sidebar-heading">
+        Audit
+    </div>
+    <li class="nav-item <?= is_active('opname') ?: is_active('opname', 'detail'); ?>">
+        <a class="nav-link" href="<?= base_url('opname') ?>">
+            <i class="fas fa-fw fa-clipboard-check"></i>
+            <span> Stock Opname </span>
+        </a>
+    </li>
+    <hr class="sidebar-divider">
+
+    <div class="sidebar-heading">
         User
     </div>
     <li class="nav-item <?= is_active('user');  ?>">

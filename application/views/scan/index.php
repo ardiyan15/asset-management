@@ -36,6 +36,37 @@
 
 <body>
     <div class="scan-wrap">
+        <?php if (!empty($opname_result)) : ?>
+            <?php $opn_alert = ['found' => 'success', 'already' => 'info', 'wrong_room' => 'warning']; ?>
+            <div class="alert alert-<?= $opn_alert[$opname_result['status']] ?? 'danger'; ?> scan-card mb-3">
+                <?= html_escape($opname_result['message']); ?>
+            </div>
+        <?php endif; ?>
+
+        <?php if (!empty($opname) && $asset) : ?>
+            <div class="card scan-card mb-3 border-left-warning" style="border-left: .3rem solid #f6c23e !important;">
+                <div class="card-body py-3">
+                    <div class="scan-label mb-1"><i class="fas fa-clipboard-check mr-1"></i> Stock opname berjalan</div>
+                    <div class="font-weight-bold text-gray-800 mb-2">
+                        <?= html_escape($opname['code']); ?> · Ruang <?= html_escape($opname['room_name']); ?>
+                        <span class="small text-muted">(<?= (int) $opname['total_found']; ?>/<?= (int) $opname['total_expected']; ?> ditemukan)</span>
+                    </div>
+                    <?php if ($opname['asset_result'] === 1 || $opname['asset_result'] === 2) : ?>
+                        <div class="text-success font-weight-bold"><i class="fas fa-check-circle mr-1"></i> Sudah tercatat di opname ini<?= $opname['asset_result'] === 2 ? ' (salah ruangan)' : ''; ?>.</div>
+                    <?php else : ?>
+                        <form method="post" action="<?= base_url('opname/mark_from_scan'); ?>">
+                            <input type="hidden" name="token" value="<?= html_escape($opname['token']); ?>">
+                            <input type="hidden" name="serial" value="<?= html_escape($asset['serial_number']); ?>">
+                            <button type="submit" class="btn btn-warning btn-block font-weight-bold">
+                                <i class="fas fa-check mr-1"></i> Tandai ditemukan di <?= html_escape($opname['room_name']); ?>
+                            </button>
+                        </form>
+                    <?php endif; ?>
+                    <a href="<?= base_url('opname/detail/' . $opname['token']); ?>" class="small d-inline-block mt-2">Buka sesi opname</a>
+                </div>
+            </div>
+        <?php endif; ?>
+
         <?php if (!$asset) : ?>
             <div class="card scan-card mt-4">
                 <div class="card-body text-center py-5">
