@@ -53,7 +53,49 @@ class Scan extends CI_Controller
             }
         }
 
+        $data['opname']        = $data['user'] ? $this->_active_opname($data['user'], $data['asset']) : null;
+        $data['opname_result'] = $this->session->flashdata('opname_scan');
+
         $this->load->view('scan/index', $data);
+    }
+
+    /**
+     * Opname yang sedang dikerjakan user (diset saat membuka halaman opname), supaya halaman
+     * scan bisa menawarkan tombol "Tandai ditemukan". Null kalau tidak ada / sudah selesai.
+     */
+    private function _active_opname(array $user, $asset)
+    {
+        $opname_id = (int) $this->session->userdata('active_opname');
+        if (!$opname_id) {
+            return null;
+        }
+
+        $this->load->model('Opname_model', 'Opname');
+        $opname = $this->Opname->get_header($opname_id);
+
+        $allowed = $opname && ($user['role_id'] === '1'
+            || (string) $user['building_id'] === (string) $opname['building_id']);
+
+        if (!$allowed || (int) $opname['status'] !== Opname_model::STATUS_OPEN) {
+            $this->session->unset_userdata('active_opname');
+            return null;
+        }
+
+        $this->load->library('encryption');
+        $this->load->helper('url_crypto');
+        $opname['token'] = urlsafe_b64encode($this->encryption->encrypt((string) $opname['id']));
+
+        // Status aset ini di opname tersebut (null = belum tercatat)
+        $opname['asset_result'] = null;
+        if ($asset) {
+            $detail = $this->db->select('result')->get_where('stock_opname_details', [
+                'stock_opname_id' => $opname['id'],
+                'asset_id'        => $asset['id_asset'],
+            ])->row_array();
+            $opname['asset_result'] = $detail ? (int) $detail['result'] : null;
+        }
+
+        return $opname;
     }
 
     /**
