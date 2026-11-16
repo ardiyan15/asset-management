@@ -27,7 +27,7 @@ class Dashboard extends CI_Model
 
 	private function get_total_assets()
 	{
-		return $this->db->count_all_results('asset');
+		return $this->db->where('is_disposed', 0)->count_all_results('asset');
 	}
 
 	private function get_total_rooms()
@@ -39,13 +39,13 @@ class Dashboard extends CI_Model
 	{
 		// when user running the filter by room name
 		if ($room_id == null) {
-			$query = "SELECT asset.asset_name, COUNT(*) AS total FROM asset INNER JOIN rooms ON asset.room_id = rooms.id INNER JOIN floors ON rooms.floor_id = floors.id INNER JOIN buildings ON floors.building_id = buildings.id WHERE buildings.id = $building_id GROUP BY asset_name LIMIT 10";
+			$query = "SELECT asset.asset_name, COUNT(*) AS total FROM asset INNER JOIN rooms ON asset.room_id = rooms.id INNER JOIN floors ON rooms.floor_id = floors.id INNER JOIN buildings ON floors.building_id = buildings.id WHERE buildings.id = $building_id AND asset.is_disposed = 0 GROUP BY asset_name LIMIT 10";
 			// if user login as administrator
 			if ($role_id == '1') {
-				$query = "SELECT asset.asset_name, COUNT(*) AS total FROM asset INNER JOIN rooms ON asset.room_id = rooms.id INNER JOIN floors ON rooms.floor_id = floors.id INNER JOIN buildings ON floors.building_id = buildings.id GROUP BY asset_name ORDER BY RAND() LIMIT 10";
+				$query = "SELECT asset.asset_name, COUNT(*) AS total FROM asset INNER JOIN rooms ON asset.room_id = rooms.id INNER JOIN floors ON rooms.floor_id = floors.id INNER JOIN buildings ON floors.building_id = buildings.id WHERE asset.is_disposed = 0 GROUP BY asset_name ORDER BY RAND() LIMIT 10";
 			}
 		} else {
-			$query = "SELECT asset.asset_name, COUNT(*) AS total FROM asset WHERE room_id = '$room_id' GROUP BY asset_name ORDER BY RAND() LIMIT 10";
+			$query = "SELECT asset.asset_name, COUNT(*) AS total FROM asset WHERE room_id = '$room_id' AND asset.is_disposed = 0 GROUP BY asset_name ORDER BY RAND() LIMIT 10";
 		}
 
 		return $this->db->query($query)->result_array();
@@ -64,6 +64,7 @@ class Dashboard extends CI_Model
 	public function get_assets_by_category($limit = 5)
 	{
 		$this->db->select('asset_name, COUNT(*) as total');
+		$this->db->where('is_disposed', 0);
 		$this->db->group_by('asset_name');
 		$this->db->order_by('total', 'DESC');
 		$this->db->limit($limit);

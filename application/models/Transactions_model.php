@@ -18,7 +18,10 @@ class Transactions_model extends CI_Model
         $this->db->from('asset');
         $this->db->where_in('asset.id_asset', $asset_ids);
         $this->db->where('asset.placement_status', 1);
+        $this->db->where('asset.is_disposed', 0);
         $this->db->where('asset.room_id !=', $dest_room_id);
+        // aset yang sedang diajukan penghapusan tidak boleh dipindah
+        $this->db->where('NOT EXISTS (SELECT 1 FROM asset_disposal_details p WHERE p.asset_id = asset.id_asset AND p.status = 0)', null, false);
 
         if ($role_id !== '1') {
             $this->db->join('rooms', 'rooms.id = asset.room_id');

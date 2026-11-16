@@ -148,7 +148,7 @@ class Opname_model extends CI_Model
         $opname_id = $this->db->insert_id();
 
         $assets = $this->db->select('id_asset')
-            ->get_where('asset', ['room_id' => $room_id, 'placement_status' => 1])
+            ->get_where('asset', ['room_id' => $room_id, 'placement_status' => 1, 'is_disposed' => 0])
             ->result_array();
 
         if (!empty($assets)) {
@@ -182,7 +182,7 @@ class Opname_model extends CI_Model
     public function check_serial(array $opname, $serial_number)
     {
         $asset = $this->db->select('asset.id_asset, asset.asset_name, asset.merk, asset.serial_number,
-                asset.asset_condition, asset.room_id, rooms.name AS room_name')
+                asset.asset_condition, asset.is_disposed, asset.room_id, rooms.name AS room_name')
             ->from('asset')
             ->join('rooms', 'rooms.id = asset.room_id', 'left')
             ->where('asset.serial_number', $serial_number)
@@ -191,6 +191,9 @@ class Opname_model extends CI_Model
 
         if (!$asset) {
             return ['status' => 'not_found', 'asset' => null, 'detail_id' => null];
+        }
+        if ((int) $asset['is_disposed'] === 1) {
+            return ['status' => 'disposed', 'asset' => $asset, 'detail_id' => null];
         }
 
         $now    = date('Y-m-d H:i:s');

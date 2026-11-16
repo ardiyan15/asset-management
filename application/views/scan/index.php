@@ -88,11 +88,48 @@
                 </div>
             </div>
 
+            <?php
+            $is_disposed      = (int) $asset['is_disposed'] === 1;
+            $disposal_pending = $disposal && (int) $disposal['status'] === 0;
+            ?>
+            <?php if ($is_disposed) : ?>
+                <div class="alert alert-danger scan-card mb-3">
+                    <div class="font-weight-bold"><i class="fas fa-ban mr-1"></i> Aset ini sudah dihapus dari daftar aset aktif</div>
+                    <div class="small mt-1">
+                        <?= $asset['disposed_at'] ? 'Disetujui ' . date('d M Y', strtotime($asset['disposed_at'])) : ''; ?>
+                        <?php if ($disposal && (int) $disposal['status'] === 1) : ?>
+                            · <?= html_escape($disposal['code']); ?> · <?= html_escape(Disposal_model::method_label($disposal['method'])); ?>
+                        <?php endif; ?>
+                    </div>
+                </div>
+            <?php elseif ($disposal_pending) : ?>
+                <div class="alert alert-warning scan-card mb-3">
+                    <div class="font-weight-bold"><i class="fas fa-hourglass-half mr-1"></i> Sedang diajukan untuk dihapus</div>
+                    <div class="small mt-1"><?= html_escape($disposal['code']); ?> · menunggu persetujuan admin. Aset tidak bisa dipindahkan sementara.</div>
+                </div>
+            <?php elseif ($can_history && (int) $asset['asset_condition'] === 3) : ?>
+                <div class="card scan-card mb-3" style="border-left: .3rem solid #e74a3b !important;">
+                    <div class="card-body py-3">
+                        <div class="font-weight-bold text-gray-800 mb-1">Aset rusak berat</div>
+                        <div class="small text-muted mb-2">
+                            <?php if ($disposal && (int) $disposal['status'] === 2) : ?>
+                                Pengajuan sebelumnya (<?= html_escape($disposal['code']); ?>) ditolak<?= !empty($disposal['review_notes']) ? ': ' . html_escape($disposal['review_notes']) : ''; ?>.
+                            <?php else : ?>
+                                Kalau tidak bisa diperbaiki, ajukan penghapusan supaya admin bisa menyetujui.
+                            <?php endif; ?>
+                        </div>
+                        <a href="<?= base_url('disposal/create?asset=' . (int) $asset['id_asset']); ?>" class="btn btn-outline-danger btn-block"><i class="fas fa-recycle mr-1"></i> Ajukan penghapusan</a>
+                    </div>
+                </div>
+            <?php endif; ?>
+
             <div class="card scan-card mb-3">
                 <div class="card-body">
                     <div class="d-flex justify-content-between align-items-center mb-3">
-                        <div class="scan-label mb-0">Lokasi saat ini</div>
-                        <?php if ((int) $asset['placement_status'] === 1) : ?>
+                        <div class="scan-label mb-0"><?= $is_disposed ? 'Lokasi terakhir' : 'Lokasi saat ini'; ?></div>
+                        <?php if ($is_disposed) : ?>
+                            <span class="badge badge-danger px-2 py-1"><i class="fas fa-ban mr-1"></i> Dihapus</span>
+                        <?php elseif ((int) $asset['placement_status'] === 1) : ?>
                             <span class="badge badge-success px-2 py-1"><i class="fas fa-check-circle mr-1"></i> Di ruangan</span>
                         <?php else : ?>
                             <span class="badge badge-warning px-2 py-1"><i class="fas fa-truck mr-1"></i> Sedang dipindahkan</span>
@@ -127,7 +164,7 @@
                 </div>
             </div>
 
-            <?php if ($can_history) : ?>
+            <?php if ($can_history && !$is_disposed) : ?>
                 <div class="card scan-card mb-3">
                     <div class="card-body">
                         <div class="scan-label mb-2">Laporkan kondisi</div>
