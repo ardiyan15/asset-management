@@ -302,6 +302,8 @@ class Opname extends CI_Controller
                 return $name . ' ditemukan.';
             case 'already':
                 return $name . ' sudah tercatat sebelumnya.';
+            case 'disposed':
+                return $name . ' sudah dihapus (disposal) dan tidak termasuk aset aktif.';
             case 'wrong_room':
                 return $name . ' tercatat di ruangan ' . ($result['asset']['room_name'] ?? '-') . ', bukan ' . $opname['room_name'] . '. Dicatat sebagai salah ruangan.';
             default:

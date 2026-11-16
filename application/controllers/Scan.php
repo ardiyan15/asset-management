@@ -58,6 +58,13 @@ class Scan extends CI_Controller
         $data['opname_result']    = $this->session->flashdata('opname_scan');
         $data['condition_result'] = $this->session->flashdata('condition_scan');
 
+        // Status penghapusan terakhir aset ini (diajukan / disetujui / ditolak)
+        $data['disposal'] = null;
+        if ($data['asset']) {
+            $this->load->model('Disposal_model', 'Disposal');
+            $data['disposal'] = $this->Disposal->get_latest_for_asset($data['asset']['id_asset']);
+        }
+
         $this->load->view('scan/index', $data);
     }
 

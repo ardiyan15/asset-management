@@ -49,7 +49,10 @@ class Asset extends CI_Controller
       $row[] = $field->merk;
       $row[] = $field->serial_number;
       $row[] = $field->name;
-      $row[] = asset_condition_badge($field->asset_condition);
+      $row[] = asset_condition_badge($field->asset_condition)
+        . ((int) $field->asset_condition === 3
+          ? ' <a href="' . site_url('disposal/create?asset=' . $field->id_asset) . '" class="badge badge-light text-danger" title="Ajukan penghapusan aset ini"><i class="fas fa-recycle"></i> Ajukan hapus</a>'
+          : '');
       $row[] = $field->created;
       $row[] = '<a href="javascript:;" class="btn btn-warning btn-sm rounded mr-1 js-condition" title="Ubah kondisi"'
         . ' data-id="' . $field->id_asset . '" data-condition="' . (int) $field->asset_condition . '"'
@@ -376,7 +379,8 @@ class Asset extends CI_Controller
     $asset     = $asset_id ? $this->Assets->get_asset_with_building($asset_id) : null;
     $is_ajax   = $this->input->is_ajax_request();
 
-    $allowed = $asset && ($user['role_id'] === '1' || (string) $user['building_id'] === (string) $asset['building_id']);
+    $allowed = $asset && (int) $asset['is_disposed'] === 0
+      && ($user['role_id'] === '1' || (string) $user['building_id'] === (string) $asset['building_id']);
 
     if (!$allowed || !is_valid_asset_condition($condition)) {
       $status  = 'failed';

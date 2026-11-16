@@ -88,6 +88,24 @@
             <span> Stock Opname </span>
         </a>
     </li>
+    <?php
+    // Badge jumlah aset yang menunggu persetujuan penghapusan (khusus admin)
+    $disposal_pending = 0;
+    if ($user['role_id'] == '1') {
+        $ci = &get_instance();
+        $ci->load->model('Disposal_model', 'DisposalBadge');
+        $disposal_pending = $ci->DisposalBadge->count_pending();
+    }
+    ?>
+    <li class="nav-item <?= is_active('disposal') ?: (is_active('disposal', 'detail') ?: is_active('disposal', 'create')); ?>">
+        <a class="nav-link" href="<?= base_url('disposal') ?>">
+            <i class="fas fa-fw fa-recycle"></i>
+            <span> Penghapusan Aset </span>
+            <?php if ($disposal_pending > 0) : ?>
+                <span class="badge badge-danger badge-counter ml-1" style="position: static;"><?= $disposal_pending; ?></span>
+            <?php endif; ?>
+        </a>
+    </li>
     <hr class="sidebar-divider">
 
     <div class="sidebar-heading">

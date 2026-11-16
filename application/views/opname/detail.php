@@ -227,7 +227,8 @@ $condition_cell = function ($d) use ($is_open) {
                 wrong_room: 'warning',
                 not_found: 'danger',
                 invalid: 'danger',
-                closed: 'danger'
+                closed: 'danger',
+                disposed: 'danger'
             };
             let scanner = null;
             let lastCode = '';

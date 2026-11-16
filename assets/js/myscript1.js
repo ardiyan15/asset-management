@@ -265,6 +265,62 @@ switch (flashData) {
 			showConfirmButton: true,
 		});
 		break;
+	case "disposalRequested":
+		Swal.fire({
+			title: "Pengajuan terkirim",
+			text: "Pengajuan penghapusan menunggu persetujuan admin",
+			icon: "success",
+			showConfirmButton: true,
+		});
+		break;
+	case "disposalApproved":
+		Swal.fire({
+			title: "Disetujui",
+			text: "Aset ditandai sudah dihapus, BAST penghapusan siap dicetak",
+			icon: "success",
+			showConfirmButton: true,
+		});
+		break;
+	case "disposalRejected":
+		Swal.fire({
+			title: "Ditolak",
+			text: "Pengajuan penghapusan aset ditolak",
+			icon: "info",
+			showConfirmButton: true,
+		});
+		break;
+	case "disposal_invalid":
+		Swal.fire({
+			title: "Data belum lengkap",
+			text: "Pilih aset yang memenuhi syarat dan isi alasan / metode penghapusan",
+			icon: "warning",
+			showConfirmButton: true,
+		});
+		break;
+	case "disposal_nothing":
+		Swal.fire({
+			title: "Tidak ada yang diproses",
+			text: "Aset yang dipilih sudah ditinjau sebelumnya",
+			icon: "info",
+			showConfirmButton: true,
+		});
+		break;
+	case "disposal_no_approved":
+		Swal.fire({
+			title: "Belum ada yang disetujui",
+			text: "BAST penghapusan baru bisa dicetak setelah ada aset yang disetujui",
+			icon: "info",
+			showConfirmButton: true,
+		});
+		break;
+	case "disposal_failed":
+		Swal.fire({
+			title: "Gagal",
+			text: "Pengajuan tidak ditemukan, Anda tidak punya akses, atau terjadi kesalahan",
+			icon: "error",
+			showConfirmButton: true,
+		});
+		break;
 	case "labelEmpty":
 		Swal.fire({
 			title: "Tidak ada label",

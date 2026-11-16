@@ -23,6 +23,8 @@ class Assets_model extends CI_Model
             $this->db->where('buildings.id', $building_id);
         }
 
+        $this->db->where('asset.is_disposed', 0);
+
         $condition = (int) $this->input->post('condition');
         if (is_valid_asset_condition($condition)) {
             $this->db->where('asset.asset_condition', $condition);
@@ -71,6 +73,7 @@ class Assets_model extends CI_Model
     public function count_all()
     {
         $this->db->from($this->table);
+        $this->db->where('is_disposed', 0);
         return $this->db->count_all_results();
     }
 
@@ -80,6 +83,7 @@ class Assets_model extends CI_Model
             $this->db->select('asset.id_asset, asset.asset_name, asset.merk, asset.serial_number, asset.placement_status, asset.asset_condition, rooms.name, rooms.id AS room_id, asset.created');
             $this->db->from('asset');
             $this->db->join('rooms', 'rooms.id = asset.room_id');
+            $this->db->where('asset.is_disposed', 0);
             $this->db->order_by('id_asset', 'DESC');
             // return $this->db->generate();
             return $this->db->get()->result_array();
@@ -91,6 +95,7 @@ class Assets_model extends CI_Model
             $this->db->join('buildings', 'buildings.id = floors.building_id');
             $this->db->order_by('id_asset', 'DESC');
             $this->db->where('buildings.id', $building_id);
+            $this->db->where('asset.is_disposed', 0);
             return $this->db->get()->result_array();
         }
     }
@@ -216,9 +221,10 @@ class Assets_model extends CI_Model
             $this->db->select('*');
             $this->db->from('asset');
             $this->db->join('rooms', 'rooms.id = asset.room_id');
+            $this->db->where('asset.is_disposed', 0);
             return $this->db->get()->num_rows();
         } else {
-            return $this->db->get_where('asset', ['room_id' => $room_id])->num_rows();
+            return $this->db->get_where('asset', ['room_id' => $room_id, 'is_disposed' => 0])->num_rows();
         }
     }
 
@@ -244,6 +250,7 @@ class Assets_model extends CI_Model
 
     public function get_report_model()
     {
+        $this->db->where('is_disposed', 0);
         $this->db->order_by('asset_location', 'ASC');
         return $this->db->get('asset')->result_array();
     }
@@ -252,13 +259,13 @@ class Assets_model extends CI_Model
     {
         // when user running the filter by room name
         if ($room_id == null) {
-            $query = "SELECT asset.asset_name, COUNT(*) AS total FROM asset INNER JOIN rooms ON asset.room_id = rooms.id INNER JOIN floors ON rooms.floor_id = floors.id INNER JOIN buildings ON floors.building_id = buildings.id WHERE buildings.id = $building_id GROUP BY asset_name LIMIT 10";
+            $query = "SELECT asset.asset_name, COUNT(*) AS total FROM asset INNER JOIN rooms ON asset.room_id = rooms.id INNER JOIN floors ON rooms.floor_id = floors.id INNER JOIN buildings ON floors.building_id = buildings.id WHERE buildings.id = $building_id AND asset.is_disposed = 0 GROUP BY asset_name LIMIT 10";
             // if user login as administrator
             if ($role_id == '1') {
-                $query = "SELECT asset.asset_name, COUNT(*) AS total FROM asset INNER JOIN rooms ON asset.room_id = rooms.id INNER JOIN floors ON rooms.floor_id = floors.id INNER JOIN buildings ON floors.building_id = buildings.id GROUP BY asset_name ORDER BY RAND() LIMIT 10";
+                $query = "SELECT asset.asset_name, COUNT(*) AS total FROM asset INNER JOIN rooms ON asset.room_id = rooms.id INNER JOIN floors ON rooms.floor_id = floors.id INNER JOIN buildings ON floors.building_id = buildings.id WHERE asset.is_disposed = 0 GROUP BY asset_name ORDER BY RAND() LIMIT 10";
             }
         } else {
-            $query = "SELECT asset.asset_name, COUNT(*) AS total FROM asset WHERE room_id = '$room_id' GROUP BY asset_name ORDER BY RAND() LIMIT 10";
+            $query = "SELECT asset.asset_name, COUNT(*) AS total FROM asset WHERE room_id = '$room_id' AND asset.is_disposed = 0 GROUP BY asset_name ORDER BY RAND() LIMIT 10";
         }
         return $this->db->query($query)->result_array();
     }
@@ -316,7 +323,7 @@ class Assets_model extends CI_Model
 
     public function get_total_asset()
     {
-        return $this->db->count_all_results('asset');
+        return $this->db->where('is_disposed', 0)->count_all_results('asset');
     }
 
     public function get_total_user_row()
@@ -367,6 +374,7 @@ class Assets_model extends CI_Model
         $this->db->from('asset');
         $this->db->join('rooms', 'rooms.id = asset.room_id');
         $this->db->where('asset.room_id', $room_id);
+        $this->db->where('asset.is_disposed', 0);
         return $this->db->get()->result_array();
     }
 
@@ -376,7 +384,7 @@ class Assets_model extends CI_Model
     public function get_asset_with_building($asset_id)
     {
         $this->db->select('asset.id_asset, asset.asset_name, asset.serial_number, asset.room_id,
-            asset.asset_condition, buildings.id AS building_id');
+            asset.asset_condition, asset.is_disposed, buildings.id AS building_id');
         $this->db->from('asset');
         $this->db->join('rooms', 'rooms.id = asset.room_id');
         $this->db->join('floors', 'floors.id = rooms.floor_id');
@@ -455,6 +463,7 @@ class Assets_model extends CI_Model
             $this->db->join('floors', 'floors.id = rooms.floor_id');
             $this->db->where('floors.building_id', $building_id);
         }
+        $this->db->where('asset.is_disposed', 0);
         $this->db->group_by('asset.asset_condition');
 
         $result = array_fill_keys(array_keys(asset_condition_options()), 0);
@@ -472,7 +481,7 @@ class Assets_model extends CI_Model
     public function get_asset_detail_by_serial($serial_number)
     {
         $this->db->select('asset.id_asset, asset.asset_name, asset.merk, asset.serial_number,
-            asset.placement_status, asset.asset_condition, asset.created,
+            asset.placement_status, asset.asset_condition, asset.is_disposed, asset.disposed_at, asset.created,
             rooms.id AS room_id, rooms.name AS room_name, rooms.description AS room_description,
             floors.name AS floor_name, buildings.id AS building_id, buildings.name AS building_name');
         $this->db->from('asset');
@@ -497,6 +506,7 @@ class Assets_model extends CI_Model
         $this->db->join('floors', 'floors.id = rooms.floor_id');
         $this->db->join('buildings', 'buildings.id = floors.building_id');
 
+        $this->db->where('asset.is_disposed', 0);
         if ($role_id !== '1') {
             $this->db->where('buildings.id', $building_id);
         }
