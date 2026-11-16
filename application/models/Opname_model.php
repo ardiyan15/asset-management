@@ -114,7 +114,7 @@ class Opname_model extends CI_Model
     public function get_details($opname_id)
     {
         $this->db->select('d.id, d.asset_id, d.expected_room_id, d.result, d.checked_at,
-            asset.asset_name, asset.merk, asset.serial_number, rooms.name AS expected_room_name');
+            asset.asset_name, asset.merk, asset.serial_number, asset.asset_condition, rooms.name AS expected_room_name');
         $this->db->from('stock_opname_details AS d');
         $this->db->join('asset', 'asset.id_asset = d.asset_id', 'left');
         $this->db->join('rooms', 'rooms.id = d.expected_room_id', 'left');
@@ -182,7 +182,7 @@ class Opname_model extends CI_Model
     public function check_serial(array $opname, $serial_number)
     {
         $asset = $this->db->select('asset.id_asset, asset.asset_name, asset.merk, asset.serial_number,
-                asset.room_id, rooms.name AS room_name')
+                asset.asset_condition, asset.room_id, rooms.name AS room_name')
             ->from('asset')
             ->join('rooms', 'rooms.id = asset.room_id', 'left')
             ->where('asset.serial_number', $serial_number)
@@ -253,6 +253,14 @@ class Opname_model extends CI_Model
             'updated_at' => $now,
         ]);
         return true;
+    }
+
+    public function get_detail($opname_id, $detail_id)
+    {
+        return $this->db->get_where('stock_opname_details', [
+            'id'              => $detail_id,
+            'stock_opname_id' => $opname_id,
+        ])->row_array();
     }
 
     public function finish($opname_id)

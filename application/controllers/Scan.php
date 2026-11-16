@@ -49,12 +49,14 @@ class Scan extends CI_Controller
                     || (string) $data['user']['building_id'] === (string) $data['asset']['building_id'];
             }
             if ($data['can_history']) {
-                $data['movements'] = $this->Transactions->get_asset_movements($data['asset']['id_asset']);
+                $data['movements']      = $this->Transactions->get_asset_movements($data['asset']['id_asset']);
+                $data['condition_logs'] = $this->Assets->get_condition_logs($data['asset']['id_asset']);
             }
         }
 
         $data['opname']        = $data['user'] ? $this->_active_opname($data['user'], $data['asset']) : null;
-        $data['opname_result'] = $this->session->flashdata('opname_scan');
+        $data['opname_result']    = $this->session->flashdata('opname_scan');
+        $data['condition_result'] = $this->session->flashdata('condition_scan');
 
         $this->load->view('scan/index', $data);
     }

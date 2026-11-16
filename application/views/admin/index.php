@@ -75,6 +75,41 @@
         </div>
     </div>
 
+    <!-- Kondisi aset -->
+    <?php
+    $condition_total = array_sum($condition_counts);
+    $condition_icons = [1 => 'fa-check-circle', 2 => 'fa-tools', 3 => 'fa-times-circle'];
+    ?>
+    <div class="row">
+        <?php foreach (asset_condition_options() as $value => $label) : ?>
+            <?php
+            $count = $condition_counts[$value] ?? 0;
+            $pct   = $condition_total > 0 ? round($count / $condition_total * 100) : 0;
+            $color = asset_condition_color($value);
+            ?>
+            <div class="col-md-4 mb-4">
+                <a href="<?= base_url('asset?condition=' . $value); ?>" class="text-decoration-none">
+                    <div class="card border-left-<?= $color; ?> shadow h-100 py-2">
+                        <div class="card-body">
+                            <div class="row no-gutters align-items-center">
+                                <div class="col mr-2">
+                                    <div class="text-xs font-weight-bold text-<?= $color; ?> text-uppercase mb-1">Kondisi <?= $label; ?></div>
+                                    <div class="h5 mb-1 font-weight-bold text-gray-800"><?= $count; ?> <span class="small text-muted font-weight-normal">aset · <?= $pct; ?>%</span></div>
+                                    <div class="progress progress-sm">
+                                        <div class="progress-bar bg-<?= $color; ?>" role="progressbar" style="width: <?= $pct; ?>%" aria-valuenow="<?= $pct; ?>" aria-valuemin="0" aria-valuemax="100"></div>
+                                    </div>
+                                </div>
+                                <div class="col-auto">
+                                    <i class="fas <?= $condition_icons[$value]; ?> fa-2x text-gray-300"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </a>
+            </div>
+        <?php endforeach; ?>
+    </div>
+
     <div class="row">
         <!-- Main Chart -->
         <div class="col-xl-8 col-lg-7">

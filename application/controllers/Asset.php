@@ -49,8 +49,12 @@ class Asset extends CI_Controller
       $row[] = $field->merk;
       $row[] = $field->serial_number;
       $row[] = $field->name;
+      $row[] = asset_condition_badge($field->asset_condition);
       $row[] = $field->created;
-      $row[] = '<a href="' . site_url('scan/' . rawurlencode($field->serial_number)) . '" target="_blank" class="btn btn-secondary btn-sm rounded mr-1" title="Halaman scan QR"><i class="fas fa-qrcode"></i></a>'
+      $row[] = '<a href="javascript:;" class="btn btn-warning btn-sm rounded mr-1 js-condition" title="Ubah kondisi"'
+        . ' data-id="' . $field->id_asset . '" data-condition="' . (int) $field->asset_condition . '"'
+        . ' data-name="' . html_escape($field->asset_name . ' (' . $field->serial_number . ')') . '"><i class="fas fa-heartbeat"></i></a>'
+        . '<a href="' . site_url('scan/' . rawurlencode($field->serial_number)) . '" target="_blank" class="btn btn-secondary btn-sm rounded mr-1" title="Halaman scan QR"><i class="fas fa-qrcode"></i></a>'
         . '<a href="' . site_url('asset/print_labels?ids=' . $field->id_asset) . '" target="_blank" class="btn btn-dark btn-sm rounded mr-1" title="Cetak label QR"><i class="fas fa-print"></i></a>'
         . '<a href="' . site_url('asset/update/' . $field->id_asset) . '" class="btn btn-info btn-sm rounded mr-1"><i class="fas fa-edit"></i></a><a href="javascript:;" class="btn btn-danger btn-sm" onclick="hapus(' . $field->id_asset . ')"><i class="fas fa-trash-alt"></i></a>';
       $result[] = $row;
@@ -149,6 +153,18 @@ class Asset extends CI_Controller
 
     if ($qty > 1) {
       $data = $result;
+    }
+
+    // Kondisi awal aset (default Baik)
+    $condition = (int) $this->input->post('condition');
+    $condition = is_valid_asset_condition($condition) ? $condition : 1;
+    if ($qty > 1) {
+      foreach ($data as &$row) {
+        $row['asset_condition'] = $condition;
+      }
+      unset($row);
+    } else {
+      $data['asset_condition'] = $condition;
     }
 
     if ($this->form_validation->run() == false) {
@@ -344,6 +360,49 @@ class Asset extends CI_Controller
   public function download()
   {
     force_download('csv_file/base_import_format.csv', NULL);
+  }
+
+  /**
+   * Ubah kondisi aset + catat log.
+   * AJAX (daftar aset) → JSON. Form biasa (halaman scan QR) → redirect balik ke scan/<serial>.
+   * Non-admin hanya boleh mengubah aset di gedungnya sendiri.
+   */
+  public function update_condition()
+  {
+    $user      = $this->Auth->get_active_user($this->session->userdata('username'));
+    $asset_id  = (int) $this->input->post('asset_id');
+    $condition = (int) $this->input->post('condition');
+    $notes     = (string) $this->input->post('notes', true);
+    $asset     = $asset_id ? $this->Assets->get_asset_with_building($asset_id) : null;
+    $is_ajax   = $this->input->is_ajax_request();
+
+    $allowed = $asset && ($user['role_id'] === '1' || (string) $user['building_id'] === (string) $asset['building_id']);
+
+    if (!$allowed || !is_valid_asset_condition($condition)) {
+      $status  = 'failed';
+      $message = !$allowed ? 'Aset tidak ditemukan atau di luar gedung Anda.' : 'Kondisi tidak valid.';
+    } else {
+      $source  = $is_ajax ? 'manual' : 'scan';
+      $status  = $this->Assets->update_condition($asset_id, $condition, $notes, $user['id_user'], $source);
+      $messages = [
+        'updated'   => 'Kondisi ' . $asset['asset_name'] . ' diubah menjadi ' . asset_condition_label($condition) . '.',
+        'unchanged' => 'Kondisi ' . $asset['asset_name'] . ' sudah ' . asset_condition_label($condition) . '.',
+        'failed'    => 'Gagal menyimpan kondisi aset.',
+      ];
+      $message = $messages[$status];
+    }
+
+    if ($is_ajax) {
+      $this->output->set_content_type('application/json')->set_output(json_encode([
+        'status'  => $status,
+        'message' => $message,
+        'badge'   => $status === 'failed' ? null : asset_condition_badge($condition),
+      ]));
+      return;
+    }
+
+    $this->session->set_flashdata('condition_scan', ['status' => $status, 'message' => $message]);
+    redirect($asset ? 'scan/' . rawurlencode($asset['serial_number']) : 'asset');
   }
 
   /**

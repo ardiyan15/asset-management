@@ -23,6 +23,7 @@
                             <th>Nama</th>
                             <th>Merk</th>
                             <th>Nomor Seri</th>
+                            <th>Kondisi</th>
                             <th>Lokasi Saat Ini</th>
                             <th>Aksi</th>
                             <th>
@@ -43,6 +44,7 @@
                                     <td scope="row">
                                         <a href="<?= base_url('scan/' . rawurlencode($asset['serial_number'])) ?>" target="_blank" title="Lihat halaman scan QR"><i class="fas fa-qrcode mr-1"></i><?= $asset['serial_number']; ?></a>
                                     </td>
+                                    <td scope="row"><?= asset_condition_badge($asset['asset_condition']); ?></td>
                                     <?php if ($asset['placement_status'] == 1) : ?>
                                         <td scope="row"><?= $asset['name']; ?></td>
                                         <td>
@@ -62,7 +64,7 @@
                             <?php endforeach; ?>
                         <?php else : ?>
                             <tr>
-                                <td colspan="5">
+                                <td colspan="8">
                                     <h4> <?= $error; ?> </h4>
                                 </td>
                             </tr>
