@@ -16,6 +16,15 @@
                 </div>
                 <!-- Untuk Menampilkan pop up sweetalert -->
                 <div class="flash-data" data-flashdata="<?= $this->session->flashdata('message'); ?>"></div>
+                <div class="form-inline mb-2">
+                    <label for="filterCondition" class="small text-muted mr-2">Kondisi</label>
+                    <select id="filterCondition" class="form-control form-control-sm">
+                        <option value="">Semua</option>
+                        <?php foreach (asset_condition_options() as $value => $label) : ?>
+                            <option value="<?= $value; ?>" <?= (int) $this->input->get('condition') === $value ? 'selected' : ''; ?>><?= $label; ?></option>
+                        <?php endforeach; ?>
+                    </select>
+                </div>
                 <table class="mt-3 table table-border table-sm table-hover table-striped" id="mytable">
                     <thead>
                         <tr>
@@ -24,6 +33,7 @@
                             <th>Merk</th>
                             <th>Nomor Seri</th>
                             <th>Lokasi Saat Ini</th>
+                            <th>Kondisi</th>
                             <th>Tahun Input</th>
                             <th>Aksi</th>
                         </tr>
@@ -75,6 +85,14 @@
                         <?= form_error('loc', '<small class="text-danger pl-3">', '</small>'); ?>
                     </div>
                     <div class="form-group">
+                        <label for="condition">Kondisi</label>
+                        <select class="form-control" id="condition" name="condition">
+                            <?php foreach (asset_condition_options() as $value => $label) : ?>
+                                <option value="<?= $value; ?>"><?= $label; ?></option>
+                            <?php endforeach; ?>
+                        </select>
+                    </div>
+                    <div class="form-group">
                         <label for="name">Jumlah</label>
                         <input type="text" class="form-control" id="qty" name="qty" placeholder="Masukkan Jumlah" value="1">
                     </div>
@@ -82,6 +100,43 @@
                 <div class="modal-footer">
                     <button type="submit" class="btn btn-success btn-sm rounded">Simpan</button>
                     <button type="button" class="btn btn-danger btn-sm rounded" data-dismiss="modal">Tutup</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Ubah Kondisi -->
+<div class="modal fade" id="conditionModal" role="dialog" aria-labelledby="conditionModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="conditionModalLabel">Ubah Kondisi Aset</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+            </div>
+            <form id="conditionForm">
+                <div class="modal-body">
+                    <input type="hidden" name="asset_id" id="conditionAssetId">
+                    <p class="font-weight-bold text-gray-800 mb-3" id="conditionAssetName"></p>
+                    <div class="form-group">
+                        <label>Kondisi</label>
+                        <div>
+                            <?php foreach (asset_condition_options() as $value => $label) : ?>
+                                <div class="custom-control custom-radio custom-control-inline">
+                                    <input type="radio" id="cond<?= $value; ?>" name="condition" value="<?= $value; ?>" class="custom-control-input">
+                                    <label class="custom-control-label text-<?= asset_condition_color($value); ?> font-weight-bold" for="cond<?= $value; ?>"><?= $label; ?></label>
+                                </div>
+                            <?php endforeach; ?>
+                        </div>
+                    </div>
+                    <div class="form-group mb-0">
+                        <label for="conditionNotes">Keterangan <span class="text-muted">(opsional)</span></label>
+                        <input type="text" class="form-control" id="conditionNotes" name="notes" maxlength="255" placeholder="mis. Layar retak, kompresor bocor">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary btn-sm" data-dismiss="modal">Batal</button>
+                    <button type="submit" class="btn btn-primary btn-sm">Simpan</button>
                 </div>
             </form>
         </div>
@@ -133,9 +188,14 @@
             serverSide: true,
             ajax: {
                 "url": "<?php echo base_url() . '/asset/get_data_asset' ?>",
-                "type": "POST"
+                "type": "POST",
+                "data": function(d) {
+                    d.condition = $('#filterCondition').val();
+                }
             },
-            "columns": [
+            "columns": [{
+                    orderable: false
+                },
                 null,
                 null,
                 null,
@@ -160,6 +220,39 @@
                     "next": "Selanjutnya"
                 }
             }
+        });
+
+        $('#filterCondition').on('change', function() {
+            table.ajax.reload();
+        });
+
+        $('#mytable').on('click', '.js-condition', function() {
+            const $btn = $(this);
+            $('#conditionAssetId').val($btn.data('id'));
+            $('#conditionAssetName').text($btn.data('name'));
+            $('#conditionNotes').val('');
+            $('#conditionForm input[name="condition"][value="' + $btn.data('condition') + '"]').prop('checked', true);
+            $('#conditionModal').modal('show');
+        });
+
+        $('#conditionForm').on('submit', function(e) {
+            e.preventDefault();
+            $.ajax({
+                url: "<?= base_url('asset/update_condition'); ?>",
+                type: 'POST',
+                data: $(this).serialize(),
+                dataType: 'json'
+            }).done(function(res) {
+                $('#conditionModal').modal('hide');
+                Swal.fire({
+                    title: res.status === 'failed' ? 'Gagal' : 'Berhasil',
+                    text: res.message,
+                    icon: res.status === 'failed' ? 'error' : (res.status === 'unchanged' ? 'info' : 'success')
+                });
+                table.ajax.reload(null, false);
+            }).fail(function() {
+                Swal.fire('Gagal', 'Gagal menghubungi server.', 'error');
+            });
         });
     });
 </script>

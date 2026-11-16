@@ -5,6 +5,18 @@ $wrong    = array_values(array_filter($details, function ($d) { return (int) $d[
 $total    = (int) $opname['total_expected'];
 $found    = (int) $opname['total_found'];
 $percent  = $total > 0 ? round($found / $total * 100) : 0;
+
+// Kolom kondisi: dropdown saat opname berjalan, badge saat sudah selesai
+$condition_cell = function ($d) use ($is_open) {
+    if (!$is_open || empty($d['serial_number'])) {
+        return isset($d['asset_condition']) ? asset_condition_badge($d['asset_condition']) : '-';
+    }
+    $html = '<select class="form-control form-control-sm opn-condition" data-detail-id="' . (int) $d['id'] . '" data-prev="' . (int) $d['asset_condition'] . '">';
+    foreach (asset_condition_options() as $value => $label) {
+        $html .= '<option value="' . $value . '"' . ((int) $d['asset_condition'] === $value ? ' selected' : '') . '>' . $label . '</option>';
+    }
+    return $html . '</select>';
+};
 ?>
 <style>
     .opn-stat { border: 0; border-left: .25rem solid; border-radius: .5rem; }
@@ -15,6 +27,7 @@ $percent  = $total > 0 ? round($found / $total * 100) : 0;
     #reader video { border-radius: .5rem; }
     tr.row-found td { background: #f0fbf5; }
     .opn-check { width: 1.25rem; height: 1.25rem; cursor: pointer; }
+    .opn-condition { min-width: 8.5rem; }
 </style>
 
 <div class="container-fluid">
@@ -124,6 +137,7 @@ $percent  = $total > 0 ? round($found / $total * 100) : 0;
                             <th>Merk</th>
                             <th>Nomor Seri</th>
                             <th>Status</th>
+                            <th>Kondisi</th>
                             <?php if ($is_open) : ?><th class="text-center">Ada?</th><?php endif; ?>
                         </tr>
                     </thead>
@@ -144,6 +158,7 @@ $percent  = $total > 0 ? round($found / $total * 100) : 0;
                                         <span class="badge badge-danger">Tidak ditemukan</span>
                                     <?php endif; ?>
                                 </td>
+                                <td><?= $condition_cell($d); ?></td>
                                 <?php if ($is_open) : ?>
                                     <td class="text-center"><input type="checkbox" class="opn-check" value="<?= $d['id']; ?>" <?= $is_found ? 'checked' : ''; ?> aria-label="Tandai ditemukan"></td>
                                 <?php endif; ?>
@@ -166,6 +181,7 @@ $percent  = $total > 0 ? round($found / $total * 100) : 0;
                         <th>Merk</th>
                         <th>Nomor Seri</th>
                         <th>Tercatat di</th>
+                        <th>Kondisi</th>
                         <?php if ($is_open) : ?><th></th><?php endif; ?>
                     </tr>
                 </thead>
@@ -176,6 +192,7 @@ $percent  = $total > 0 ? round($found / $total * 100) : 0;
                             <td><?= html_escape($d['merk'] ?? '-'); ?></td>
                             <td><code><?= html_escape($d['serial_number'] ?? '-'); ?></code></td>
                             <td><span class="badge badge-warning"><?= html_escape($d['expected_room_name'] ?? '-'); ?></span></td>
+                            <td><?= $condition_cell($d); ?></td>
                             <?php if ($is_open) : ?>
                                 <td class="text-right"><button type="button" class="btn btn-sm btn-link text-danger js-remove-wrong" title="Hapus dari daftar"><i class="fas fa-times"></i></button></td>
                             <?php endif; ?>
@@ -200,6 +217,8 @@ $percent  = $total > 0 ? round($found / $total * 100) : 0;
             const token = <?= json_encode($token); ?>;
             const checkUrl = <?= json_encode(base_url('opname/check')); ?>;
             const toggleUrl = <?= json_encode(base_url('opname/toggle')); ?>;
+            const conditionUrl = <?= json_encode(base_url('opname/set_condition')); ?>;
+            const conditionOptions = <?= json_encode(asset_condition_options()); ?>;
             const $input = $('#serialInput');
             const $result = $('#scanResult');
             const alertClass = {
@@ -232,6 +251,15 @@ $percent  = $total > 0 ? round($found / $total * 100) : 0;
                     '<span class="badge badge-light">Belum dicek</span>');
             }
 
+            function conditionSelect(detailId, current) {
+                const $sel = $('<select class="form-control form-control-sm opn-condition">')
+                    .attr('data-detail-id', detailId).attr('data-prev', current);
+                $.each(conditionOptions, function(value, label) {
+                    $sel.append($('<option>').val(value).text(label).prop('selected', String(value) === String(current)));
+                });
+                return $sel;
+            }
+
             function addWrongRow(res) {
                 const a = res.asset;
                 const $tr = $('<tr>').attr('data-detail-id', res.detail_id)
@@ -239,6 +267,7 @@ $percent  = $total > 0 ? round($found / $total * 100) : 0;
                     .append($('<td>').text(a.merk))
                     .append($('<td>').append($('<code>').text(a.serial_number)))
                     .append($('<td>').append($('<span class="badge badge-warning">').text(a.room_name || '-')))
+                    .append($('<td>').append(conditionSelect(res.detail_id, a.asset_condition)))
                     .append('<td class="text-right"><button type="button" class="btn btn-sm btn-link text-danger js-remove-wrong" title="Hapus dari daftar"><i class="fas fa-times"></i></button></td>');
                 $('#wrongTable tbody').prepend($tr);
                 $('#wrongCard').removeClass('d-none');
@@ -289,6 +318,28 @@ $percent  = $total > 0 ? round($found / $total * 100) : 0;
                     updateSummary(res.summary);
                 }).fail(function() {
                     $cb.prop('checked', !found);
+                    showResult('invalid', 'Gagal menghubungi server. Coba lagi.');
+                });
+            });
+
+            $('#expectedTable, #wrongTable').on('change', '.opn-condition', function() {
+                const $sel = $(this);
+                const prev = $sel.attr('data-prev');
+                $.post(conditionUrl, {
+                    token: token,
+                    detail_id: $sel.attr('data-detail-id'),
+                    condition: $sel.val()
+                }, null, 'json').done(function(res) {
+                    if (res.status === 'failed' || res.status === 'closed') {
+                        $sel.val(prev);
+                        return showResult('invalid', res.message);
+                    }
+                    $sel.attr('data-prev', $sel.val());
+                    if (res.marked_found) markRow(res.detail_id, true);
+                    showResult('found', res.message);
+                    updateSummary(res.summary);
+                }).fail(function() {
+                    $sel.val(prev);
                     showResult('invalid', 'Gagal menghubungi server. Coba lagi.');
                 });
             });

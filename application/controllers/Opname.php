@@ -134,6 +134,50 @@ class Opname extends CI_Controller
     }
 
     /**
+     * AJAX: catat kondisi aset saat opname. Aset yang dinilai kondisinya berarti dilihat
+     * langsung, jadi baris yang belum dicek sekaligus ditandai ditemukan.
+     */
+    public function set_condition()
+    {
+        $user   = $this->Auth->get_active_user($this->session->userdata('username'));
+        $opname = $this->_authorized_opname($this->input->post('token'), $user, true);
+
+        if (!$opname || (int) $opname['status'] !== Opname_model::STATUS_OPEN) {
+            return $this->_json(['status' => 'closed', 'message' => 'Sesi opname tidak ditemukan atau sudah selesai.']);
+        }
+
+        $condition = (int) $this->input->post('condition');
+        $detail    = $this->Opname->get_detail($opname['id'], (int) $this->input->post('detail_id'));
+
+        if (!$detail || !is_valid_asset_condition($condition)) {
+            return $this->_json(['status' => 'failed', 'message' => 'Data tidak valid.']);
+        }
+
+        $this->load->model('Assets_model', 'Assets');
+        $status = $this->Assets->update_condition(
+            $detail['asset_id'],
+            $condition,
+            $this->input->post('notes', true),
+            $user['id_user'],
+            'opname',
+            $opname['id']
+        );
+
+        $marked_found = false;
+        if ($status !== 'failed' && (int) $detail['result'] === Opname_model::RESULT_UNCHECKED) {
+            $marked_found = $this->Opname->set_found($opname['id'], $detail['id'], true);
+        }
+
+        return $this->_json([
+            'status'       => $status,
+            'detail_id'    => (int) $detail['id'],
+            'marked_found' => $marked_found,
+            'message'      => $status === 'failed' ? 'Gagal menyimpan kondisi.' : 'Kondisi disimpan: ' . asset_condition_label($condition) . '.',
+            'summary'      => $this->_summary($opname['id']),
+        ]);
+    }
+
+    /**
      * Form biasa dari halaman scan QR (scan pakai kamera HP → tandai ditemukan).
      */
     public function mark_from_scan()

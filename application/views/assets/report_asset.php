@@ -22,6 +22,7 @@
                     <th width="200">Nama</th>
                     <th width="30">Merk</th>
                     <th width="150">Nomor Seri</th>
+                    <th width="80">Kondisi</th>
                     <th>Lokasi Saat Ini</th>
                 </tr>
             </thead>
@@ -33,6 +34,7 @@
                         <td scope="row"><?= $asset['asset_name']; ?></td>
                         <td scope="row"><?= $asset['merk']; ?></td>
                         <td scope="row"><?= $asset['serial_number']; ?></td>
+                        <td scope="row"><?= asset_condition_label($asset['asset_condition']); ?></td>
                         <?php if ($asset['placement_status'] == 1) : ?>
                             <td scope="row"><?= $asset['name']; ?></td>
                         <?php else : ?>

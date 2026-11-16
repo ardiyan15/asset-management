@@ -112,8 +112,12 @@
                     <hr>
                     <div class="row">
                         <div class="col-6">
-                            <div class="scan-label">Merk</div>
-                            <div class="scan-value"><?= html_escape($asset['merk']); ?></div>
+                            <div class="scan-label">Kondisi</div>
+                            <div class="scan-value">
+                                <span class="badge badge-<?= asset_condition_color($asset['asset_condition']); ?> px-2 py-1" style="font-size: .85rem;">
+                                    <?= html_escape(asset_condition_label($asset['asset_condition'])); ?>
+                                </span>
+                            </div>
                         </div>
                         <div class="col-6">
                             <div class="scan-label">Tanggal input</div>
@@ -122,6 +126,60 @@
                     </div>
                 </div>
             </div>
+
+            <?php if ($can_history) : ?>
+                <div class="card scan-card mb-3">
+                    <div class="card-body">
+                        <div class="scan-label mb-2">Laporkan kondisi</div>
+
+                        <?php if (!empty($condition_result)) : ?>
+                            <?php $cond_alert = ['updated' => 'success', 'unchanged' => 'info']; ?>
+                            <div class="alert alert-<?= $cond_alert[$condition_result['status']] ?? 'danger'; ?> py-2"><?= html_escape($condition_result['message']); ?></div>
+                        <?php endif; ?>
+
+                        <form method="post" action="<?= base_url('asset/update_condition'); ?>">
+                            <input type="hidden" name="asset_id" value="<?= (int) $asset['id_asset']; ?>">
+                            <div class="btn-group btn-group-toggle d-flex mb-2" data-toggle="buttons">
+                                <?php foreach (asset_condition_options() as $value => $label) : ?>
+                                    <?php $active = (int) $asset['asset_condition'] === $value; ?>
+                                    <label class="btn btn-outline-<?= asset_condition_color($value); ?> flex-fill <?= $active ? 'active' : ''; ?>">
+                                        <input type="radio" name="condition" value="<?= $value; ?>" autocomplete="off" <?= $active ? 'checked' : ''; ?>> <?= $label; ?>
+                                    </label>
+                                <?php endforeach; ?>
+                            </div>
+                            <input type="text" name="notes" class="form-control mb-2" maxlength="255" placeholder="Keterangan (opsional), mis. layar retak">
+                            <button type="submit" class="btn btn-primary btn-block">Simpan kondisi</button>
+                        </form>
+
+                        <?php if (!empty($condition_logs)) : ?>
+                            <hr>
+                            <div class="scan-label mb-2">Riwayat kondisi</div>
+                            <ul class="timeline">
+                                <?php
+                                $source_label = ['manual' => 'Daftar aset', 'scan' => 'Scan QR', 'opname' => 'Stock opname'];
+                                foreach ($condition_logs as $log) :
+                                ?>
+                                    <li class="st-<?= (int) $log['new_condition'] === 1 ? 1 : ((int) $log['new_condition'] === 2 ? 0 : 2); ?>">
+                                        <div class="font-weight-bold text-gray-800">
+                                            <?= html_escape(asset_condition_label($log['old_condition'])); ?>
+                                            <i class="fas fa-long-arrow-alt-right mx-1 text-gray-500"></i>
+                                            <?= html_escape(asset_condition_label($log['new_condition'])); ?>
+                                        </div>
+                                        <?php if (!empty($log['notes'])) : ?>
+                                            <div class="small"><?= html_escape($log['notes']); ?></div>
+                                        <?php endif; ?>
+                                        <div class="when">
+                                            <?= date('d M Y H:i', strtotime($log['created_at'])); ?>
+                                            · <?= html_escape($log['username'] ?? '-'); ?>
+                                            · <?= html_escape($source_label[$log['source']] ?? $log['source']); ?><?= !empty($log['opname_code']) ? ' ' . html_escape($log['opname_code']) : ''; ?>
+                                        </div>
+                                    </li>
+                                <?php endforeach; ?>
+                            </ul>
+                        <?php endif; ?>
+                    </div>
+                </div>
+            <?php endif; ?>
 
             <div class="card scan-card mb-3">
                 <div class="card-body">
@@ -181,6 +239,16 @@
 
         <p class="text-center small text-muted mt-3 mb-0">Dipindai dari label aset &middot; <?= date('d M Y H:i'); ?></p>
     </div>
+    <script>
+        // Halaman ini tidak memuat JS Bootstrap; tandai tombol kondisi yang dipilih secara manual
+        document.querySelectorAll('.btn-group-toggle input[type="radio"]').forEach(function(radio) {
+            radio.addEventListener('change', function() {
+                radio.closest('.btn-group-toggle').querySelectorAll('label').forEach(function(label) {
+                    label.classList.toggle('active', label.contains(radio));
+                });
+            });
+        });
+    </script>
 </body>
 
 </html>

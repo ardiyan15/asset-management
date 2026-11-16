@@ -3,23 +3,29 @@
 class Assets_model extends CI_Model
 {
     var $table = 'asset';
-    var $column_order = ['asset.id_asset', 'asset.asset_name', 'asset.merk', 'asset.serial_number', 'asset.placement_status', 'rooms.name AS room_name', 'rooms.id AS room_id', 'asset.created'];
+    // urutan sama dengan kolom tabel di views/menu/index.php (null = tidak bisa di-sort)
+    var $column_order = [null, 'asset.asset_name', 'asset.merk', 'asset.serial_number', 'rooms.name', 'asset.asset_condition', 'asset.created', null];
     var $column_search = ['asset.id_asset', 'asset.asset_name', 'asset.merk', 'asset.serial_number', 'rooms.name', 'asset.placement_status', 'asset.created'];
     var $order = ['id_asset' => 'desc'];
 
     private function _get_datatables_query($role_id, $building_id)
     {
         if ($role_id == 1) {
-            $this->db->select('asset.id_asset, asset.asset_name, asset.merk, asset.serial_number, asset.placement_status, rooms.name, rooms.id AS room_id, asset.created');
+            $this->db->select('asset.id_asset, asset.asset_name, asset.merk, asset.serial_number, asset.placement_status, asset.asset_condition, rooms.name, rooms.id AS room_id, asset.created');
             $this->db->from('asset');
             $this->db->join('rooms', 'rooms.id = asset.room_id');
         } else {
-            $this->db->select('asset.id_asset, asset.asset_name, asset.merk, asset.serial_number, asset.placement_status, rooms.name, rooms.id AS room_id, asset.created');
+            $this->db->select('asset.id_asset, asset.asset_name, asset.merk, asset.serial_number, asset.placement_status, asset.asset_condition, rooms.name, rooms.id AS room_id, asset.created');
             $this->db->from('asset');
             $this->db->join('rooms', 'rooms.id = asset.room_id');
             $this->db->join('floors', 'floors.id = rooms.floor_id');
             $this->db->join('buildings', 'buildings.id = floors.building_id');
             $this->db->where('buildings.id', $building_id);
+        }
+
+        $condition = (int) $this->input->post('condition');
+        if (is_valid_asset_condition($condition)) {
+            $this->db->where('asset.asset_condition', $condition);
         }
 
         $i = 0;
@@ -37,8 +43,9 @@ class Assets_model extends CI_Model
             }
             $i++;
         }
-        if (isset($_POST['order'])) { // here order processing
-            $this->db->order_by($this->column_order[$_POST['order']['0']['column']], $_POST['order']['0']['dir']);
+        $order_col = $this->column_order[(int) ($_POST['order'][0]['column'] ?? -1)] ?? null;
+        if (isset($_POST['order']) && $order_col) { // here order processing
+            $this->db->order_by($order_col, $_POST['order'][0]['dir'] === 'asc' ? 'ASC' : 'DESC');
         } else if (isset($this->order)) {
             $order = $this->order;
             $this->db->order_by(key($order), $order[key($order)]);
@@ -70,14 +77,14 @@ class Assets_model extends CI_Model
     public function menu_model($role_id, $building_id)
     {
         if ($role_id == '1') {
-            $this->db->select('asset.id_asset, asset.asset_name, asset.merk, asset.serial_number, asset.placement_status, rooms.name, rooms.id AS room_id, asset.created');
+            $this->db->select('asset.id_asset, asset.asset_name, asset.merk, asset.serial_number, asset.placement_status, asset.asset_condition, rooms.name, rooms.id AS room_id, asset.created');
             $this->db->from('asset');
             $this->db->join('rooms', 'rooms.id = asset.room_id');
             $this->db->order_by('id_asset', 'DESC');
             // return $this->db->generate();
             return $this->db->get()->result_array();
         } else {
-            $this->db->select('asset.id_asset, asset.asset_name, asset.merk, asset.serial_number, asset.placement_status, rooms.name, rooms.id AS room_id, asset.created');
+            $this->db->select('asset.id_asset, asset.asset_name, asset.merk, asset.serial_number, asset.placement_status, asset.asset_condition, rooms.name, rooms.id AS room_id, asset.created');
             $this->db->from('asset');
             $this->db->join('rooms', 'rooms.id = asset.room_id');
             $this->db->join('floors', 'floors.id = rooms.floor_id');
@@ -356,11 +363,105 @@ class Assets_model extends CI_Model
 
     public function get_asset_by_room_id($room_id)
     {
-        $this->db->select('asset.id_asset, asset.asset_name, asset.merk, asset.serial_number, asset.placement_status, rooms.name, rooms.id AS room_id');
+        $this->db->select('asset.id_asset, asset.asset_name, asset.merk, asset.serial_number, asset.placement_status, asset.asset_condition, rooms.name, rooms.id AS room_id');
         $this->db->from('asset');
         $this->db->join('rooms', 'rooms.id = asset.room_id');
         $this->db->where('asset.room_id', $room_id);
         return $this->db->get()->result_array();
+    }
+
+    /**
+     * Aset + gedungnya, untuk cek hak akses sebelum mengubah data aset.
+     */
+    public function get_asset_with_building($asset_id)
+    {
+        $this->db->select('asset.id_asset, asset.asset_name, asset.serial_number, asset.room_id,
+            asset.asset_condition, buildings.id AS building_id');
+        $this->db->from('asset');
+        $this->db->join('rooms', 'rooms.id = asset.room_id');
+        $this->db->join('floors', 'floors.id = rooms.floor_id');
+        $this->db->join('buildings', 'buildings.id = floors.building_id');
+        $this->db->where('asset.id_asset', $asset_id);
+        return $this->db->get()->row_array();
+    }
+
+    /**
+     * Ubah kondisi aset dan catat log-nya dalam satu DB transaction.
+     *
+     * @param string   $source    manual | scan | opname
+     * @return string  updated | unchanged | failed
+     */
+    public function update_condition($asset_id, $new_condition, $notes, $user_id, $source = 'manual', $opname_id = null)
+    {
+        $asset = $this->db->select('asset_condition')->get_where('asset', ['id_asset' => $asset_id])->row_array();
+        if (!$asset) {
+            return 'failed';
+        }
+
+        $old_condition = (int) $asset['asset_condition'];
+        if ($old_condition === (int) $new_condition) {
+            return 'unchanged';
+        }
+
+        $notes = trim((string) $notes);
+
+        $this->db->trans_begin();
+
+        $this->db->where('id_asset', $asset_id)->update('asset', ['asset_condition' => (int) $new_condition]);
+        $this->db->insert('asset_condition_logs', [
+            'asset_id'        => $asset_id,
+            'old_condition'   => $old_condition,
+            'new_condition'   => (int) $new_condition,
+            'notes'           => $notes !== '' ? mb_substr($notes, 0, 255) : null,
+            'source'          => $source,
+            'stock_opname_id' => $opname_id,
+            'user_id'         => $user_id,
+            'created_at'      => date('Y-m-d H:i:s'),
+        ]);
+
+        if ($this->db->trans_status() === false) {
+            $this->db->trans_rollback();
+            return 'failed';
+        }
+
+        $this->db->trans_commit();
+        return 'updated';
+    }
+
+    /**
+     * Riwayat perubahan kondisi satu aset (terbaru dulu).
+     */
+    public function get_condition_logs($asset_id)
+    {
+        $this->db->select('asset_condition_logs.*, user.username, stock_opname.code AS opname_code');
+        $this->db->from('asset_condition_logs');
+        $this->db->join('user', 'user.id_user = asset_condition_logs.user_id', 'left');
+        $this->db->join('stock_opname', 'stock_opname.id = asset_condition_logs.stock_opname_id', 'left');
+        $this->db->where('asset_condition_logs.asset_id', $asset_id);
+        $this->db->order_by('asset_condition_logs.id', 'DESC');
+        return $this->db->get()->result_array();
+    }
+
+    /**
+     * Jumlah aset per kondisi (di-scope per gedung untuk non-admin), untuk dashboard.
+     * @return array [1 => n, 2 => n, 3 => n]
+     */
+    public function count_by_condition($role_id, $building_id)
+    {
+        $this->db->select('asset.asset_condition, COUNT(*) AS total');
+        $this->db->from('asset');
+        if ($role_id !== '1') {
+            $this->db->join('rooms', 'rooms.id = asset.room_id');
+            $this->db->join('floors', 'floors.id = rooms.floor_id');
+            $this->db->where('floors.building_id', $building_id);
+        }
+        $this->db->group_by('asset.asset_condition');
+
+        $result = array_fill_keys(array_keys(asset_condition_options()), 0);
+        foreach ($this->db->get()->result_array() as $row) {
+            $result[(int) $row['asset_condition']] = (int) $row['total'];
+        }
+        return $result;
     }
 
 
@@ -371,7 +472,7 @@ class Assets_model extends CI_Model
     public function get_asset_detail_by_serial($serial_number)
     {
         $this->db->select('asset.id_asset, asset.asset_name, asset.merk, asset.serial_number,
-            asset.placement_status, asset.created,
+            asset.placement_status, asset.asset_condition, asset.created,
             rooms.id AS room_id, rooms.name AS room_name, rooms.description AS room_description,
             floors.name AS floor_name, buildings.id AS building_id, buildings.name AS building_name');
         $this->db->from('asset');

@@ -96,12 +96,13 @@ $date_ref = strtotime($opname['finished_at'] ?: $opname['started_at']);
                 <th>Nama Aset</th>
                 <th>Merk</th>
                 <th>Nomor Seri</th>
-                <th style="width: 20%;">Hasil</th>
+                <th style="width: 13%;">Kondisi</th>
+                <th style="width: 16%;">Hasil</th>
             </tr>
         </thead>
         <tbody>
             <?php if (empty($expected)) : ?>
-                <tr><td colspan="5" class="center">Tidak ada aset terdaftar</td></tr>
+                <tr><td colspan="6" class="center">Tidak ada aset terdaftar</td></tr>
             <?php endif; ?>
             <?php foreach ($expected as $i => $d) : ?>
                 <tr>
@@ -109,6 +110,7 @@ $date_ref = strtotime($opname['finished_at'] ?: $opname['started_at']);
                     <td><?= html_escape($d['asset_name'] ?? '(aset dihapus)'); ?></td>
                     <td><?= html_escape($d['merk'] ?? '-'); ?></td>
                     <td><?= html_escape($d['serial_number'] ?? '-'); ?></td>
+                    <td class="center"><?= html_escape(asset_condition_label($d['asset_condition'] ?? null)); ?></td>
                     <td class="center">
                         <?php if ((int) $d['result'] === 1) : ?>
                             <span class="found">Ditemukan</span>
@@ -130,7 +132,8 @@ $date_ref = strtotime($opname['finished_at'] ?: $opname['started_at']);
                     <th>Nama Aset</th>
                     <th>Merk</th>
                     <th>Nomor Seri</th>
-                    <th style="width: 20%;">Tercatat di</th>
+                    <th style="width: 13%;">Kondisi</th>
+                    <th style="width: 16%;">Tercatat di</th>
                 </tr>
             </thead>
             <tbody>
@@ -140,6 +143,7 @@ $date_ref = strtotime($opname['finished_at'] ?: $opname['started_at']);
                         <td><?= html_escape($d['asset_name'] ?? '(aset dihapus)'); ?></td>
                         <td><?= html_escape($d['merk'] ?? '-'); ?></td>
                         <td><?= html_escape($d['serial_number'] ?? '-'); ?></td>
+                        <td class="center"><?= html_escape(asset_condition_label($d['asset_condition'] ?? null)); ?></td>
                         <td class="center"><?= html_escape($d['expected_room_name'] ?? '-'); ?></td>
                     </tr>
                 <?php endforeach; ?>

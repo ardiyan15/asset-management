@@ -29,6 +29,7 @@ class Admin extends CI_Controller
 		$data['summaries']  = $this->Dashboard->summary_data();
 		$data['recent_transactions'] = $this->Dashboard->get_recent_transactions(5);
 		$data['asset_categories'] = $this->Dashboard->get_assets_by_category(5);
+		$data['condition_counts'] = $this->Assets->count_by_condition($role_id, $building_id);
 
 		$this->load->view('templates/header', $data);
 		$this->load->view('templates/sidebar', $data);
