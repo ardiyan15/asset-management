@@ -22,6 +22,8 @@
                         <th class="text-center">No</th>
                         <th class="text-center">Kode Kategori</th>
                         <th class="text-center">Nama Kategori</th>
+                        <th class="text-center">Masa Manfaat</th>
+                        <th class="text-center">Nilai Sisa</th>
                         <th class="text-center">Status</th>
                         <th class="text-center">Aksi</th>
                     </tr>
@@ -33,6 +35,8 @@
                             <th class="text-center"> <?= $i ?></th>
                             <td class="text-center"> <?= $category['code']; ?></td>
                             <td class="text-center"> <?= $category['name']; ?></td>
+                            <td class="text-center"> <?= $category['useful_life_years'] ? (int) $category['useful_life_years'] . ' tahun' : '<span class="text-muted">Tidak disusutkan</span>'; ?></td>
+                            <td class="text-center"> <?= rtrim(rtrim(number_format((float) $category['residual_percent'], 2, ',', ''), '0'), ','); ?>%</td>
                             <?php if ($category['status'] == 1) : ?>
                                 <td class="text-center"> Aktif </td>
                             <?php else : ?>
@@ -72,6 +76,18 @@
                     <div class="form-group">
                         <label for="code">Nama Kategori</label>
                         <input type="text" class="form-control" id="name" name="name" placeholder="Nama Kategori" required>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group col-6">
+                            <label for="useful_life_years">Masa Manfaat (tahun)</label>
+                            <input type="number" class="form-control" id="useful_life_years" name="useful_life_years" min="1" max="50" step="1" value="" placeholder="mis. 4">
+                            <small class="form-text text-muted">Kosongkan kalau tidak disusutkan.</small>
+                        </div>
+                        <div class="form-group col-6">
+                            <label for="residual_percent">Nilai Sisa (%)</label>
+                            <input type="number" class="form-control" id="residual_percent" name="residual_percent" min="0" max="100" step="0.01" value="0" placeholder="0">
+                            <small class="form-text text-muted">Persen dari harga beli di akhir masa manfaat.</small>
+                        </div>
                     </div>
                 </div>
                 <div class="modal-footer">

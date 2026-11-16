@@ -170,6 +170,23 @@ class Asset extends CI_Controller
       $data['asset_condition'] = $condition;
     }
 
+    // Data pembelian (opsional) + kategori, sama untuk semua unit yang dibuat
+    $purchase = $this->_purchase_input();
+    if ($purchase === false) {
+      $this->session->set_flashdata('message', 'purchase_invalid');
+      redirect('asset');
+    }
+    $category_row        = $this->Categories->get_active_category_by_code($category);
+    $purchase['category_id'] = $category_row ? (int) $category_row['id'] : null;
+    if ($qty > 1) {
+      foreach ($data as &$row) {
+        $row = array_merge($row, $purchase);
+      }
+      unset($row);
+    } else {
+      $data = array_merge($data, $purchase);
+    }
+
     if ($this->form_validation->run() == false) {
       $this->session->set_flashdata('message', 'failed');
       redirect('asset');
@@ -201,8 +218,24 @@ class Asset extends CI_Controller
   {
     $data['user']           = $this->Auth->get_active_user($this->session->userdata('username'));
     $data['title']          = 'Edit Aset';
-    $data['asset']          = $this->Assets->get_asset_by_id($id);
+    $data['asset']          = $this->_editable_asset($id, $data['user']);
     $data['serial_number']  = substr($data['asset']['serial_number'], 0, 4);
+    $data['categories']     = $this->Categories->get_all_categories();
+
+    // Garansi disimpan sebagai tanggal; form memakai jumlah bulan sejak tanggal perolehan
+    $data['warranty_months'] = '';
+    if ($data['asset']['purchase_date'] && $data['asset']['warranty_until']) {
+      $diff = (new DateTime($data['asset']['purchase_date']))->diff(new DateTime($data['asset']['warranty_until']));
+      $data['warranty_months'] = $diff->y * 12 + $diff->m;
+    }
+
+    $category = $data['asset']['category_id'] ? $this->Categories->get_category_by_id($data['asset']['category_id']) : null;
+    $data['depreciation'] = asset_depreciation(
+      $data['asset']['purchase_price'],
+      $data['asset']['purchase_date'],
+      $category['useful_life_years'] ?? null,
+      $category['residual_percent'] ?? 0
+    );
 
     $this->load->view('templates/header', $data);
     $this->load->view('templates/sidebar', $data);
@@ -220,25 +253,95 @@ class Asset extends CI_Controller
 
     $id                   = $this->input->post('id');
     $serial_number        = $this->input->post('seri');
-    $asset                = $this->Assets->get_asset_by_id($id);
+    $user                 = $this->Auth->get_active_user($this->session->userdata('username'));
+    $asset                = $this->_editable_asset($id, $user);
     $remove_room_location = substr($asset['serial_number'], 4);
     $new_serial_number    = $serial_number . $remove_room_location;
 
-    $data = [
+    $purchase = $this->_purchase_input();
+    if ($purchase === false) {
+      $this->session->set_flashdata('message', 'purchase_invalid');
+      redirect('asset/update/' . (int) $id);
+    }
+
+    $category_id = (int) $this->input->post('category_id');
+
+    $data = array_merge([
       'asset_name'    => $this->input->post('nama'),
       'merk'          => $this->input->post('merk'),
-      'serial_number' => $new_serial_number
-    ];
+      'serial_number' => $new_serial_number,
+      'category_id'   => $category_id > 0 ? $category_id : null,
+    ], $purchase);
 
     $result = $this->Assets->update_asset_by_id($data, $id);
 
-    if ($result > 0) {
+    // affected_rows 0 = tidak ada perubahan, bukan error
+    if ($result > 0 || $this->db->error()['code'] == 0) {
       $this->session->set_flashdata('message', 'edited ');
       redirect('asset');
     } else {
       $this->session->set_flashdata('message', 'Failed ');
       redirect('asset');
     }
+  }
+
+  private function _category_id_by_code($code)
+  {
+    $category = $this->Categories->get_active_category_by_code(trim((string) $code));
+    return $category ? (int) $category['id'] : null;
+  }
+
+  /**
+   * Aset yang boleh diedit user: ada, belum dihapus, dan (non-admin) di gedungnya sendiri.
+   */
+  private function _editable_asset($id, $user)
+  {
+    $scoped = $this->Assets->get_asset_with_building((int) $id);
+    $allowed = $scoped && (int) $scoped['is_disposed'] === 0
+      && ($user['role_id'] === '1' || (string) $user['building_id'] === (string) $scoped['building_id']);
+
+    if (!$allowed) {
+      $this->session->set_flashdata('message', 'failed ');
+      redirect('asset');
+    }
+    return $this->Assets->get_asset_by_id((int) $id);
+  }
+
+  /**
+   * Input data pembelian dari form tambah/edit aset.
+   * Harga diterima sebagai angka rupiah bulat (titik/koma pemisah ribuan dibuang).
+   * Garansi diisi dalam bulan sejak tanggal perolehan, disimpan sebagai tanggal akhir garansi.
+   *
+   * @return array|false false kalau ada input yang tidak valid
+   */
+  private function _purchase_input()
+  {
+    $date   = trim((string) $this->input->post('purchase_date'));
+    $price  = preg_replace('/[^0-9]/', '', (string) $this->input->post('purchase_price'));
+    $vendor = trim((string) $this->input->post('vendor', true));
+    $months = trim((string) $this->input->post('warranty_months'));
+
+    if ($date !== '') {
+      $parsed = DateTime::createFromFormat('Y-m-d', $date);
+      if (!$parsed || $parsed->format('Y-m-d') !== $date || $date > date('Y-m-d')) {
+        return false;
+      }
+    }
+    if ($months !== '' && (!ctype_digit($months) || (int) $months > 240 || $date === '')) {
+      return false;
+    }
+    if (strlen($price) > 13) {
+      return false;
+    }
+
+    return [
+      'purchase_date'  => $date !== '' ? $date : null,
+      'purchase_price' => $price !== '' ? $price : null,
+      'vendor'         => $vendor !== '' ? mb_substr($vendor, 0, 100) : null,
+      'warranty_until' => ($date !== '' && (int) $months > 0)
+        ? (new DateTime($date))->modify('+' . (int) $months . ' months')->format('Y-m-d')
+        : null,
+    ];
   }
 
   public function location($room_id)
@@ -309,6 +412,7 @@ class Asset extends CI_Controller
               'merk'               => $sheetData[$i][1],
               'serial_number'      => $serial_number,
               'room_id'            => $room_id,
+              'category_id'        => $this->_category_id_by_code($sheetData[$i][2]),
               'status'             => 0,
               'placement_status'   => 1,
               'created'            => date('Y-m-d')
@@ -345,6 +449,7 @@ class Asset extends CI_Controller
             'merk' => $sheetData[$i][1],
             'serial_number' => $final_serial_number,
             'room_id' => $room_id,
+            'category_id' => $this->_category_id_by_code($sheetData[$i][2]),
             'status' => 0,
             'placement_status' => 1,
             'created' => date('Y-m-d')

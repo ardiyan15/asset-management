@@ -96,6 +96,13 @@
                         <label for="name">Jumlah</label>
                         <input type="text" class="form-control" id="qty" name="qty" placeholder="Masukkan Jumlah" value="1">
                     </div>
+                    <a class="small font-weight-bold" data-toggle="collapse" href="#purchaseFields" role="button" aria-expanded="false" aria-controls="purchaseFields">
+                        <i class="fas fa-receipt mr-1"></i> Data pembelian (opsional)
+                    </a>
+                    <div class="collapse mt-3" id="purchaseFields">
+                        <?php $this->load->view('menu/_purchase_fields', ['purchase' => null]); ?>
+                        <small class="text-muted d-block">Kalau jumlah lebih dari 1, data pembelian yang sama dipakai untuk semua unit.</small>
+                    </div>
                 </div>
                 <div class="modal-footer">
                     <button type="submit" class="btn btn-success btn-sm rounded">Simpan</button>

@@ -482,9 +482,12 @@ class Assets_model extends CI_Model
     {
         $this->db->select('asset.id_asset, asset.asset_name, asset.merk, asset.serial_number,
             asset.placement_status, asset.asset_condition, asset.is_disposed, asset.disposed_at, asset.created,
+            asset.purchase_date, asset.purchase_price, asset.vendor, asset.warranty_until,
+            categories.name AS category_name, categories.useful_life_years, categories.residual_percent,
             rooms.id AS room_id, rooms.name AS room_name, rooms.description AS room_description,
             floors.name AS floor_name, buildings.id AS building_id, buildings.name AS building_name');
         $this->db->from('asset');
+        $this->db->join('categories', 'categories.id = asset.category_id', 'left');
         $this->db->join('rooms', 'rooms.id = asset.room_id');
         $this->db->join('floors', 'floors.id = rooms.floor_id');
         $this->db->join('buildings', 'buildings.id = floors.building_id');

@@ -23,6 +23,11 @@ class Categories_model extends CI_Model {
         return $this->db->affected_rows();
     }
 
+    public function get_active_category_by_code($code)
+    {
+        return $this->db->get_where('categories', ['code' => $code, 'status' => 1])->row_array();
+    }
+
     public function get_category_by_id($id)
     {
         return $this->db->get_where('categories', ['id' => $id])->row_array();
@@ -32,6 +37,8 @@ class Categories_model extends CI_Model {
     {
         $this->db->set('code', $data['code']);
         $this->db->set('name', $data['name']);
+        $this->db->set('useful_life_years', $data['useful_life_years']);
+        $this->db->set('residual_percent', $data['residual_percent']);
         $this->db->set('updated_at', $data['updated_at']);
         $this->db->where('id', $data['id']);;
         $this->db->update('categories');
