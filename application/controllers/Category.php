@@ -29,13 +29,19 @@ class Category extends CI_Controller {
     {
         $code = $this->input->post('code');
         $name = $this->input->post('name');
+        $depr = $this->_depreciation_input();
 
-        $data = [
+        if ($depr === false) {
+            $this->session->set_flashdata('message', 'depreciation_invalid');
+            redirect('category');
+        }
+
+        $data = array_merge([
             'code'          => $code,
             'name'          => $name,
             'status'        => 1,
             'created_at'    => date("Y-m-d H:i:s")
-        ];
+        ], $depr);
 
         $result = $this->Categories->create($data);
 
@@ -79,13 +85,19 @@ class Category extends CI_Controller {
         $id     = $this->input->post('id');
         $name   = $this->input->post('name');
         $code   = $this->input->post('code');
+        $depr   = $this->_depreciation_input();
 
-        $data = [
+        if ($depr === false) {
+            $this->session->set_flashdata('message', 'depreciation_invalid');
+            redirect('category/edit/' . (int) $id);
+        }
+
+        $data = array_merge([
             'id'            => $id,
             'code'          => $code,
             'name'          => $name,
             'updated_at'    => date("Y-m-d H:i:s")
-        ];
+        ], $depr);
 
         $result = $this->Categories->update_category_by_id($data);
 
@@ -96,5 +108,27 @@ class Category extends CI_Controller {
             $this->session->set_flashdata('message','failed ');
             redirect('category');
         }
+    }
+
+    /**
+     * Masa manfaat (tahun, 1-50, kosong = tidak disusutkan) dan nilai sisa (0-100%).
+     * @return array|false
+     */
+    private function _depreciation_input()
+    {
+        $life     = trim((string) $this->input->post('useful_life_years'));
+        $residual = trim(str_replace(',', '.', (string) $this->input->post('residual_percent')));
+
+        if ($life !== '' && (!ctype_digit($life) || (int) $life < 1 || (int) $life > 50)) {
+            return false;
+        }
+        if ($residual !== '' && (!is_numeric($residual) || (float) $residual < 0 || (float) $residual > 100)) {
+            return false;
+        }
+
+        return [
+            'useful_life_years' => $life !== '' ? (int) $life : null,
+            'residual_percent'  => $residual !== '' ? round((float) $residual, 2) : 0,
+        ];
     }
 }

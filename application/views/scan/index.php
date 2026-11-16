@@ -164,6 +164,54 @@
                 </div>
             </div>
 
+            <?php if ($can_history && ($asset['purchase_date'] || $asset['purchase_price'] !== null || $asset['vendor'])) : ?>
+                <?php
+                $depr     = asset_depreciation($asset['purchase_price'], $asset['purchase_date'], $asset['useful_life_years'], $asset['residual_percent'] ?? 0);
+                $warranty = warranty_status($asset['warranty_until']);
+                ?>
+                <div class="card scan-card mb-3">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-start mb-2">
+                            <div class="scan-label mb-0">Nilai aset</div>
+                            <?php if ($asset['category_name']) : ?>
+                                <span class="badge badge-light"><?= html_escape($asset['category_name']); ?></span>
+                            <?php endif; ?>
+                        </div>
+                        <?php if ($depr) : ?>
+                            <div class="h4 font-weight-bold text-gray-800 mb-1"><?= rupiah($depr['book_value']); ?></div>
+                            <div class="small text-muted mb-2">
+                                Nilai buku hari ini<?= $depr['configured'] ? ' · susut ' . $depr['percent_depreciated'] . '% (' . asset_age_label($depr['age_months']) . ' dari ' . ($depr['life_months'] / 12) . ' th)' : ' · tidak disusutkan'; ?>
+                            </div>
+                            <?php if ($depr['configured']) : ?>
+                                <div class="progress mb-3" style="height: .4rem;">
+                                    <div class="progress-bar bg-primary" style="width: <?= $depr['percent_depreciated']; ?>%"></div>
+                                </div>
+                            <?php endif; ?>
+                        <?php endif; ?>
+                        <div class="row">
+                            <div class="col-6 mb-2">
+                                <div class="scan-label">Harga perolehan</div>
+                                <div class="scan-value"><?= rupiah($asset['purchase_price']); ?></div>
+                            </div>
+                            <div class="col-6 mb-2">
+                                <div class="scan-label">Tanggal perolehan</div>
+                                <div class="scan-value"><?= $asset['purchase_date'] ? date('d M Y', strtotime($asset['purchase_date'])) : '-'; ?></div>
+                            </div>
+                            <div class="col-6">
+                                <div class="scan-label">Vendor</div>
+                                <div class="scan-value"><?= html_escape($asset['vendor'] ?: '-'); ?></div>
+                            </div>
+                            <div class="col-6">
+                                <div class="scan-label">Garansi</div>
+                                <div class="scan-value">
+                                    <?= $warranty ? '<span class="badge badge-' . $warranty['color'] . '">' . html_escape($warranty['label']) . '</span>' : '-'; ?>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            <?php endif; ?>
+
             <?php if ($can_history && !$is_disposed) : ?>
                 <div class="card scan-card mb-3">
                     <div class="card-body">

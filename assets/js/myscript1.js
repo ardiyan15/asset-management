@@ -321,6 +321,22 @@ switch (flashData) {
 			showConfirmButton: true,
 		});
 		break;
+	case "purchase_invalid":
+		Swal.fire({
+			title: "Data pembelian tidak valid",
+			text: "Cek tanggal perolehan (tidak boleh di masa depan), harga, dan garansi (butuh tanggal perolehan, maks. 240 bulan)",
+			icon: "warning",
+			showConfirmButton: true,
+		});
+		break;
+	case "depreciation_invalid":
+		Swal.fire({
+			title: "Data penyusutan tidak valid",
+			text: "Masa manfaat 1-50 tahun (atau kosong) dan nilai sisa 0-100%",
+			icon: "warning",
+			showConfirmButton: true,
+		});
+		break;
 	case "labelEmpty":
 		Swal.fire({
 			title: "Tidak ada label",
