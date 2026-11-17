@@ -49,9 +49,14 @@ class Buildings extends CI_Controller
             'updated_at'    => date("Y-m-d H:i:s")
         ];
 
+        $before = $this->db->get_where('buildings', ['id' => (int) $data['id']])->row_array();
         $result = $this->Buildings->update_data_building_by_id($data);
 
         if($result > 0) {
+            $this->audit->log('master.building_update', 'Ubah gedung ' . ($before['name'] ?? '') . ' menjadi ' . $data['name'], [
+                'entity_type' => 'building', 'entity_id' => (int) $data['id'], 'entity_label' => $data['name'],
+                'building_id' => (int) $data['id'], 'changes' => Audit::diff($before ?: [], ['name' => $data['name']]),
+            ]);
             $this->session->set_flashdata('message', 'editBuilding');
             redirect('buildings');
         } else {
@@ -62,9 +67,14 @@ class Buildings extends CI_Controller
 
     public function delete($id)
     {
+        $before = $this->db->get_where('buildings', ['id' => (int) $id])->row_array();
         $result = $this->Buildings->delete_building_by_id($id);
 
         if($result > 0) {
+            $this->audit->log('master.building_delete', 'Hapus gedung ' . ($before['name'] ?? '#' . (int) $id), [
+                'entity_type' => 'building', 'entity_id' => (int) $id, 'entity_label' => $before['name'] ?? null,
+                'building_id' => (int) $id,
+            ]);
             $this->session->set_flashdata('message', 'deleteBuilding');
             redirect('buildings');
         } else {

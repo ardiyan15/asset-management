@@ -64,6 +64,12 @@ class Opname extends CI_Controller
             redirect('opname');
         }
 
+        $this->audit->log('opname.start', 'Mulai stock opname ruangan ' . $room['name'], [
+            'entity_type'  => 'opname',
+            'entity_id'    => $opname_id,
+            'entity_label' => $this->Opname->get_header($opname_id)['code'] ?? null,
+            'building_id'  => $room['building_id'],
+        ]);
         $this->session->set_flashdata('message', 'opnameStarted');
         redirect('opname/detail/' . $this->_token($opname_id));
     }
@@ -206,6 +212,15 @@ class Opname extends CI_Controller
         $opname = $this->_authorized_opname($token, $user);
 
         if ($this->Opname->finish($opname['id']) > 0) {
+            $summary = $this->_summary($opname['id']);
+            $this->audit->log('opname.finish', 'Selesaikan stock opname ruangan ' . $opname['room_name']
+                . ': ' . $summary['found'] . '/' . $summary['expected'] . ' ditemukan, ' . $summary['missing'] . ' tidak ditemukan, '
+                . $summary['wrong_room'] . ' salah ruangan', [
+                'entity_type'  => 'opname',
+                'entity_id'    => $opname['id'],
+                'entity_label' => $opname['code'],
+                'building_id'  => $opname['building_id'],
+            ]);
             if ((int) $this->session->userdata('active_opname') === (int) $opname['id']) {
                 $this->session->unset_userdata('active_opname');
             }
@@ -222,6 +237,12 @@ class Opname extends CI_Controller
         $opname = $this->_authorized_opname($this->input->post('token'), $user);
 
         if ($this->Opname->cancel($opname['id']) > 0) {
+            $this->audit->log('opname.cancel', 'Batalkan stock opname ruangan ' . $opname['room_name'], [
+                'entity_type'  => 'opname',
+                'entity_id'    => $opname['id'],
+                'entity_label' => $opname['code'],
+                'building_id'  => $opname['building_id'],
+            ]);
             if ((int) $this->session->userdata('active_opname') === (int) $opname['id']) {
                 $this->session->unset_userdata('active_opname');
             }
@@ -245,6 +266,12 @@ class Opname extends CI_Controller
         $this->load->library('pdf');
         $this->pdf->setPaper('A4', 'portrait');
         $this->pdf->filename = 'BA-' . str_replace('/', '-', $data['opname']['code']) . '.pdf';
+        $this->audit->log('report.export', 'Cetak berita acara stock opname ' . $data['opname']['code'] . ' (PDF)', [
+            'entity_type'  => 'opname',
+            'entity_id'    => $data['opname']['id'],
+            'entity_label' => $data['opname']['code'],
+            'building_id'  => $data['opname']['building_id'],
+        ]);
         $this->pdf->load_view('opname/print_report', $data);
     }
 

@@ -72,6 +72,17 @@ class Disposal extends CI_Controller
             redirect('disposal/create');
         }
 
+        $header = $this->Disposal->get_header($disposal_id);
+        $this->audit->log('disposal.request', 'Ajukan penghapusan ' . count($assets) . ' aset (' . Disposal_model::method_label($method) . ')', [
+            'entity_type'  => 'disposal',
+            'entity_id'    => $disposal_id,
+            'entity_label' => $header['code'] ?? null,
+            'building_id'  => $user['role_id'] === '1' ? null : $user['building_id'],
+            'changes'      => [
+                'aset'   => ['old' => null, 'new' => implode(', ', array_column($assets, 'serial_number'))],
+                'alasan' => ['old' => null, 'new' => mb_substr($reason, 0, 200)],
+            ],
+        ]);
         $this->session->set_flashdata('message', 'disposalRequested');
         redirect('disposal/detail/' . $this->_token($disposal_id));
     }
@@ -130,6 +141,11 @@ class Disposal extends CI_Controller
         $this->load->library('pdf');
         $this->pdf->setPaper('A4', 'portrait');
         $this->pdf->filename = 'BAST-' . str_replace('/', '-', $data['disposal']['code']) . '.pdf';
+        $this->audit->log('report.export', 'Cetak BAST penghapusan ' . $data['disposal']['code'] . ' (PDF)', [
+            'entity_type'  => 'disposal',
+            'entity_id'    => $data['disposal']['id'],
+            'entity_label' => $data['disposal']['code'],
+        ]);
         $this->pdf->load_view('disposal/print_bast', $data);
     }
 
@@ -162,6 +178,13 @@ class Disposal extends CI_Controller
         } elseif ($processed === 0) {
             $this->session->set_flashdata('message', 'disposal_nothing');
         } else {
+            $this->audit->log($approve ? 'disposal.approve' : 'disposal.reject',
+                ($approve ? 'Setujui' : 'Tolak') . ' penghapusan ' . $processed . ' aset (' . $disposal['code'] . ')', [
+                'entity_type'  => 'disposal',
+                'entity_id'    => $disposal['id'],
+                'entity_label' => $disposal['code'],
+                'changes'      => ['catatan' => ['old' => null, 'new' => trim($notes) ?: null]],
+            ]);
             $this->session->set_flashdata('message', $approve ? 'disposalApproved' : 'disposalRejected');
         }
         redirect('disposal/detail/' . $token);

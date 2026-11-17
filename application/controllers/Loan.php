@@ -76,6 +76,17 @@ class Loan extends CI_Controller
             redirect('loan');
         }
 
+        $this->audit->log('loan.create', 'Pinjamkan ' . $asset['asset_name'] . ' ke ' . $input['borrower_name'] . ' sampai ' . $input['due_date'], [
+            'entity_type'  => 'asset',
+            'entity_id'    => $asset['id_asset'],
+            'entity_label' => $asset['serial_number'],
+            'building_id'  => $asset['building_id'],
+            'changes'      => [
+                'kode'          => ['old' => null, 'new' => $this->Loan->get_loan($loan_id)['code'] ?? null],
+                'peminjam'      => ['old' => null, 'new' => $input['borrower_name']],
+                'batas_kembali' => ['old' => null, 'new' => $input['due_date']],
+            ],
+        ]);
         $this->session->set_flashdata('message', 'loanCreated');
         $this->session->set_flashdata('loan_slip', $this->_token($loan_id));
         redirect('loan');
@@ -104,6 +115,18 @@ class Loan extends CI_Controller
         // Jam pengembalian = sekarang kalau hari ini, selain itu akhir hari tanggal yang dipilih
         $returned_at = $date === date('Y-m-d') ? date('Y-m-d H:i:s') : $date . ' 23:59:00';
         $ok = $this->Loan->mark_returned($loan, $returned_at, $condition, $this->input->post('return_notes', true), $user['id_user']);
+        if ($ok) {
+            $this->audit->log('loan.return', 'Pengembalian ' . $loan['asset_name'] . ' dari ' . $loan['borrower_name'] . ' (' . $loan['code'] . ')', [
+                'entity_type'  => 'asset',
+                'entity_id'    => $loan['asset_id'],
+                'entity_label' => $loan['serial_number'],
+                'building_id'  => $loan['building_id'],
+                'changes'      => [
+                    'kondisi'        => ['old' => asset_condition_label($loan['condition_out']), 'new' => asset_condition_label($condition)],
+                    'tanggal_kembali' => ['old' => $loan['due_date'], 'new' => $date],
+                ],
+            ]);
+        }
 
         $this->session->set_flashdata('message', $ok ? 'loanReturned' : 'loan_failed');
         redirect($this->_back());
@@ -126,6 +149,15 @@ class Loan extends CI_Controller
         }
 
         $ok = $this->Loan->extend($loan, $due);
+        if ($ok) {
+            $this->audit->log('loan.extend', 'Perpanjang peminjaman ' . $loan['asset_name'] . ' oleh ' . $loan['borrower_name'] . ' (' . $loan['code'] . ')', [
+                'entity_type'  => 'asset',
+                'entity_id'    => $loan['asset_id'],
+                'entity_label' => $loan['serial_number'],
+                'building_id'  => $loan['building_id'],
+                'changes'      => ['batas_kembali' => ['old' => $loan['due_date'], 'new' => $due]],
+            ]);
+        }
         $this->session->set_flashdata('message', $ok ? 'loanExtended' : 'loan_failed');
         redirect($this->_back());
     }

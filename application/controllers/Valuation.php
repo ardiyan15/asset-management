@@ -42,6 +42,7 @@ class Valuation extends CI_Controller
         $this->load->library('pdf');
         $this->pdf->setPaper('A4', 'landscape');
         $this->pdf->filename = 'laporan-nilai-aset-' . $data['filters']['as_of'] . '.pdf';
+        $this->audit->log('report.export', 'Ekspor laporan nilai aset per ' . $data['filters']['as_of'] . ' (PDF, ' . count($data['rows']) . ' aset)');
         $this->pdf->load_view('valuation/print', $data);
     }
 
@@ -101,6 +102,7 @@ class Valuation extends CI_Controller
         $spreadsheet->setActiveSheetIndex(0);
 
         $filename = 'laporan-nilai-aset-' . $as_of . '.xlsx';
+        $this->audit->log('report.export', 'Ekspor laporan nilai aset per ' . $as_of . ' (Excel, ' . count($data['rows']) . ' aset)');
         header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
         header('Content-Disposition: attachment; filename="' . $filename . '"');
         header('Cache-Control: max-age=0');

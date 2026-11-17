@@ -66,6 +66,7 @@ class TI extends CI_Controller
     $detail = $this->_pending_detail_from_token($token);
 
     if ($detail && $this->Transactions->accept_details([$detail])) {
+      $this->_audit('transaction.accept', 'Terima', [$detail]);
       $this->session->set_flashdata('message', 'ti_success');
     } else {
       $this->session->set_flashdata('message', 'ti_failed');
@@ -78,6 +79,7 @@ class TI extends CI_Controller
     $detail = $this->_pending_detail_from_token($token);
 
     if ($detail && $this->Transactions->reject_detail($detail)) {
+      $this->_audit('transaction.reject', 'Tolak', [$detail]);
       $this->session->set_flashdata('message', 'reject');
     } else {
       $this->session->set_flashdata('message', 'ti_failed');
@@ -96,7 +98,39 @@ class TI extends CI_Controller
     $user = $this->Auth->get_active_user($this->session->userdata('username'));
     $details = $this->Transactions->get_pending_details($user['role_id'], $user['building_id'], [], $asset_ids);
 
-    echo json_encode($this->Transactions->accept_details($details) ? count($details) : 0);
+    $ok = !empty($details) && $this->Transactions->accept_details($details);
+    if ($ok) {
+      $this->_audit('transaction.accept', 'Terima', $details);
+    }
+    echo json_encode($ok ? count($details) : 0);
+  }
+
+  /**
+   * Catat terima/tolak kiriman: satu baris log per kode transaksi.
+   */
+  private function _audit($action, $verb, array $details)
+  {
+    $rows = $this->db->select('transaction.transaction_id AS code, asset.serial_number, asset.asset_name, rooms.name AS room_name, floors.building_id')
+      ->from('transaction_details AS td')
+      ->join('transaction', 'transaction.id = td.transaction_id', 'left')
+      ->join('asset', 'asset.id_asset = td.asset_id', 'left')
+      ->join('rooms', 'rooms.id = td.room_id', 'left')
+      ->join('floors', 'floors.id = rooms.floor_id', 'left')
+      ->where_in('td.id', array_column($details, 'id'))
+      ->get()->result_array();
+
+    $by_code = [];
+    foreach ($rows as $row) {
+      $by_code[$row['code'] ?? '-'][] = $row;
+    }
+    foreach ($by_code as $code => $items) {
+      $this->audit->log($action, $verb . ' kiriman ' . count($items) . ' aset ke ' . $items[0]['room_name'] . ' (' . $code . ')', [
+        'entity_type'  => 'transaction',
+        'entity_label' => $code,
+        'building_id'  => $items[0]['building_id'],
+        'changes'      => ['aset' => ['old' => null, 'new' => implode(', ', array_column($items, 'serial_number'))]],
+      ]);
+    }
   }
 
   /**

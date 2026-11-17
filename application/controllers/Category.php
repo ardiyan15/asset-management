@@ -46,6 +46,9 @@ class Category extends CI_Controller {
         $result = $this->Categories->create($data);
 
         if($result > 0) {
+            $this->audit->log('master.category_create', 'Tambah kategori ' . $data['code'] . ' - ' . $data['name'], [
+                'entity_type' => 'category', 'entity_id' => $this->db->insert_id(), 'entity_label' => $data['code'],
+            ]);
             $this->session->set_flashdata('message', 'addCategory');
             redirect('category');
         } else {
@@ -56,9 +59,13 @@ class Category extends CI_Controller {
 
     public function delete($id)
     {
+        $before = $this->Categories->get_category_by_id($id);
         $result = $this->Categories->delete_category_by_id($id);
 
         if($result > 0) {
+            $this->audit->log('master.category_delete', 'Nonaktifkan kategori ' . ($before['code'] ?? '') . ' - ' . ($before['name'] ?? ''), [
+                'entity_type' => 'category', 'entity_id' => (int) $id, 'entity_label' => $before['code'] ?? null,
+            ]);
             $this->session->set_flashdata('message', 'deleteCategory');
             redirect('category');
         } else {
@@ -99,9 +106,14 @@ class Category extends CI_Controller {
             'updated_at'    => date("Y-m-d H:i:s")
         ], $depr);
 
+        $before = $this->Categories->get_category_by_id($id);
         $result = $this->Categories->update_category_by_id($data);
 
         if($result > 0) {
+            $this->audit->log('master.category_update', 'Ubah kategori ' . $data['code'] . ' - ' . $data['name'], [
+                'entity_type' => 'category', 'entity_id' => (int) $id, 'entity_label' => $data['code'],
+                'changes'     => Audit::diff($before ?: [], $data, ['code', 'name', 'useful_life_years', 'residual_percent']),
+            ]);
             $this->session->set_flashdata('message', 'editCategory');
             redirect('category');
         } else {

@@ -63,6 +63,16 @@ class Rooms_model extends CI_Model
         return $this->db->affected_rows();
     }
 
+    public function get_building_id_by_room($room_id)
+    {
+        $row = $this->db->select('floors.building_id')
+            ->from('rooms')
+            ->join('floors', 'floors.id = rooms.floor_id')
+            ->where('rooms.id', (int) $room_id)
+            ->get()->row_array();
+        return $row ? (int) $row['building_id'] : null;
+    }
+
     public function get_room_id_by_name($name)
     {
         $this->db->select('rooms.id');

@@ -44,6 +44,7 @@ class Admin extends CI_Controller
 
 	public function list_user()
 	{
+		is_allowed();
 		$data['title']      = 'Daftar Pengguna';
 		$data['user']       = $this->Auth->get_active_user($this->session->userdata('username'));
 		$data['all_users']  = $this->Users->get_all_user();
@@ -59,9 +60,15 @@ class Admin extends CI_Controller
 
 	public function activated($id)
 	{
+		is_allowed();
+		$target = $this->db->select('id_user, username, building_id')->get_where('user', ['id_user' => (int) $id])->row_array();
 		$active = $this->Assets->activate_list_user($id);
 
 		if ($active > 0) {
+			$this->audit->log('user.activate', 'Aktifkan akun ' . ($target['username'] ?? '#' . (int) $id), [
+				'entity_type' => 'user', 'entity_id' => (int) $id, 'entity_label' => $target['username'] ?? null,
+				'building_id' => $target['building_id'] ?? null,
+			]);
 			$this->session->set_flashdata('message', 'activate');
 			redirect('admin/list_user');
 		} else {
@@ -72,9 +79,15 @@ class Admin extends CI_Controller
 
 	public function deactivated($id)
 	{
+		is_allowed();
+		$target = $this->db->select('id_user, username, building_id')->get_where('user', ['id_user' => (int) $id])->row_array();
 		$deactivate = $this->Assets->deactivate_list_user($id);
 
 		if ($deactivate > 0) {
+			$this->audit->log('user.deactivate', 'Nonaktifkan akun ' . ($target['username'] ?? '#' . (int) $id), [
+				'entity_type' => 'user', 'entity_id' => (int) $id, 'entity_label' => $target['username'] ?? null,
+				'building_id' => $target['building_id'] ?? null,
+			]);
 			$this->session->set_flashdata('message', 'deactivate');
 			redirect('admin/list_user');
 		} else {
@@ -85,9 +98,16 @@ class Admin extends CI_Controller
 
 	public function deleteUser($id)
 	{
+		is_allowed();
+		$target  = $this->db->select('id_user, username, role_id, building_id')->get_where('user', ['id_user' => (int) $id])->row_array();
 		$deleted = $this->Assets->delete_user($id);
 
 		if ($deleted > 0) {
+			$this->audit->log('user.delete', 'Hapus akun ' . ($target['username'] ?? '#' . (int) $id), [
+				'entity_type' => 'user', 'entity_id' => (int) $id, 'entity_label' => $target['username'] ?? null,
+				'building_id' => $target['building_id'] ?? null,
+				'changes'     => ['role_id' => ['old' => $target['role_id'] ?? null, 'new' => null]],
+			]);
 			$this->session->set_flashdata('message', 'delete');
 			redirect('admin/list_user');
 		} else {
@@ -98,6 +118,7 @@ class Admin extends CI_Controller
 
 	public function edit_user()
 	{
+		is_allowed();
 		$data = [
 			'username' => $this->input->post('username')
 		];
@@ -109,13 +130,25 @@ class Admin extends CI_Controller
 
 		$id = $this->input->post('id_user');
 
+		$before = $this->db->select('id_user, username, building_id')->get_where('user', ['id_user' => (int) $id])->row_array();
 		$this->Users->update_user($id, $data);
+		// Password tidak pernah dicatat, hanya tanda bahwa password direset
+		$changes = Audit::diff($before ?: [], ['username' => $data['username']]);
+		if (!empty($password)) {
+			$changes['password_direset'] = ['old' => null, 'new' => 'ya'];
+		}
+		$this->audit->log('user.update', 'Ubah akun ' . ($before['username'] ?? '#' . (int) $id) . (!empty($password) ? ' (termasuk reset password)' : ''), [
+			'entity_type' => 'user', 'entity_id' => (int) $id, 'entity_label' => $data['username'],
+			'building_id' => $before['building_id'] ?? null,
+			'changes'     => $changes,
+		]);
 		$this->session->set_flashdata('message', 'editUser');
 		redirect('admin/list_user');
 	}
 
 	public function add_building_location()
 	{
+		is_allowed();
 		$data = [
 			'name'          => $this->input->post('name'),
 			'status'        => 1,
@@ -125,6 +158,9 @@ class Admin extends CI_Controller
 		$add_building = $this->Buildings->add_building($data);
 
 		if ($add_building > 0) {
+			$this->audit->log('master.building_create', 'Tambah gedung ' . $data['name'], [
+				'entity_type' => 'building', 'entity_id' => $this->db->insert_id(), 'entity_label' => $data['name'],
+			]);
 			$this->session->set_flashdata('message', 'success');
 			redirect('buildings');
 		} else {
@@ -135,6 +171,7 @@ class Admin extends CI_Controller
 
 	public function editStrLocation($id)
 	{
+		is_allowed();
 		$data = [
 			'store_code'        => $this->input->post('strCode'),
 			'store_name'        => $this->input->post('strName'),
@@ -156,6 +193,7 @@ class Admin extends CI_Controller
 
 	public function activateStr($id)
 	{
+		is_allowed();
 		$result = $this->Assets->activated_store($id);
 
 		if ($result > 0) {

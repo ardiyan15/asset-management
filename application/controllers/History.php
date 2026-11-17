@@ -80,6 +80,10 @@ class History extends CI_Controller
             redirect('history/asset_out');
         }
 
+        $this->audit->log('report.export', 'Cetak BAST pindah aset ' . $data['asset']['transaction_id'] . ' (PDF)', [
+            'entity_type'  => 'transaction',
+            'entity_label' => $data['asset']['transaction_id'],
+        ]);
         $this->pdf->setPaper('A4', 'portrait');
         $this->pdf->filename = "BAST-" . $data['asset']['transaction_id'] . ".pdf";
         $this->pdf->load_view('history/print_bast', $data);

@@ -60,6 +60,7 @@ class Report extends CI_Controller
         $this->load->library('pdf');
         $this->pdf->setPaper('A4', 'landscape');
         $this->pdf->filename = 'rekap-aset-per-' . $data['filters']['group'] . '-' . date('Ymd') . '.pdf';
+        $this->audit->log('report.export', 'Ekspor rekap aset per ' . strtolower($data['group_label']) . ' (PDF, ' . count($data['rows']) . ' aset)');
         $this->pdf->load_view('report/print', $data);
     }
 
@@ -125,6 +126,7 @@ class Report extends CI_Controller
         $spreadsheet->setActiveSheetIndex(0);
 
         $filename = 'rekap-aset-per-' . $data['filters']['group'] . '-' . date('Ymd') . '.xlsx';
+        $this->audit->log('report.export', 'Ekspor rekap aset per ' . strtolower($data['group_label']) . ' (Excel, ' . count($data['rows']) . ' aset)');
         header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
         header('Content-Disposition: attachment; filename="' . $filename . '"');
         header('Cache-Control: max-age=0');

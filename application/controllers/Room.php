@@ -41,6 +41,10 @@ class Room extends CI_Controller
         $result = $this->Rooms->create($data);
 
         if($result > 0) {
+            $this->audit->log('master.room_create', 'Tambah ruangan ' . $data['name'], [
+                'entity_type' => 'room', 'entity_id' => $this->db->insert_id(), 'entity_label' => $data['name'],
+                'building_id' => $this->Rooms->get_building_id_by_room($this->db->insert_id()),
+            ]);
             $this->session->set_flashdata('message', 'addRoom');
             redirect('room/'.$data['floor_id']);
         } else {
@@ -73,9 +77,15 @@ class Room extends CI_Controller
             'updated_at'    => date("Y-m-d H:i:s")
         ];
 
+        $before = $this->db->get_where('rooms', ['id' => (int) $data['id']])->row_array();
         $result = $this->Rooms->update_room_by_id($data);
 
         if($result > 0) {
+            $this->audit->log('master.room_update', 'Ubah ruangan ' . ($before['name'] ?? '') . ' menjadi ' . $data['name'], [
+                'entity_type' => 'room', 'entity_id' => (int) $data['id'], 'entity_label' => $data['name'],
+                'building_id' => $this->Rooms->get_building_id_by_room($data['id']),
+                'changes'     => Audit::diff($before ?: [], ['name' => $data['name'], 'description' => $data['description']]),
+            ]);
             $this->session->set_flashdata('message', 'editRoom');
             redirect('room/'.$floor_id);
         } else {

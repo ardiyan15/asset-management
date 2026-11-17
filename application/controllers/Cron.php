@@ -171,6 +171,34 @@ class Cron extends CI_Controller
         $this->maintenance_reminders($mode);
         $this->_out('== Peminjaman ==');
         $this->loan_reminders($mode);
+        $this->_out('== Audit log ==');
+        $this->audit_cleanup($mode);
+    }
+
+    /**
+     * Hapus audit log yang lebih lama dari $config['audit_retention_days'] (0 = tidak dihapus).
+     *   php index.php cron audit_cleanup [dry]
+     */
+    public function audit_cleanup($mode = '')
+    {
+        $days = (int) $this->config->item('audit_retention_days');
+        if ($days <= 0) {
+            $this->_out('Retensi audit log tidak diatur (audit_retention_days = 0), semua log disimpan.');
+            return;
+        }
+
+        $this->load->model('Audit_model', 'AuditLog');
+        $cutoff = date('Y-m-d', strtotime('-' . $days . ' days'));
+        if ($mode === 'dry') {
+            $count = $this->db->where('created_at <', $cutoff . ' 00:00:00')->count_all_results('audit_logs');
+            $this->_out('[DRY RUN] ' . $count . ' log sebelum ' . $cutoff . ' akan dihapus.');
+            return;
+        }
+
+        $deleted = $this->AuditLog->purge_older_than($days);
+        // Penghapusan log juga dicatat supaya tidak ada celah yang tidak terlihat
+        $this->audit->log('audit.purge', 'Hapus ' . $deleted . ' audit log sebelum ' . $cutoff . ' (retensi ' . $days . ' hari)');
+        $this->_out('Dihapus ' . $deleted . ' audit log sebelum ' . $cutoff . '.');
     }
 
     private function _out($line)
