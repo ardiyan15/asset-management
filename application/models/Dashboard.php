@@ -50,24 +50,4 @@ class Dashboard extends CI_Model
 
 		return $this->db->query($query)->result_array();
 	}
-
-	public function get_recent_transactions($limit = 5)
-	{
-		$this->db->select('detail_process.*, asset.asset_name, asset.serial_number');
-		$this->db->from('detail_process');
-		$this->db->join('asset', 'asset.id_asset = detail_process.asset_id');
-		$this->db->order_by('detail_process.id_detail_process', 'DESC');
-		$this->db->limit($limit);
-		return $this->db->get()->result_array();
-	}
-
-	public function get_assets_by_category($limit = 5)
-	{
-		$this->db->select('asset_name, COUNT(*) as total');
-		$this->db->where('is_disposed', 0);
-		$this->db->group_by('asset_name');
-		$this->db->order_by('total', 'DESC');
-		$this->db->limit($limit);
-		return $this->db->get('asset')->result_array();
-	}
 }

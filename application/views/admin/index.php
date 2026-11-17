@@ -148,10 +148,56 @@
                         <canvas id="categoryChart"></canvas>
                     </div>
                     <div class="mt-4 text-center small">
-                        <span class="mr-2">
-                            <i class="fas fa-circle text-primary"></i> 5 Teratas
-                        </span>
+                        <?php $cat_colors = ['#4e73df', '#1cc88a', '#36b9cc', '#f6c23e', '#e74a3b', '#858796']; ?>
+                        <?php foreach ($asset_categories as $i => $cat) : ?>
+                            <span class="mr-2 d-inline-block">
+                                <i class="fas fa-circle" style="color: <?= $cat_colors[$i % count($cat_colors)]; ?>"></i>
+                                <?= html_escape($cat['label']); ?> (<?= (int) $cat['total']; ?>)
+                            </span>
+                        <?php endforeach; ?>
                     </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Transaksi per bulan & aset rusak -->
+    <div class="row">
+        <div class="col-xl-8 col-lg-7">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                    <h6 class="m-0 font-weight-bold text-primary">Transaksi Pindah Aset per Bulan</h6>
+                    <span class="small text-muted">12 bulan terakhir</span>
+                </div>
+                <div class="card-body">
+                    <div class="chart-area" style="height: 300px;">
+                        <canvas id="monthlyChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-4 col-lg-5">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                    <h6 class="m-0 font-weight-bold text-primary">Aset Rusak per <?= $user['role_id'] == '1' ? 'Gedung' : 'Ruangan'; ?></h6>
+                    <a href="<?= base_url('report?group=' . ($user['role_id'] == '1' ? 'building' : 'room')); ?>" class="small">Rekap</a>
+                </div>
+                <div class="card-body">
+                    <?php
+                    $damaged = array_values(array_filter($condition_locations, function ($l) {
+                        return $l[2] + $l[3] > 0;
+                    }));
+                    ?>
+                    <?php if (empty($damaged)) : ?>
+                        <div class="text-center text-muted py-5">
+                            <i class="fas fa-check-circle fa-3x text-gray-300 mb-3"></i>
+                            <p class="mb-0 small">Tidak ada aset rusak. Semua aset aktif dalam kondisi baik.</p>
+                        </div>
+                    <?php else : ?>
+                        <div style="position: relative; height: <?= max(220, min(300, count($damaged) * 34 + 70)); ?>px;">
+                            <canvas id="damagedChart"></canvas>
+                        </div>
+                    <?php endif; ?>
                 </div>
             </div>
         </div>
@@ -169,7 +215,7 @@
                          <table class="table table-bordered table-hover" width="100%" cellspacing="0">
                             <thead>
                                 <tr>
-                                    <th>ID</th>
+                                    <th>Kode</th>
                                     <th>Aset</th>
                                     <th>Serial Number</th>
                                     <th>Dari</th>
@@ -182,21 +228,17 @@
                                 <?php if(empty($recent_transactions)): ?>
                                     <tr><td colspan="7" class="text-center">Belum ada transaksi</td></tr>
                                 <?php else: ?>
+                                    <?php $trx_status = [0 => ['warning', 'Dikirim'], 1 => ['success', 'Diterima'], 2 => ['secondary', 'Ditolak']]; ?>
                                     <?php foreach($recent_transactions as $trans): ?>
+                                    <?php $st = $trx_status[(int) $trans['status']] ?? ['light', '-']; ?>
                                     <tr>
-                                        <td>#<?= $trans['id_detail_process'] ?></td>
-                                        <td><?= $trans['asset_name'] ?></td>
-                                        <td><?= $trans['serial_number'] ?></td>
-                                        <td><?= $trans['source'] ?></td>
-                                        <td><?= $trans['destination'] ?></td>
-                                        <td><?= date('d M Y, H:i', $trans['created_at']) ?></td> <!-- Assuming created_at exists -->
-                                        <td>
-                                            <?php if($trans['deleted'] == 0): ?>
-                                                 <span class="badge badge-warning">Proses</span>
-                                            <?php else: ?>
-                                                 <span class="badge badge-success">Selesai</span>
-                                            <?php endif; ?>
-                                        </td>
+                                        <td class="small text-nowrap"><?= html_escape($trans['trx_code'] ?? '-') ?></td>
+                                        <td><?= html_escape($trans['asset_name'] ?? '-') ?></td>
+                                        <td><code><?= html_escape($trans['serial_number'] ?? '-') ?></code></td>
+                                        <td><?= html_escape($trans['source_name'] ?? '-') ?></td>
+                                        <td><?= html_escape($trans['destination_name'] ?? '-') ?></td>
+                                        <td class="text-nowrap"><?= date('d M Y, H:i', strtotime($trans['created_at'])) ?></td>
+                                        <td><span class="badge badge-<?= $st[0] ?>"><?= $st[1] ?></span></td>
                                     </tr>
                                     <?php endforeach; ?>
                                 <?php endif; ?>
@@ -215,10 +257,10 @@
     var myChart = new Chart(ctx, {
         type: 'bar', // Changed from horizontalBar for cleaner look, or keep horizontalBar
         data: {
-            labels: [<?php foreach ($assets as $asset) { echo '"' . $asset['asset_name'] . '"' . ","; } ?>],
+            labels: <?= json_encode(array_column($assets, 'asset_name')); ?>,
             datasets: [{
                 label: 'Jumlah Aset',
-                data: [<?php foreach ($assets as $asset) { echo $asset['total'] . ','; } ?>],
+                data: <?= json_encode(array_map('intval', array_column($assets, 'total'))); ?>,
                 backgroundColor: 'rgba(78, 115, 223, 0.8)', // Primary color
                 hoverBackgroundColor: 'rgba(78, 115, 223, 1)',
                 borderColor: '#4e73df',
@@ -254,11 +296,11 @@
     var myPieChart = new Chart(ctxPie, {
         type: 'doughnut',
         data: {
-            labels: [<?php foreach ($asset_categories as $cat) { echo '"' . $cat['asset_name'] . '"' . ","; } ?>],
+            labels: <?= json_encode(array_column($asset_categories, 'label')); ?>,
             datasets: [{
-                data: [<?php foreach ($asset_categories as $cat) { echo $cat['total'] . ','; } ?>],
-                backgroundColor: ['#4e73df', '#1cc88a', '#36b9cc', '#f6c23e', '#e74a3b'],
-                hoverBackgroundColor: ['#2e59d9', '#17a673', '#2c9faf', '#dda20a', '#be2617'],
+                data: <?= json_encode(array_map('intval', array_column($asset_categories, 'total'))); ?>,
+                backgroundColor: ['#4e73df', '#1cc88a', '#36b9cc', '#f6c23e', '#e74a3b', '#858796'],
+                hoverBackgroundColor: ['#2e59d9', '#17a673', '#2c9faf', '#dda20a', '#be2617', '#6e707e'],
                 hoverBorderColor: "rgba(234, 236, 244, 1)",
             }],
         },
@@ -278,4 +320,54 @@
             cutoutPercentage: 80,
         },
     });
+
+    // Transaksi pindah aset per bulan (dikirim / diterima / ditolak)
+    var monthly = <?= json_encode($monthly_transactions); ?>;
+    new Chart(document.getElementById('monthlyChart'), {
+        type: 'bar',
+        data: {
+            labels: monthly.labels,
+            datasets: [
+                { label: 'Diterima', backgroundColor: '#1cc88a', data: monthly[1] },
+                { label: 'Menunggu', backgroundColor: '#f6c23e', data: monthly[0] },
+                { label: 'Ditolak', backgroundColor: '#858796', data: monthly[2] }
+            ]
+        },
+        options: {
+            maintainAspectRatio: false,
+            legend: { position: 'bottom' },
+            scales: {
+                xAxes: [{ stacked: true, gridLines: { display: false } }],
+                yAxes: [{
+                    stacked: true,
+                    ticks: { beginAtZero: true, callback: function (v) { return v % 1 === 0 ? v : ''; } },
+                    gridLines: { color: 'rgb(234, 236, 244)', drawBorder: false, borderDash: [2] }
+                }]
+            },
+            tooltips: { mode: 'index' }
+        }
+    });
+
+    // Aset rusak per gedung (admin) / ruangan (user)
+    var damaged = <?= json_encode(array_values(array_filter($condition_locations, function ($l) { return $l[2] + $l[3] > 0; }))); ?>;
+    if (damaged.length) {
+        new Chart(document.getElementById('damagedChart'), {
+            type: 'horizontalBar',
+            data: {
+                labels: damaged.map(function (d) { return d.label; }),
+                datasets: [
+                    { label: 'Rusak Ringan', backgroundColor: '#f6c23e', data: damaged.map(function (d) { return d[2]; }) },
+                    { label: 'Rusak Berat', backgroundColor: '#e74a3b', data: damaged.map(function (d) { return d[3]; }) }
+                ]
+            },
+            options: {
+                maintainAspectRatio: false,
+                legend: { position: 'bottom' },
+                scales: {
+                    xAxes: [{ stacked: true, ticks: { beginAtZero: true, callback: function (v) { return v % 1 === 0 ? v : ''; } } }],
+                    yAxes: [{ stacked: true, gridLines: { display: false } }]
+                }
+            }
+        });
+    }
 </script>

@@ -111,6 +111,12 @@
     <div class="sidebar-heading">
         Laporan
     </div>
+    <li class="nav-item <?= is_active('report'); ?>">
+        <a class="nav-link" href="<?= base_url('report') ?>">
+            <i class="fas fa-fw fa-chart-bar"></i>
+            <span> Rekap Aset </span>
+        </a>
+    </li>
     <li class="nav-item <?= is_active('valuation'); ?>">
         <a class="nav-link" href="<?= base_url('valuation') ?>">
             <i class="fas fa-fw fa-coins"></i>
