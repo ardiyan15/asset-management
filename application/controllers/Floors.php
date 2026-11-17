@@ -40,6 +40,10 @@ class Floors extends CI_Controller
         $result = $this->Floors->create($data);
 
         if($result > 0) {
+            $this->audit->log('master.floor_create', 'Tambah lantai ' . $data['name'], [
+                'entity_type' => 'floor', 'entity_id' => $this->db->insert_id(), 'entity_label' => $data['name'],
+                'building_id' => (int) $data['building_id'],
+            ]);
             $this->session->set_flashdata('message', 'addFloor');
             redirect('floors/'.$data['building_id']);
         } else {
@@ -71,9 +75,14 @@ class Floors extends CI_Controller
             'updated_at'    => date("Y-m-d H:i:s")
         ];
 
+        $before = $this->db->get_where('floors', ['id' => (int) $data['id']])->row_array();
         $result = $this->Floors->update_floors_by_id($data);
 
         if($result > 0) {
+            $this->audit->log('master.floor_update', 'Ubah lantai ' . ($before['name'] ?? '') . ' menjadi ' . $data['name'], [
+                'entity_type' => 'floor', 'entity_id' => (int) $data['id'], 'entity_label' => $data['name'],
+                'building_id' => $before['building_id'] ?? null, 'changes' => Audit::diff($before ?: [], ['name' => $data['name']]),
+            ]);
             $this->session->set_flashdata('message', 'editFloor');
             redirect('floors/'.$building_id);
         } else {

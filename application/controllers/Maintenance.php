@@ -77,7 +77,15 @@ class Maintenance extends CI_Controller
         }
 
         $input['created_by'] = $user['id_user'];
-        $this->Maintenance->create_schedule($input);
+        $schedule_id = $this->Maintenance->create_schedule($input);
+        $this->audit->log('maintenance.schedule_create', 'Buat jadwal "' . $input['title'] . '" ' . maintenance_interval_label($input['interval_value'], $input['interval_unit'])
+            . ' untuk ' . $asset['asset_name'], [
+            'entity_type'  => 'maintenance_schedule',
+            'entity_id'    => $schedule_id,
+            'entity_label' => $asset['serial_number'],
+            'building_id'  => $asset['building_id'],
+            'changes'      => ['jatuh_tempo' => ['old' => null, 'new' => $input['next_due_date']]],
+        ]);
 
         $this->session->set_flashdata('message', 'maintenanceScheduled');
         redirect('maintenance?status=all');
@@ -95,6 +103,16 @@ class Maintenance extends CI_Controller
         }
 
         $this->Maintenance->update_schedule($schedule['id'], $input);
+        $changes = Audit::diff($schedule, $input, ['title', 'interval_value', 'interval_unit', 'next_due_date', 'remind_days_before', 'notes']);
+        if ($changes) {
+            $this->audit->log('maintenance.schedule_update', 'Ubah jadwal "' . $input['title'] . '" untuk ' . $schedule['asset_name'], [
+                'entity_type'  => 'maintenance_schedule',
+                'entity_id'    => $schedule['id'],
+                'entity_label' => $schedule['serial_number'],
+                'building_id'  => $schedule['building_id'],
+                'changes'      => $changes,
+            ]);
+        }
         $this->session->set_flashdata('message', 'maintenanceUpdated');
         redirect($this->_back());
     }
@@ -105,6 +123,12 @@ class Maintenance extends CI_Controller
         $schedule = $this->_authorized_schedule($this->input->post('token'), $user);
 
         $this->Maintenance->update_schedule($schedule['id'], ['is_active' => (int) $schedule['is_active'] === 1 ? 0 : 1]);
+        $this->audit->log('maintenance.schedule_toggle', ((int) $schedule['is_active'] === 1 ? 'Nonaktifkan' : 'Aktifkan') . ' jadwal "' . $schedule['title'] . '" untuk ' . $schedule['asset_name'], [
+            'entity_type'  => 'maintenance_schedule',
+            'entity_id'    => $schedule['id'],
+            'entity_label' => $schedule['serial_number'],
+            'building_id'  => $schedule['building_id'],
+        ]);
         $this->session->set_flashdata('message', (int) $schedule['is_active'] === 1 ? 'maintenanceDeactivated' : 'maintenanceActivated');
         redirect($this->_back());
     }
@@ -133,6 +157,20 @@ class Maintenance extends CI_Controller
         $log['performed_by'] = $user['id_user'];
 
         $ok = $this->Maintenance->record($log, $schedule);
+        if ($ok) {
+            $this->audit->log('maintenance.record', ($schedule ? 'Catat servis "' . $schedule['title'] . '"' : 'Catat ' . (Maintenance_model::TYPES[$log['type']] ?? $log['type']))
+                . ' untuk ' . $asset['asset_name'] . ', biaya ' . rupiah($log['cost']), [
+                'entity_type'  => 'asset',
+                'entity_id'    => $asset_id,
+                'entity_label' => $asset['serial_number'],
+                'building_id'  => $asset['building_id'],
+                'changes'      => [
+                    'tanggal'    => ['old' => null, 'new' => $log['performed_at']],
+                    'biaya'      => ['old' => null, 'new' => (float) $log['cost']],
+                    'keterangan' => ['old' => null, 'new' => mb_substr($log['description'], 0, 200)],
+                ],
+            ]);
+        }
         $this->session->set_flashdata('message', $ok ? 'maintenanceRecorded' : 'maintenance_failed');
         redirect($this->_back());
     }
@@ -181,6 +219,7 @@ class Maintenance extends CI_Controller
         }
 
         $filename = 'riwayat-maintenance-' . ($data['filters']['year'] ?: 'semua') . '.xlsx';
+        $this->audit->log('report.export', 'Ekspor riwayat maintenance ' . ($data['filters']['year'] ?: 'semua tahun') . ' (Excel, ' . count($data['logs']) . ' baris)');
         header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
         header('Content-Disposition: attachment; filename="' . $filename . '"');
         header('Cache-Control: max-age=0');

@@ -18,6 +18,10 @@ class User extends CI_Controller
         $data['title']  = 'Profil Saya';
         $data['user']   = $this->Auth->get_active_user($this->session->userdata('username'));
 
+        // Aktivitas terakhir user ini (dari audit log)
+        $this->load->model('Audit_model', 'AuditLog');
+        $data['activities'] = $this->AuditLog->for_user($data['user']['id_user'], 15);
+
         $this->load->view('templates/header', $data);
         $this->load->view('templates/sidebar', $data);
         $this->load->view('templates/topbar', $data);
@@ -43,6 +47,7 @@ class User extends CI_Controller
         } else {
             // Selalu ubah profil user yang sedang login, bukan id dari form (bisa dimanipulasi)
             $id_user        = $data['user']['id_user'];
+            $old_email      = $data['user']['email'] ?? null;
             $username       = $data['user']['username'];
             $email          = trim((string) $this->input->post('email'));
             $upload_image   = $_FILES['image']['name'] ?? '';
@@ -76,6 +81,10 @@ class User extends CI_Controller
             ];
 
             $this->Auth->update_profile_model($data);
+            $this->audit->log('user.profile_update', 'Ubah profil sendiri' . ($newImage !== null ? ' (foto diganti)' : ''), [
+                'entity_type' => 'user', 'entity_id' => $id_user, 'entity_label' => $username,
+                'changes'     => Audit::diff(['email' => $old_email], ['email' => $data['email']]),
+            ]);
 
             $this->session->set_flashdata(
                 'message',
@@ -126,6 +135,9 @@ class User extends CI_Controller
                     // Password sudah ok
                     $password_hash = password_hash($newPassword, PASSWORD_DEFAULT);
                     $this->Auth->change_password_model($password_hash, $data['user']['id_user']);
+                    $this->audit->log('user.password_change', 'Ganti password sendiri', [
+                        'entity_type' => 'user', 'entity_id' => $data['user']['id_user'], 'entity_label' => $data['user']['username'],
+                    ]);
                     $this->session->set_flashdata(
                         'message', 
                         '<div class="alert alert-success" role="alert">
@@ -140,6 +152,7 @@ class User extends CI_Controller
 
     public function create()
     {
+        is_allowed();
         $this->_render_create();
     }
 
@@ -159,6 +172,7 @@ class User extends CI_Controller
 
     public function store()
     {
+        is_allowed();
         $this->form_validation->set_error_delimiters('', '<br>');
         $this->form_validation->set_message('required', '{field} wajib diisi.');
         $this->form_validation->set_rules('username', 'Username', 'required|trim|is_unique[user.username]', [
@@ -208,6 +222,11 @@ class User extends CI_Controller
         $result = $this->Users->create($data);
 
         if($result > 0) {
+            $this->audit->log('user.create', 'Buat akun ' . $data['username'] . ' (' . ($data['role_id'] == 1 ? 'admin' : 'user') . ')', [
+                'entity_type' => 'user', 'entity_id' => $this->db->insert_id(), 'entity_label' => $data['username'],
+                'building_id' => (int) $data['building_id'],
+                'changes'     => ['role_id' => ['old' => null, 'new' => (int) $data['role_id']], 'building_id' => ['old' => null, 'new' => (int) $data['building_id']]],
+            ]);
             $this->session->set_flashdata('message', 'addUser');
             redirect('admin/list_user');
         } else {

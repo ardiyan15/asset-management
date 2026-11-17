@@ -43,6 +43,12 @@ $config['qr_base_url'] = '';
 $config['maintenance_mail_from'] = '';
 
 /*
+| Retensi audit log dalam hari. 0 = simpan selamanya (default).
+| Kalau diisi, `php index.php cron daily` menghapus log yang lebih lama dari N hari.
+*/
+$config['audit_retention_days'] = 0;
+
+/*
 |--------------------------------------------------------------------------
 | Index File
 |--------------------------------------------------------------------------

@@ -136,6 +136,14 @@
             <?php endif; ?>
         </a>
     </li>
+    <?php if ($user['role_id'] == '1') : ?>
+        <li class="nav-item <?= is_active('activity'); ?>">
+            <a class="nav-link" href="<?= base_url('activity') ?>">
+                <i class="fas fa-fw fa-user-shield"></i>
+                <span> Audit Log </span>
+            </a>
+        </li>
+    <?php endif; ?>
     <hr class="sidebar-divider">
 
     <div class="sidebar-heading">

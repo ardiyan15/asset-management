@@ -50,6 +50,13 @@ class Auth extends CI_Controller
                         'role_id'   => $user['role_id'],
                     ];
                     $this->session->set_userdata($data);
+                    $this->audit->log('auth.login', 'Login berhasil', [
+                        'user'        => $user,
+                        'entity_type' => 'user',
+                        'entity_id'   => $user['id_user'],
+                        'entity_label' => $user['username'],
+                        'building_id' => $user['building_id'] ?: null,
+                    ]);
 
                     // Kembali ke halaman scan QR kalau login dipicu dari sana
                     $redirect = (string) $this->session->userdata('redirect_after_login');
@@ -59,6 +66,12 @@ class Auth extends CI_Controller
                     }
                     redirect('admin');
                 } else {
+                    $this->audit->log('auth.login_failed', 'Login gagal: password salah', [
+                        'user'         => $user,
+                        'entity_type'  => 'user',
+                        'entity_id'    => $user['id_user'],
+                        'entity_label' => $user['username'],
+                    ]);
                     $this->session->set_flashdata(
                         'message',
                         '<div class="alert alert-danger alert-dismissible fade show" role="alert">
@@ -71,6 +84,12 @@ class Auth extends CI_Controller
                     redirect('auth');
                 }
             } else {
+                $this->audit->log('auth.login_failed', 'Login ditolak: user belum aktif', [
+                    'user'         => $user,
+                    'entity_type'  => 'user',
+                    'entity_id'    => $user['id_user'],
+                    'entity_label' => $user['username'],
+                ]);
                 $this->session->set_flashdata(
                     'message',
                     '<div class="alert alert-danger" role="alert">
@@ -80,6 +99,11 @@ class Auth extends CI_Controller
                 redirect('auth');
             }
         } else {
+            // Username tidak dikenal: catat percobaan, tanpa password
+            $this->audit->log('auth.login_failed', 'Login gagal: username tidak terdaftar atau nonaktif', [
+                'entity_type'  => 'user',
+                'entity_label' => mb_substr((string) $username, 0, 40),
+            ]);
             $this->session->set_flashdata(
                 'message',
                 '<div class="alert alert-danger" role="alert">
@@ -233,6 +257,9 @@ class Auth extends CI_Controller
 
     public function logout()
     {
+        if ($this->session->userdata('username')) {
+            $this->audit->log('auth.logout', 'Logout');
+        }
         $this->session->unset_userdata('username');
         $this->session->unset_userdata('role_id');
 

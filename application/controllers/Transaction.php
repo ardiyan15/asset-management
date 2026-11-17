@@ -114,7 +114,22 @@ class Transaction extends CI_Controller
     $user   = $this->Auth->get_active_user($this->session->userdata('username'));
     $assets = $this->Transactions->get_movable_assets($user['role_id'], $user['building_id'], $asset_ids, $room_id);
 
-    return $this->Transactions->create_transaction($assets, $room_id, $note) ? count($assets) : 0;
+    $code = $this->Transactions->create_transaction($assets, $room_id, $note);
+    if ($code) {
+      $room    = $this->Rooms->get_single_room_by_id($room_id);
+      $serials = array_column($this->db->select('serial_number')->where_in('id_asset', array_column($assets, 'id_asset'))->get('asset')->result_array(), 'serial_number');
+      $this->audit->log('transaction.create', 'Kirim ' . count($assets) . ' aset ke ruangan ' . $room['name'] . ' (' . $code . ')', [
+        'entity_type'  => 'transaction',
+        'entity_label' => $code,
+        'building_id'  => $this->audit->building_of_asset($assets[0]['id_asset']),
+        'changes'      => [
+          'aset'    => ['old' => null, 'new' => implode(', ', $serials)],
+          'tujuan'  => ['old' => null, 'new' => $room['name']],
+          'catatan' => ['old' => null, 'new' => $note ?: null],
+        ],
+      ]);
+    }
+    return $code ? count($assets) : 0;
   }
 
   public function get_room_id($assetId)

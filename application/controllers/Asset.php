@@ -193,6 +193,15 @@ class Asset extends CI_Controller
     } else {
       $add = $this->Assets->add_asset_model($data);
       if ($add > 0) {
+        $rows    = $qty > 1 ? $data : [$data];
+        $serials = array_column($rows, 'serial_number');
+        $this->audit->log('asset.create', 'Tambah ' . count($rows) . ' aset "' . $rows[0]['asset_name'] . '" (' . implode(', ', $serials) . ')', [
+          'entity_type'  => 'asset',
+          'entity_id'    => count($rows) === 1 ? $this->db->insert_id() : null,
+          'entity_label' => count($rows) === 1 ? $serials[0] : $serials[0] . ' s.d. ' . end($serials),
+          'building_id'  => $this->Rooms->get_building_id_by_room($roomId),
+          'changes'      => ['jumlah' => ['old' => null, 'new' => count($rows)], 'ruangan' => ['old' => null, 'new' => $location]],
+        ]);
         $this->session->set_flashdata('message', 'added ');
         redirect('asset');
       } else {
@@ -204,10 +213,27 @@ class Asset extends CI_Controller
 
   public function delete()
   {
-    $id = $this->input->post('assetId');
+    $id    = (int) $this->input->post('assetId');
+    $user  = $this->Auth->get_active_user($this->session->userdata('username'));
+    $scope = $id ? $this->Assets->get_asset_with_building($id) : null;
+
+    // Hapus permanen hanya untuk admin atau aset di gedung user sendiri
+    if (!$scope || ($user['role_id'] !== '1' && (string) $user['building_id'] !== (string) $scope['building_id'])) {
+      echo json_encode(403);
+      return;
+    }
+
+    $before = $this->Assets->get_asset_by_id($id);
     $result = $this->Assets->delete_ast_model($id);
 
     if ($result > 0) {
+      $this->audit->log('asset.delete', 'Hapus permanen aset "' . $before['asset_name'] . '"', [
+        'entity_type'  => 'asset',
+        'entity_id'    => $id,
+        'entity_label' => $before['serial_number'],
+        'building_id'  => $scope['building_id'],
+        'changes'      => Audit::diff($before, array_fill_keys(['asset_name', 'merk', 'serial_number', 'room_id', 'asset_condition', 'purchase_price'], null)),
+      ]);
       echo json_encode(200);
     } else {
       echo json_encode(500);
@@ -277,6 +303,16 @@ class Asset extends CI_Controller
 
     // affected_rows 0 = tidak ada perubahan, bukan error
     if ($result > 0 || $this->db->error()['code'] == 0) {
+      $changes = Audit::diff($asset, $data);
+      if ($changes) {
+        $this->audit->log('asset.update', 'Ubah data aset "' . $data['asset_name'] . '"', [
+          'entity_type'  => 'asset',
+          'entity_id'    => (int) $id,
+          'entity_label' => $new_serial_number,
+          'building_id'  => $this->audit->building_of_asset($id),
+          'changes'      => $changes,
+        ]);
+      }
       $this->session->set_flashdata('message', 'edited ');
       redirect('asset');
     } else {
@@ -371,6 +407,7 @@ class Asset extends CI_Controller
     // $file_mimes = ['application/vnd.ms-excel'];
     $file_mimes = ['text/csv'];
     if (isset($_FILES['import']['name']) && in_array($_FILES['import']['type'], $file_mimes)) {
+      $count_before = $this->db->count_all('asset');
 
       $reader = new \PhpOffice\PhpSpreadsheet\Reader\Csv();
       $spreadsheet = $reader->load($_FILES['import']['tmp_name']);
@@ -457,6 +494,11 @@ class Asset extends CI_Controller
           $this->db->insert('asset', $result);
         }
       }
+      $imported = $this->db->count_all('asset') - $count_before;
+      $this->audit->log('asset.import', 'Import ' . $imported . ' aset dari file CSV "' . $_FILES['import']['name'] . '"', [
+        'entity_type' => 'asset',
+        'changes'     => ['jumlah' => ['old' => null, 'new' => $imported]],
+      ]);
       $this->session->set_flashdata('message', 'added ');
       redirect('asset');
     } else {
@@ -499,6 +541,19 @@ class Asset extends CI_Controller
         'failed'    => 'Gagal menyimpan kondisi aset.',
       ];
       $message = $messages[$status];
+
+      if ($status === 'updated') {
+        $this->audit->log('asset.condition', 'Ubah kondisi "' . $asset['asset_name'] . '" menjadi ' . asset_condition_label($condition), [
+          'entity_type'  => 'asset',
+          'entity_id'    => $asset_id,
+          'entity_label' => $asset['serial_number'],
+          'building_id'  => $asset['building_id'],
+          'changes'      => [
+            'kondisi'    => ['old' => asset_condition_label($asset['asset_condition']), 'new' => asset_condition_label($condition)],
+            'keterangan' => ['old' => null, 'new' => trim($notes) ?: null],
+          ],
+        ]);
+      }
     }
 
     if ($is_ajax) {
@@ -552,6 +607,12 @@ class Asset extends CI_Controller
     $data['assets'] = $assets;
     $data['title']  = 'Label QR Aset';
 
+    $this->audit->log('asset.print_labels', 'Cetak ' . count($assets) . ' label QR' . ($room_id !== null ? ' ruangan ' . ($assets[0]['room_name'] ?? '') : ''), [
+      'entity_type'  => $room_id !== null ? 'room' : 'asset',
+      'entity_id'    => $room_id,
+      'entity_label' => count($assets) === 1 ? $assets[0]['serial_number'] : null,
+    ]);
+
     $this->load->library('pdf');
     $this->pdf->setPaper('A4', 'portrait');
     $this->pdf->filename = 'label-qr-aset-' . date('YmdHis') . '.pdf';
@@ -562,6 +623,12 @@ class Asset extends CI_Controller
   {
     $data['room']    = $this->Rooms->get_single_room_by_id($room_id);
     $data['assets']  = $this->Assets->get_asset_by_room_id($room_id);
+    $this->audit->log('report.export', 'Cetak laporan aset ruangan ' . ($data['room']['name'] ?? '') . ' (PDF)', [
+      'entity_type'  => 'room',
+      'entity_id'    => (int) $room_id,
+      'entity_label' => $data['room']['name'] ?? null,
+      'building_id'  => $this->Rooms->get_building_id_by_room($room_id),
+    ]);
     $this->load->library('pdf');
     $this->pdf->setPaper('A4', 'portrait');
     $this->pdf->filename = 'laporan-aset-ruangan.pdf';
