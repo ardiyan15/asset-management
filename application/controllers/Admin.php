@@ -27,9 +27,13 @@ class Admin extends CI_Controller
 		$data['room_name']  = $this->Rooms->get_room_name_by_id($room_id);
 		$data['rooms']      = $this->Rooms->get_room_by_building_id($role_id, $building_id);
 		$data['summaries']  = $this->Dashboard->summary_data();
-		$data['recent_transactions'] = $this->Dashboard->get_recent_transactions(5);
-		$data['asset_categories'] = $this->Dashboard->get_assets_by_category(5);
 		$data['condition_counts'] = $this->Assets->count_by_condition($role_id, $building_id);
+
+		$this->load->model('Recap_model', 'Recap');
+		$data['recent_transactions']  = $this->Recap->recent_transactions($role_id, $building_id, 5);
+		$data['asset_categories']     = $this->Recap->count_by_category($role_id, $building_id);
+		$data['condition_locations']  = $this->Recap->condition_by_location($role_id, $building_id);
+		$data['monthly_transactions'] = $this->Recap->transactions_per_month($role_id, $building_id, 12);
 
 		$this->load->view('templates/header', $data);
 		$this->load->view('templates/sidebar', $data);
