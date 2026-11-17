@@ -71,6 +71,30 @@ class Scan extends CI_Controller
         $data['opname_result']    = $this->session->flashdata('opname_scan');
         $data['condition_result'] = $this->session->flashdata('condition_scan');
 
+        // Peminjaman: yang sedang berjalan (tampil ke semua), riwayat & aksi hanya untuk yang berhak
+        $data['loan'] = null;
+        $data['loan_history'] = [];
+        $data['can_lend'] = false;
+        if ($data['asset']) {
+            $this->load->model('Loan_model', 'Loan');
+            $this->load->helper('loan');
+            $data['loan'] = $this->Loan->open_loan_for_asset($data['asset']['id_asset']);
+            if ($data['loan']) {
+                $data['loan']['state'] = loan_status($data['loan']);
+            }
+            if ($data['can_history']) {
+                $this->load->library('encryption');
+                $this->load->helper('url_crypto');
+                if ($data['loan']) {
+                    $data['loan']['token'] = urlsafe_b64encode($this->encryption->encrypt((string) $data['loan']['id']));
+                }
+                $data['loan_history'] = $this->Loan->history_for_asset($data['asset']['id_asset'], 5);
+                $data['can_lend'] = !$data['loan'] && (bool) $this->Loan->available_assets(
+                    $data['user']['role_id'], $data['user']['building_id'], $data['asset']['id_asset']
+                );
+            }
+        }
+
         // Status penghapusan terakhir aset ini (diajukan / disetujui / ditolak)
         $data['disposal'] = null;
         if ($data['asset']) {

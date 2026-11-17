@@ -378,6 +378,29 @@ switch (flashData) {
 			showConfirmButton: true,
 		});
 		break;
+	case "loanCreated":
+		Swal.fire({ title: "Peminjaman tercatat", text: "Jangan lupa cetak bukti peminjaman untuk ditandatangani", icon: "success", showConfirmButton: true });
+		break;
+	case "loanReturned":
+		Swal.fire({ title: "Dikembalikan", text: "Pengembalian aset tersimpan", icon: "success", showConfirmButton: true });
+		break;
+	case "loanExtended":
+		Swal.fire({ title: "Diperpanjang", text: "Batas kembali peminjaman diperbarui", icon: "success", showConfirmButton: true });
+		break;
+	case "loan_invalid":
+		Swal.fire({
+			title: "Data tidak valid",
+			text: "Cek aset (harus tersedia), nama peminjam, tanggal pinjam (tidak di masa depan), dan batas kembali",
+			icon: "warning",
+			showConfirmButton: true,
+		});
+		break;
+	case "loan_extend_invalid":
+		Swal.fire({ title: "Tanggal tidak valid", text: "Batas kembali baru harus setelah batas sebelumnya dan tidak di masa lalu", icon: "warning", showConfirmButton: true });
+		break;
+	case "loan_failed":
+		Swal.fire({ title: "Gagal", text: "Peminjaman tidak ditemukan, aset sudah dipinjam, atau Anda tidak punya akses", icon: "error", showConfirmButton: true });
+		break;
 	case "labelEmpty":
 		Swal.fire({
 			title: "Tidak ada label",

@@ -146,7 +146,12 @@ $condition_cell = function ($d) use ($is_open) {
                             <?php $is_found = (int) $d['result'] === 1; ?>
                             <tr data-detail-id="<?= $d['id']; ?>" class="<?= $is_found ? 'row-found' : ''; ?>">
                                 <td><?= $i + 1; ?></td>
-                                <td><?= html_escape($d['asset_name'] ?? '(aset dihapus)'); ?></td>
+                                <td>
+                                    <?= html_escape($d['asset_name'] ?? '(aset dihapus)'); ?>
+                                    <?php if (!empty($d['on_loan_to'])) : ?>
+                                        <div><span class="badge badge-info" title="Aset sedang dipinjam, wajar kalau tidak ada di ruangan"><i class="fas fa-hand-holding mr-1"></i>Dipinjam: <?= html_escape($d['on_loan_to']); ?></span></div>
+                                    <?php endif; ?>
+                                </td>
                                 <td><?= html_escape($d['merk'] ?? '-'); ?></td>
                                 <td><code><?= html_escape($d['serial_number'] ?? '-'); ?></code></td>
                                 <td class="js-status">
