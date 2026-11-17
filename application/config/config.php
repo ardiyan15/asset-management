@@ -36,6 +36,13 @@ $config['base_url'] = 'http://asset-management.test/';
 $config['qr_base_url'] = '';
 
 /*
+| Alamat pengirim email pengingat maintenance (Cron::maintenance_reminders).
+| Kosongkan untuk memakai noreply@asset-management.test. Untuk SMTP Gmail,
+| isi sama dengan smtp_user di application/config/email.php.
+*/
+$config['maintenance_mail_from'] = '';
+
+/*
 |--------------------------------------------------------------------------
 | Index File
 |--------------------------------------------------------------------------

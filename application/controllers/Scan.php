@@ -51,6 +51,19 @@ class Scan extends CI_Controller
             if ($data['can_history']) {
                 $data['movements']      = $this->Transactions->get_asset_movements($data['asset']['id_asset']);
                 $data['condition_logs'] = $this->Assets->get_condition_logs($data['asset']['id_asset']);
+
+                // Jadwal & riwayat maintenance aset ini
+                $this->load->model('Maintenance_model', 'Maintenance');
+                $this->load->library('encryption');
+                $this->load->helper(['url_crypto', 'maintenance']);
+                $data['maintenance_schedules'] = $this->Maintenance->schedules_for_asset($data['asset']['id_asset']);
+                foreach ($data['maintenance_schedules'] as &$schedule) {
+                    $schedule['token'] = urlsafe_b64encode($this->encryption->encrypt((string) $schedule['id']));
+                    $schedule['due']   = maintenance_due_status($schedule['next_due_date'], $schedule['remind_days_before'], $schedule['is_active']);
+                }
+                unset($schedule);
+                $data['maintenance_logs'] = $this->Maintenance->logs_for_asset($data['asset']['id_asset'], 5);
+                $data['maintenance_cost'] = $this->Maintenance->total_cost_for_asset($data['asset']['id_asset']);
             }
         }
 

@@ -89,6 +89,21 @@
         </a>
     </li>
     <?php
+    // Badge jadwal maintenance yang terlambat / masuk masa pengingat (per gedung untuk user)
+    $ci_mt = &get_instance();
+    $ci_mt->load->model('Maintenance_model', 'MaintenanceBadge');
+    $maintenance_due = $ci_mt->MaintenanceBadge->count_due($user['role_id'], $user['building_id']);
+    ?>
+    <li class="nav-item <?= is_active('maintenance') ?: is_active('maintenance', 'history'); ?>">
+        <a class="nav-link" href="<?= base_url('maintenance') ?>">
+            <i class="fas fa-fw fa-tools"></i>
+            <span> Maintenance </span>
+            <?php if ($maintenance_due > 0) : ?>
+                <span class="badge badge-warning badge-counter ml-1" style="position: static;" title="Jadwal perlu dikerjakan"><?= $maintenance_due; ?></span>
+            <?php endif; ?>
+        </a>
+    </li>
+    <?php
     // Badge jumlah aset yang menunggu persetujuan penghapusan (khusus admin)
     $disposal_pending = 0;
     if ($user['role_id'] == '1') {

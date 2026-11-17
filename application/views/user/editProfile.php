@@ -21,6 +21,14 @@
                     <?= form_error('username', '<small class="text-danger pl-3">', '</small>'); ?>
                 </div>
             </div>
+            <div class="form-group row">
+                <label for="email" class="col-sm-2 col-form-label">Email</label>
+                <div class="col-sm-10">
+                    <input type="email" class="form-control" id="email" name="email" maxlength="100" value="<?= html_escape(set_value('email', $user['email'] ?? '')); ?>" placeholder="nama@contoh.com">
+                    <small class="form-text text-muted">Dipakai untuk menerima pengingat jadwal maintenance. Kosongkan kalau tidak ingin menerima email.</small>
+                    <?= form_error('email', '<small class="text-danger pl-3">', '</small>'); ?>
+                </div>
+            </div>
             <div class=" form-group row">
                 <div class="col-sm-2"> Gambar </div>
                 <div class="col-sm-10">
