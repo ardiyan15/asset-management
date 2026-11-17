@@ -212,6 +212,62 @@
                 </div>
             <?php endif; ?>
 
+            <?php if ($can_history && !$is_disposed && (!empty($maintenance_schedules) || !empty($maintenance_logs))) : ?>
+                <div class="card scan-card mb-3">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-start mb-2">
+                            <div class="scan-label mb-0">Maintenance</div>
+                            <?php if ($maintenance_cost > 0) : ?>
+                                <span class="small text-muted">Total biaya <?= rupiah($maintenance_cost); ?></span>
+                            <?php endif; ?>
+                        </div>
+
+                        <?php foreach ($maintenance_schedules as $ms) : ?>
+                            <?php if ((int) $ms['is_active'] !== 1) continue; ?>
+                            <div class="border rounded p-2 mb-2">
+                                <div class="d-flex justify-content-between align-items-start">
+                                    <div>
+                                        <div class="font-weight-bold text-gray-800"><?= html_escape($ms['title']); ?></div>
+                                        <div class="small text-muted"><?= maintenance_interval_label($ms['interval_value'], $ms['interval_unit']); ?> · berikutnya <?= date('d M Y', strtotime($ms['next_due_date'])); ?></div>
+                                    </div>
+                                    <span class="badge badge-<?= $ms['due']['color']; ?>"><?= $ms['due']['label']; ?></span>
+                                </div>
+                                <details class="mt-2">
+                                    <summary class="small font-weight-bold text-primary" style="cursor: pointer;">Catat servis</summary>
+                                    <form method="post" action="<?= base_url('maintenance/record'); ?>" class="mt-2">
+                                        <input type="hidden" name="token" value="<?= html_escape($ms['token']); ?>">
+                                        <input type="hidden" name="back" value="<?= html_escape('scan/' . rawurlencode($asset['serial_number'])); ?>">
+                                        <div class="form-row">
+                                            <div class="col-6 mb-2"><input type="date" name="performed_at" class="form-control form-control-sm" max="<?= date('Y-m-d'); ?>" value="<?= date('Y-m-d'); ?>" required></div>
+                                            <div class="col-6 mb-2"><input type="number" name="cost" class="form-control form-control-sm" min="0" step="1" placeholder="Biaya (Rp)"></div>
+                                        </div>
+                                        <input type="text" name="description" class="form-control form-control-sm mb-2" maxlength="2000" required placeholder="Pekerjaan, mis. cuci & isi freon">
+                                        <input type="text" name="vendor" class="form-control form-control-sm mb-2" maxlength="100" placeholder="Teknisi / vendor (opsional)">
+                                        <button type="submit" class="btn btn-success btn-sm btn-block">Simpan</button>
+                                    </form>
+                                </details>
+                            </div>
+                        <?php endforeach; ?>
+
+                        <?php if (!empty($maintenance_logs)) : ?>
+                            <div class="scan-label mt-3 mb-2">Riwayat terakhir</div>
+                            <ul class="timeline">
+                                <?php foreach ($maintenance_logs as $ml) : ?>
+                                    <li class="st-1">
+                                        <div class="font-weight-bold text-gray-800">
+                                            <?= $ml['type'] === 'rutin' ? 'Perawatan rutin' : 'Perbaikan'; ?>
+                                            <span class="font-weight-normal text-muted">· <?= rupiah($ml['cost']); ?></span>
+                                        </div>
+                                        <div class="small"><?= html_escape($ml['description']); ?></div>
+                                        <div class="when"><?= date('d M Y', strtotime($ml['performed_at'])); ?><?= $ml['vendor'] ? ' · ' . html_escape($ml['vendor']) : ''; ?></div>
+                                    </li>
+                                <?php endforeach; ?>
+                            </ul>
+                        <?php endif; ?>
+                    </div>
+                </div>
+            <?php endif; ?>
+
             <?php if ($can_history && !$is_disposed) : ?>
                 <div class="card scan-card mb-3">
                     <div class="card-body">
@@ -241,7 +297,7 @@
                             <div class="scan-label mb-2">Riwayat kondisi</div>
                             <ul class="timeline">
                                 <?php
-                                $source_label = ['manual' => 'Daftar aset', 'scan' => 'Scan QR', 'opname' => 'Stock opname'];
+                                $source_label = ['manual' => 'Daftar aset', 'scan' => 'Scan QR', 'opname' => 'Stock opname', 'maintenance' => 'Maintenance'];
                                 foreach ($condition_logs as $log) :
                                 ?>
                                     <li class="st-<?= (int) $log['new_condition'] === 1 ? 1 : ((int) $log['new_condition'] === 2 ? 0 : 2); ?>">

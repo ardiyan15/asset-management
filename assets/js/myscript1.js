@@ -337,6 +337,47 @@ switch (flashData) {
 			showConfirmButton: true,
 		});
 		break;
+	case "maintenanceScheduled":
+		Swal.fire({
+			title: "Jadwal dibuat",
+			text: "Jadwal maintenance tersimpan, pengingat akan muncul saat mendekati jatuh tempo",
+			icon: "success",
+			showConfirmButton: true,
+		});
+		break;
+	case "maintenanceUpdated":
+		Swal.fire({ title: "Berhasil", text: "Jadwal maintenance diperbarui", icon: "success", showConfirmButton: true });
+		break;
+	case "maintenanceActivated":
+		Swal.fire({ title: "Berhasil", text: "Jadwal diaktifkan kembali", icon: "success", showConfirmButton: true });
+		break;
+	case "maintenanceDeactivated":
+		Swal.fire({ title: "Berhasil", text: "Jadwal dinonaktifkan, tidak akan diingatkan lagi", icon: "info", showConfirmButton: true });
+		break;
+	case "maintenanceRecorded":
+		Swal.fire({
+			title: "Tercatat",
+			text: "Pekerjaan maintenance tersimpan di riwayat",
+			icon: "success",
+			showConfirmButton: true,
+		});
+		break;
+	case "maintenance_invalid":
+		Swal.fire({
+			title: "Data belum lengkap",
+			text: "Cek aset, nama perawatan, interval, tanggal (tidak boleh di masa depan untuk servis), dan keterangan pekerjaan",
+			icon: "warning",
+			showConfirmButton: true,
+		});
+		break;
+	case "maintenance_failed":
+		Swal.fire({
+			title: "Gagal",
+			text: "Jadwal tidak ditemukan, Anda tidak punya akses, atau terjadi kesalahan",
+			icon: "error",
+			showConfirmButton: true,
+		});
+		break;
 	case "labelEmpty":
 		Swal.fire({
 			title: "Tidak ada label",

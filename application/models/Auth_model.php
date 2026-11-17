@@ -21,6 +21,9 @@ class Auth_model extends CI_Model
             $this->db->set('image', $data['newImage']);
         }
         $this->db->set('username', $data['username']);
+        if (array_key_exists('email', $data)) {
+            $this->db->set('email', $data['email']);
+        }
         $this->db->where('id_user', $data['id_user']);
         $this->db->update('user');
     }

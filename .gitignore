@@ -31,3 +31,6 @@ user_guide_src/cilexer/pycilexer.egg-info/*
 /tests/results/
 
 .claude/*
+
+# Kredensial SMTP lokal (lihat application/config/email.example.php)
+/application/config/email.php

@@ -31,6 +31,9 @@ class User extends CI_Controller
         $data['user']  = $this->Auth->get_active_user($this->session->userdata('username'));
         // Cek jika ada file gambar yang diupload
         $this->form_validation->set_rules('username', 'username', 'required|trim');
+        $this->form_validation->set_rules('email', 'Email', 'trim|valid_email|max_length[100]', [
+            'valid_email' => 'Format email tidak valid',
+        ]);
         if ($this->form_validation->run() == false) {
             $this->load->view('templates/header', $data);
             $this->load->view('templates/sidebar', $data);
@@ -38,8 +41,10 @@ class User extends CI_Controller
             $this->load->view('user/editProfile', $data);
             $this->load->view('templates/footer');
         } else {
-            $id_user        = $this->input->post('id_user');
-            $username       = $this->input->post('username');
+            // Selalu ubah profil user yang sedang login, bukan id dari form (bisa dimanipulasi)
+            $id_user        = $data['user']['id_user'];
+            $username       = $data['user']['username'];
+            $email          = trim((string) $this->input->post('email'));
             $upload_image   = $_FILES['image']['name'] ?? '';
             $newImage       = null; // null = gambar lama tidak diganti
 
@@ -66,6 +71,7 @@ class User extends CI_Controller
             $data = [
                 'newImage'  => $newImage,
                 'username'  => $username,
+                'email'     => $email !== '' ? $email : null,
                 'id_user'   => $id_user
             ];
 
