@@ -71,6 +71,21 @@
             <span> Transaksi Masuk </span>
         </a>
     </li>
+    <?php
+    // Badge peminjaman yang terlambat / harus kembali hari ini (per gedung untuk user)
+    $ci_loan = &get_instance();
+    $ci_loan->load->model('Loan_model', 'LoanBadge');
+    $loan_attention = $ci_loan->LoanBadge->count_attention($user['role_id'], $user['building_id']);
+    ?>
+    <li class="nav-item <?= is_active('loan'); ?>">
+        <a class="nav-link" href="<?= base_url('loan') ?>">
+            <i class="fas fa-fw fa-hand-holding"></i>
+            <span> Peminjaman Aset </span>
+            <?php if ($loan_attention > 0) : ?>
+                <span class="badge badge-danger badge-counter ml-1" style="position: static;" title="Terlambat / kembali hari ini"><?= $loan_attention; ?></span>
+            <?php endif; ?>
+        </a>
+    </li>
     <li class="nav-item <?= is_active('History');  ?>">
         <a class="nav-link" href="<?= base_url('History') ?>">
             <i class="fas fa-fw fa-history"></i>

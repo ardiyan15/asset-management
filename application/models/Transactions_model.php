@@ -22,6 +22,8 @@ class Transactions_model extends CI_Model
         $this->db->where('asset.room_id !=', $dest_room_id);
         // aset yang sedang diajukan penghapusan tidak boleh dipindah
         $this->db->where('NOT EXISTS (SELECT 1 FROM asset_disposal_details p WHERE p.asset_id = asset.id_asset AND p.status = 0)', null, false);
+        // aset yang sedang dipinjam tidak boleh dipindah
+        $this->db->where('NOT EXISTS (SELECT 1 FROM asset_loans al WHERE al.asset_id = asset.id_asset AND al.status = 0)', null, false);
 
         if ($role_id !== '1') {
             $this->db->join('rooms', 'rooms.id = asset.room_id');

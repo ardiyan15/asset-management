@@ -123,6 +123,47 @@
                 </div>
             <?php endif; ?>
 
+            <?php if (!empty($loan)) : ?>
+                <?php $overdue = $loan['state']['key'] === 'overdue'; ?>
+                <div class="card scan-card mb-3" style="border-left: .3rem solid <?= $overdue ? '#e74a3b' : '#36b9cc'; ?> !important;">
+                    <div class="card-body py-3">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div class="font-weight-bold text-gray-800"><i class="fas fa-hand-holding mr-1"></i> Sedang dipinjam</div>
+                            <span class="badge badge-<?= $loan['state']['color']; ?>"><?= $loan['state']['label']; ?></span>
+                        </div>
+                        <?php if ($can_history) : ?>
+                            <div class="mt-1"><?= html_escape($loan['borrower_name']); ?><?= $loan['borrower_unit'] ? ' · ' . html_escape($loan['borrower_unit']) : ''; ?></div>
+                            <?php if ($loan['borrower_phone']) : ?><div class="small"><a href="tel:<?= html_escape($loan['borrower_phone']); ?>"><i class="fas fa-phone-alt mr-1"></i><?= html_escape($loan['borrower_phone']); ?></a></div><?php endif; ?>
+                        <?php endif; ?>
+                        <div class="small text-muted">Sejak <?= date('d M Y', strtotime($loan['loaned_at'])); ?> · kembali paling lambat <?= date('d M Y', strtotime($loan['due_date'])); ?></div>
+
+                        <?php if ($can_history) : ?>
+                            <details class="mt-2">
+                                <summary class="small font-weight-bold text-primary" style="cursor: pointer;">Catat pengembalian</summary>
+                                <form method="post" action="<?= base_url('loan/return_loan'); ?>" class="mt-2">
+                                    <input type="hidden" name="token" value="<?= html_escape($loan['token']); ?>">
+                                    <input type="hidden" name="back" value="<?= html_escape('scan/' . rawurlencode($asset['serial_number'])); ?>">
+                                    <div class="form-row">
+                                        <div class="col-6 mb-2"><input type="date" name="returned_date" class="form-control form-control-sm" min="<?= substr($loan['loaned_at'], 0, 10); ?>" max="<?= date('Y-m-d'); ?>" value="<?= date('Y-m-d'); ?>" required></div>
+                                        <div class="col-6 mb-2">
+                                            <select name="condition_in" class="form-control form-control-sm">
+                                                <?php foreach (asset_condition_options() as $value => $label) : ?>
+                                                    <option value="<?= $value; ?>" <?= (int) $loan['condition_out'] === $value ? 'selected' : ''; ?>><?= $label; ?></option>
+                                                <?php endforeach; ?>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <input type="text" name="return_notes" class="form-control form-control-sm mb-2" maxlength="255" placeholder="Catatan (opsional)">
+                                    <button type="submit" class="btn btn-success btn-sm btn-block">Simpan pengembalian</button>
+                                </form>
+                            </details>
+                        <?php endif; ?>
+                    </div>
+                </div>
+            <?php elseif (!empty($can_lend)) : ?>
+                <a href="<?= base_url('loan?asset=' . (int) $asset['id_asset']); ?>" class="btn btn-outline-info btn-block mb-3"><i class="fas fa-hand-holding mr-1"></i> Pinjamkan aset ini</a>
+            <?php endif; ?>
+
             <div class="card scan-card mb-3">
                 <div class="card-body">
                     <div class="d-flex justify-content-between align-items-center mb-3">
@@ -297,7 +338,7 @@
                             <div class="scan-label mb-2">Riwayat kondisi</div>
                             <ul class="timeline">
                                 <?php
-                                $source_label = ['manual' => 'Daftar aset', 'scan' => 'Scan QR', 'opname' => 'Stock opname', 'maintenance' => 'Maintenance'];
+                                $source_label = ['manual' => 'Daftar aset', 'scan' => 'Scan QR', 'opname' => 'Stock opname', 'maintenance' => 'Maintenance', 'loan' => 'Pengembalian pinjaman'];
                                 foreach ($condition_logs as $log) :
                                 ?>
                                     <li class="st-<?= (int) $log['new_condition'] === 1 ? 1 : ((int) $log['new_condition'] === 2 ? 0 : 2); ?>">
@@ -370,6 +411,27 @@
                     <?php endif; ?>
                 </div>
             </div>
+
+            <?php if ($can_history && !empty($loan_history)) : ?>
+                <div class="card scan-card mb-3">
+                    <div class="card-body">
+                        <div class="scan-label mb-2">Riwayat peminjaman</div>
+                        <ul class="timeline">
+                            <?php foreach ($loan_history as $lh) : ?>
+                                <?php $lst = loan_status($lh); ?>
+                                <li class="st-<?= $lst['key'] === 'overdue' || $lst['label'] === 'Dikembalikan (telat)' ? 2 : ((int) $lh['status'] === 0 ? 0 : 1); ?>">
+                                    <div class="font-weight-bold text-gray-800"><?= html_escape($lh['borrower_name']); ?><?= $lh['borrower_unit'] ? ' <span class="font-weight-normal text-muted">· ' . html_escape($lh['borrower_unit']) . '</span>' : ''; ?></div>
+                                    <div class="small"><span class="badge badge-<?= $lst['color']; ?>"><?= $lst['label']; ?></span> <?= html_escape($lh['purpose'] ?? ''); ?></div>
+                                    <div class="when">
+                                        <?= date('d M Y', strtotime($lh['loaned_at'])); ?> – <?= $lh['returned_at'] ? date('d M Y', strtotime($lh['returned_at'])) : 'sekarang'; ?>
+                                        · batas <?= date('d M Y', strtotime($lh['due_date'])); ?>
+                                    </div>
+                                </li>
+                            <?php endforeach; ?>
+                        </ul>
+                    </div>
+                </div>
+            <?php endif; ?>
 
             <?php if ($can_history) : ?>
                 <a href="<?= base_url('asset/location/' . $asset['room_id']); ?>" class="btn btn-outline-primary btn-block mb-3">

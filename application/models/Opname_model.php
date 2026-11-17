@@ -114,7 +114,8 @@ class Opname_model extends CI_Model
     public function get_details($opname_id)
     {
         $this->db->select('d.id, d.asset_id, d.expected_room_id, d.result, d.checked_at,
-            asset.asset_name, asset.merk, asset.serial_number, asset.asset_condition, rooms.name AS expected_room_name');
+            asset.asset_name, asset.merk, asset.serial_number, asset.asset_condition, rooms.name AS expected_room_name,
+            (SELECT al.borrower_name FROM asset_loans al WHERE al.asset_id = d.asset_id AND al.status = 0 LIMIT 1) AS on_loan_to', false);
         $this->db->from('stock_opname_details AS d');
         $this->db->join('asset', 'asset.id_asset = d.asset_id', 'left');
         $this->db->join('rooms', 'rooms.id = d.expected_room_id', 'left');

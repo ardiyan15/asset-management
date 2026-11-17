@@ -91,6 +91,88 @@ class Cron extends CI_Controller
             count($schedules), count(array_unique($sent_schedule_ids)), $failed, $dry_run ? ' (dry run, tidak ada yang dikirim)' : ''));
     }
 
+    /**
+     * Pengingat peminjaman aset yang terlambat dikembalikan, ke petugas gedung asal aset.
+     *   php index.php cron loan_reminders [dry]
+     */
+    public function loan_reminders($mode = '')
+    {
+        $this->load->model('Loan_model', 'Loan');
+        $this->load->helper('loan');
+
+        $dry_run = $mode === 'dry';
+        $loans   = $this->Loan->overdue_for_notification();
+
+        if (empty($loans)) {
+            $this->_out('Tidak ada peminjaman terlambat yang perlu diingatkan hari ini.');
+            return;
+        }
+
+        $recipients = $this->Maintenance->notification_recipients();
+        if (empty($recipients)) {
+            $this->_out(count($loans) . ' peminjaman terlambat, tapi belum ada user aktif yang mengisi email. Isi email di menu Edit Profil.');
+            return;
+        }
+
+        $sent_ids = [];
+        $failed   = 0;
+
+        foreach ($recipients as $recipient) {
+            $items = array_values(array_filter($loans, function ($l) use ($recipient) {
+                return $recipient['role_id'] == 1 || (string) $recipient['building_id'] === (string) $l['building_id'];
+            }));
+            if (empty($items)) {
+                continue;
+            }
+
+            $subject = '[Asset Management] ' . count($items) . ' peminjaman aset terlambat dikembalikan';
+
+            if ($dry_run) {
+                $this->_out('--- [DRY RUN] Ke: ' . $recipient['email'] . ' (' . $recipient['username'] . ')');
+                $this->_out('Subjek: ' . $subject);
+                foreach ($items as $l) {
+                    $this->_out('  - ' . $l['code'] . ' | ' . $l['asset_name'] . ' (' . $l['serial_number'] . ') | ' . $l['borrower_name']
+                        . ($l['borrower_phone'] ? ' ' . $l['borrower_phone'] : '') . ' | batas ' . $l['due_date'] . ' | ' . loan_status($l)['label']);
+                }
+                continue;
+            }
+
+            $this->email->clear();
+            $this->email->set_mailtype('html');
+            $this->email->from($this->config->item('maintenance_mail_from') ?: 'noreply@asset-management.test', 'Asset Management');
+            $this->email->to($recipient['email']);
+            $this->email->subject($subject);
+            $this->email->message($this->load->view('loan/email_overdue', ['recipient' => $recipient, 'items' => $items], true));
+
+            if ($this->email->send(false)) {
+                $this->_out('Terkirim ke ' . $recipient['email'] . ' (' . count($items) . ' peminjaman)');
+                $sent_ids = array_merge($sent_ids, array_column($items, 'id'));
+            } else {
+                $failed++;
+                $this->_out('GAGAL kirim ke ' . $recipient['email'] . '. Cek pengaturan SMTP di application/config/email.php.');
+                log_message('error', 'Cron loan_reminders: ' . strip_tags($this->email->print_debugger(['headers'])));
+            }
+        }
+
+        if (!$dry_run) {
+            $this->Loan->mark_notified(array_unique($sent_ids));
+        }
+        $this->_out(sprintf('Selesai: %d peminjaman terlambat, %d ditandai sudah diingatkan, %d pengiriman gagal.%s',
+            count($loans), count(array_unique($sent_ids)), $failed, $dry_run ? ' (dry run, tidak ada yang dikirim)' : ''));
+    }
+
+    /**
+     * Jalankan semua pengingat harian sekaligus (untuk satu entri Task Scheduler).
+     *   php index.php cron daily [dry]
+     */
+    public function daily($mode = '')
+    {
+        $this->_out('== Maintenance ==');
+        $this->maintenance_reminders($mode);
+        $this->_out('== Peminjaman ==');
+        $this->loan_reminders($mode);
+    }
+
     private function _out($line)
     {
         echo $line . PHP_EOL;

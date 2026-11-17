@@ -67,6 +67,7 @@ class Disposal_model extends CI_Model
             'asset.placement_status' => 1,
         ]);
         $this->db->where('NOT EXISTS (SELECT 1 FROM asset_disposal_details p WHERE p.asset_id = asset.id_asset AND p.status = ' . self::STATUS_PENDING . ')', null, false);
+        $this->db->where('NOT EXISTS (SELECT 1 FROM asset_loans al WHERE al.asset_id = asset.id_asset AND al.status = 0)', null, false);
 
         if ($role_id !== '1') {
             $this->db->where('buildings.id', $building_id);
