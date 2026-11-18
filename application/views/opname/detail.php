@@ -17,6 +17,22 @@ $condition_cell = function ($d) use ($is_open) {
     }
     return $html . '</select>';
 };
+
+// Kolom foto bukti: jumlah foto opname + tombol kamera saat opname berjalan
+$photo_cell = function ($d) use ($is_open, $photo_counts) {
+    $count = (int) ($photo_counts[$d['asset_id']] ?? 0);
+    $badge = '<span class="badge badge-' . ($count ? 'info' : 'light') . ' js-photo-count" data-asset-id="' . (int) $d['asset_id'] . '">'
+        . '<i class="fas fa-image mr-1"></i>' . $count . '</span>';
+    if (!$is_open || empty($d['serial_number'])) {
+        return $count && !empty($d['serial_number'])
+            ? '<a href="' . base_url('scan/' . rawurlencode($d['serial_number'])) . '" target="_blank" title="Lihat foto">' . $badge . '</a>'
+            : $badge;
+    }
+    return '<label class="btn btn-sm btn-light border mb-0 js-photo-btn" title="Foto bukti kondisi">'
+        . '<i class="fas fa-camera"></i>'
+        . '<input type="file" class="d-none js-photo-input" accept="image/jpeg,image/png,image/webp" capture="environment" multiple data-asset-id="' . (int) $d['asset_id'] . '">'
+        . '</label> ' . $badge;
+};
 ?>
 <style>
     .opn-stat { border: 0; border-left: .25rem solid; border-radius: .5rem; }
@@ -138,6 +154,7 @@ $condition_cell = function ($d) use ($is_open) {
                             <th>Nomor Seri</th>
                             <th>Status</th>
                             <th>Kondisi</th>
+                            <th>Foto</th>
                             <?php if ($is_open) : ?><th class="text-center">Ada?</th><?php endif; ?>
                         </tr>
                     </thead>
@@ -164,6 +181,7 @@ $condition_cell = function ($d) use ($is_open) {
                                     <?php endif; ?>
                                 </td>
                                 <td><?= $condition_cell($d); ?></td>
+                                <td class="text-nowrap"><?= $photo_cell($d); ?></td>
                                 <?php if ($is_open) : ?>
                                     <td class="text-center"><input type="checkbox" class="opn-check" value="<?= $d['id']; ?>" <?= $is_found ? 'checked' : ''; ?> aria-label="Tandai ditemukan"></td>
                                 <?php endif; ?>
@@ -187,6 +205,7 @@ $condition_cell = function ($d) use ($is_open) {
                         <th>Nomor Seri</th>
                         <th>Tercatat di</th>
                         <th>Kondisi</th>
+                            <th>Foto</th>
                         <?php if ($is_open) : ?><th></th><?php endif; ?>
                     </tr>
                 </thead>
@@ -198,6 +217,7 @@ $condition_cell = function ($d) use ($is_open) {
                             <td><code><?= html_escape($d['serial_number'] ?? '-'); ?></code></td>
                             <td><span class="badge badge-warning"><?= html_escape($d['expected_room_name'] ?? '-'); ?></span></td>
                             <td><?= $condition_cell($d); ?></td>
+                                <td class="text-nowrap"><?= $photo_cell($d); ?></td>
                             <?php if ($is_open) : ?>
                                 <td class="text-right"><button type="button" class="btn btn-sm btn-link text-danger js-remove-wrong" title="Hapus dari daftar"><i class="fas fa-times"></i></button></td>
                             <?php endif; ?>
@@ -224,6 +244,7 @@ $condition_cell = function ($d) use ($is_open) {
             const toggleUrl = <?= json_encode(base_url('opname/toggle')); ?>;
             const conditionUrl = <?= json_encode(base_url('opname/set_condition')); ?>;
             const conditionOptions = <?= json_encode(asset_condition_options()); ?>;
+            const photoUrl = <?= json_encode(base_url('photo/upload')); ?>;
             const $input = $('#serialInput');
             const $result = $('#scanResult');
             const alertClass = {
@@ -274,6 +295,10 @@ $condition_cell = function ($d) use ($is_open) {
                     .append($('<td>').append($('<code>').text(a.serial_number)))
                     .append($('<td>').append($('<span class="badge badge-warning">').text(a.room_name || '-')))
                     .append($('<td>').append(conditionSelect(res.detail_id, a.asset_condition)))
+                    .append($('<td class="text-nowrap">').html(
+                        '<label class="btn btn-sm btn-light border mb-0 js-photo-btn" title="Foto bukti kondisi"><i class="fas fa-camera"></i>' +
+                        '<input type="file" class="d-none js-photo-input" accept="image/jpeg,image/png,image/webp" capture="environment" multiple data-asset-id="' + parseInt(a.id_asset, 10) + '"></label> ' +
+                        '<span class="badge badge-light js-photo-count" data-asset-id="' + parseInt(a.id_asset, 10) + '"><i class="fas fa-image mr-1"></i>0</span>'))
                     .append('<td class="text-right"><button type="button" class="btn btn-sm btn-link text-danger js-remove-wrong" title="Hapus dari daftar"><i class="fas fa-times"></i></button></td>');
                 $('#wrongTable tbody').prepend($tr);
                 $('#wrongCard').removeClass('d-none');
@@ -347,6 +372,45 @@ $condition_cell = function ($d) use ($is_open) {
                 }).fail(function() {
                     $sel.val(prev);
                     showResult('invalid', 'Gagal menghubungi server. Coba lagi.');
+                });
+            });
+
+            // Upload foto bukti kondisi (AJAX), langsung dari kamera HP
+            $('#expectedTable, #wrongTable').on('change', '.js-photo-input', function() {
+                const input = this;
+                if (!input.files.length) return;
+                const assetId = $(input).data('asset-id');
+                const $btn = $(input).closest('.js-photo-btn').addClass('disabled');
+                const fd = new FormData();
+                fd.append('asset_id', assetId);
+                fd.append('source', 'opname');
+                fd.append('opname_token', token);
+                $.each(input.files, function(i, f) {
+                    fd.append('photos[]', f);
+                });
+
+                $.ajax({
+                    url: photoUrl,
+                    type: 'POST',
+                    data: fd,
+                    processData: false,
+                    contentType: false,
+                    dataType: 'json'
+                }).done(function(res) {
+                    const ok = res.status === 'ok' || res.status === 'partial';
+                    if (ok) {
+                        $('.js-photo-count[data-asset-id="' + assetId + '"]').each(function() {
+                            const n = (parseInt($(this).text(), 10) || 0) + res.photos.length;
+                            $(this).removeClass('badge-light').addClass('badge-info').html('<i class="fas fa-image mr-1"></i>' + n);
+                        });
+                    }
+                    showResult(ok ? (res.status === 'ok' ? 'found' : 'already') : 'invalid',
+                        res.message + (res.errors && res.errors.length ? ' ' + res.errors.join(' ') : ''));
+                }).fail(function() {
+                    showResult('invalid', 'Gagal mengupload foto. Coba lagi.');
+                }).always(function() {
+                    $btn.removeClass('disabled');
+                    input.value = '';
                 });
             });
 

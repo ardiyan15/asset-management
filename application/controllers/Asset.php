@@ -39,13 +39,21 @@ class Asset extends CI_Controller
     $role_id = $this->session->userdata('role_id');
 
     $list = $this->Assets->get_datatables($role_id, $data['user']['building_id']);
+
+    // Thumbnail foto utama untuk baris di halaman ini saja
+    $this->load->model('Photo_model', 'Photos');
+    $thumbs = $this->Photos->primaries(array_column($list, 'id_asset'));
     $result = [];
     $no = (int) $this->input->post('start');
     foreach ($list as $field) {
       $no++;
       $row = [];
       $row[] = $no;
-      $row[] = $field->asset_name;
+      $thumb = $thumbs[$field->id_asset] ?? null;
+      $row[] = ($thumb
+        ? '<img src="' . Photo_model::url($thumb['asset_id'], $thumb['thumb_name']) . '" alt="" loading="lazy" class="rounded mr-2" style="width:36px;height:36px;object-fit:cover;vertical-align:middle;">'
+        : '<span class="d-inline-flex align-items-center justify-content-center rounded bg-light text-gray-400 mr-2" style="width:36px;height:36px;vertical-align:middle;"><i class="fas fa-image"></i></span>')
+        . html_escape($field->asset_name);
       $row[] = $field->merk;
       $row[] = $field->serial_number;
       $row[] = $field->name;
@@ -227,6 +235,8 @@ class Asset extends CI_Controller
     $result = $this->Assets->delete_ast_model($id);
 
     if ($result > 0) {
+      $this->load->model('Photo_model', 'Photos');
+      $this->Photos->delete_all_for_asset($id);
       $this->audit->log('asset.delete', 'Hapus permanen aset "' . $before['asset_name'] . '"', [
         'entity_type'  => 'asset',
         'entity_id'    => $id,
@@ -247,6 +257,9 @@ class Asset extends CI_Controller
     $data['asset']          = $this->_editable_asset($id, $data['user']);
     $data['serial_number']  = substr($data['asset']['serial_number'], 0, 4);
     $data['categories']     = $this->Categories->get_all_categories();
+
+    $this->load->model('Photo_model', 'Photos');
+    $data['photos']         = $this->Photos->for_asset($id);
 
     // Garansi disimpan sebagai tanggal; form memakai jumlah bulan sejak tanggal perolehan
     $data['warranty_months'] = '';
