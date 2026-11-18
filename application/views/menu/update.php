@@ -71,4 +71,13 @@
             </div>
         </div>
     <?php endif; ?>
+    <div class="col-12 mt-4">
+        <h2 class="h6 font-weight-bold text-gray-800 border-top pt-3 mb-3">Foto Aset <span class="text-muted font-weight-normal">(<?= count($photos); ?>)</span></h2>
+        <?php $this->load->view('photos/_gallery', [
+            'asset'    => $asset,
+            'photos'   => $photos,
+            'can_edit' => true,
+            'back'     => 'asset/update/' . (int) $asset['id_asset'],
+        ]); ?>
+    </div>
 </div>

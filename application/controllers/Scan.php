@@ -95,6 +95,17 @@ class Scan extends CI_Controller
             }
         }
 
+        // Foto: foto utama tampil untuk semua, galeri lengkap hanya untuk yang berhak
+        $data['primary_photo'] = null;
+        $data['photos'] = [];
+        if ($data['asset']) {
+            $this->load->model('Photo_model', 'Photos');
+            $data['primary_photo'] = $this->Photos->primary_for_asset($data['asset']['id_asset']);
+            if ($data['can_history']) {
+                $data['photos'] = $this->Photos->for_asset($data['asset']['id_asset']);
+            }
+        }
+
         // Status penghapusan terakhir aset ini (diajukan / disetujui / ditolak)
         $data['disposal'] = null;
         if ($data['asset']) {

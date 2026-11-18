@@ -88,6 +88,13 @@
                 </div>
             </div>
 
+            <?php if (!empty($primary_photo)) : ?>
+                <a href="<?= Photo_model::url($primary_photo['asset_id'], $primary_photo['file_name']); ?>" target="_blank" rel="noopener" class="d-block mb-3">
+                    <img src="<?= Photo_model::url($primary_photo['asset_id'], $primary_photo['file_name']); ?>" alt="Foto <?= html_escape($asset['asset_name']); ?>"
+                        class="scan-card" style="width: 100%; max-height: 320px; object-fit: cover; border-radius: 1rem;">
+                </a>
+            <?php endif; ?>
+
             <?php
             $is_disposed      = (int) $asset['is_disposed'] === 1;
             $disposal_pending = $disposal && (int) $disposal['status'] === 0;
@@ -411,6 +418,21 @@
                     <?php endif; ?>
                 </div>
             </div>
+
+            <?php if ($can_history) : ?>
+                <div class="card scan-card mb-3">
+                    <div class="card-body">
+                        <div class="scan-label mb-2">Foto aset (<?= count($photos); ?>)</div>
+                        <?php $this->load->view('photos/_gallery', [
+                            'asset'    => $asset,
+                            'photos'   => $photos,
+                            'can_edit' => !$is_disposed,
+                            'back'     => 'scan/' . rawurlencode($asset['serial_number']),
+                            'camera'   => true,
+                        ]); ?>
+                    </div>
+                </div>
+            <?php endif; ?>
 
             <?php if ($can_history && !empty($loan_history)) : ?>
                 <div class="card scan-card mb-3">

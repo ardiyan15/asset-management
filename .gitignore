@@ -34,3 +34,7 @@ user_guide_src/cilexer/pycilexer.egg-info/*
 
 # Kredensial SMTP lokal (lihat application/config/email.example.php)
 /application/config/email.php
+
+# Foto aset hasil upload (folder & pengaman tetap di-commit)
+/uploads/assets/*
+!/uploads/assets/index.html

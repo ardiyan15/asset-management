@@ -1,0 +1,24 @@
+# Folder upload: hanya file gambar yang boleh diakses, tidak ada eksekusi skrip.
+Options -Indexes -ExecCGI
+
+<IfModule mod_php.c>
+    php_flag engine off
+</IfModule>
+<IfModule mod_php7.c>
+    php_flag engine off
+</IfModule>
+
+RemoveHandler .php .phtml .php3 .php4 .php5 .php7 .php8 .phar
+RemoveType .php .phtml .php3 .php4 .php5 .php7 .php8 .phar
+
+# Tolak semua file kecuali gambar & index.html
+<FilesMatch ".*">
+    Require all denied
+</FilesMatch>
+<FilesMatch "(?i)^[a-z0-9_\-]+\.(jpe?g|png|webp)$|^index\.html$">
+    Require all granted
+</FilesMatch>
+
+<IfModule mod_headers.c>
+    Header set X-Content-Type-Options "nosniff"
+</IfModule>

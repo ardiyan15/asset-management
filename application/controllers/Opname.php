@@ -82,6 +82,10 @@ class Opname extends CI_Controller
         $data['title']   = 'Stock Opname ' . $data['opname']['code'];
         $data['details'] = $this->Opname->get_details($data['opname']['id']);
 
+        // Jumlah foto bukti kondisi per aset di sesi opname ini
+        $this->load->model('Photo_model', 'Photos');
+        $data['photo_counts'] = $this->Photos->count_for_opname($data['opname']['id']);
+
         // Dipakai halaman scan QR untuk menawarkan "tandai ditemukan" saat opname berjalan
         if ((int) $data['opname']['status'] === Opname_model::STATUS_OPEN) {
             $this->session->set_userdata('active_opname', (int) $data['opname']['id']);
