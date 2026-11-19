@@ -20,6 +20,8 @@
                     <tr>
                         <th class="text-center"> No </th>
                         <th class="text-center"> Username </th>
+                        <th class="text-center"> Email </th>
+                        <th class="text-center"> Role </th>
                         <th class="text-center"> Bangunan </th>
                         <th class="text-center"> Aksi </th>
                     </tr>
@@ -29,15 +31,13 @@
                     <?php foreach ($all_users as $user) : ?>
                         <tr>
                             <th class="text-center"> <?= $i ?></th>
-                            <td class="text-center"> <?= $user['username']; ?></td>
-                            <td class="text-center"> <?= $user['name']; ?></td>
+                            <td class="text-center"> <?= html_escape($user['username']); ?><?= $user['is_active'] ? '' : ' <span class="badge badge-secondary">Nonaktif</span>'; ?></td>
+                            <td class="text-center"> <?= $user['email'] ? html_escape($user['email']) : '<span class="text-muted">-</span>'; ?></td>
+                            <td class="text-center"> <?= $user['role_id'] == 1 ? '<span class="badge badge-primary">Admin</span>' : '<span class="badge badge-light">User</span>'; ?></td>
+                            <td class="text-center"> <?= $user['name'] ? html_escape($user['name']) : ($user['role_id'] == 1 ? 'Semua gedung' : '<span class="text-muted">-</span>'); ?></td>
                             <td class="text-center">
-                                <a href="javascript:;"
-                                    data-id="<?= $user['id_user'] ?>"
-                                    data-username="<?= $user['username'] ?>"
-                                    data-building="<?= $user['building_id'] ?>"
-                                    class="btn btn-info btn-sm rounded btn-edit-user mr-1"
-                                    data-toggle="modal" data-target="#editUserModal">
+                                <a href="<?= base_url('user/edit/' . urlsafe_b64encode($this->encryption->encrypt($user['id_user']))) ?>"
+                                    class="btn btn-info btn-sm rounded mr-1" title="Ubah user">
                                     <i class="fas fa-edit"></i>
                                 </a>
                                 <a class="btn btn-danger btn-sm rounded activate-user" href="<?= base_url('admin/deleteUser/') . $user['id_user']; ?>"> <i class="fas fa-trash-alt"></i></a>
@@ -91,36 +91,6 @@
                 <div class="modal-footer">
                     <button type="submit" class="btn btn-success">Add</button>
                     <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
-                </div>
-            </form>
-        </div>
-    </div>
-</div>
-
-<div class="modal fade" id="editUserModal" tabindex="-1" role="dialog" aria-labelledby="editUserLabel">
-    <div class="modal-dialog" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="editUserLabel">Ubah User</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <form method="post" action="<?= base_url('admin/edit_user'); ?>">
-                <div class="modal-body">
-                    <input type="hidden" name="id_user" id="id_user"> 
-                    <div class="form-group">
-                        <label for="username">Username</label>
-                        <input type="text" class="form-control" id="username" name="username" placeholder="Username" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="password">Password</label>
-                        <input type="password" class="form-control" id="password" name="password" placeholder="Leave blank to keep current password">
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="submit" class="btn btn-primary">Save Changes</button>
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
                 </div>
             </form>
         </div>

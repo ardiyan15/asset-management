@@ -567,15 +567,4 @@ $(document).ready(function () {
 	$(".filter-room").select2({
 		theme: "bootstrap",
 	});
-
-	// Edit User Modal Population
-	$(document).on("click", ".btn-edit-user", function () {
-		const id = $(this).data("id");
-		const username = $(this).data("username");
-		const building = $(this).data("building");
-
-		$("#editUserModal #id_user").val(id);
-		$("#editUserModal #username").val(username);
-		$("#editUserModal #loc").val(building);
-	});
 });

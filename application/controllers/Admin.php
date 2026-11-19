@@ -45,6 +45,9 @@ class Admin extends CI_Controller
 	public function list_user()
 	{
 		is_allowed();
+		// token url_crypto untuk link Ubah User
+		$this->load->library('encryption');
+		$this->load->helper('url_crypto');
 		$data['title']      = 'Daftar Pengguna';
 		$data['user']       = $this->Auth->get_active_user($this->session->userdata('username'));
 		$data['all_users']  = $this->Users->get_all_user();
@@ -114,36 +117,6 @@ class Admin extends CI_Controller
 			$this->session->set_flashdata('message', 'delete');
 			redirect('admin/list_user');
 		}
-	}
-
-	public function edit_user()
-	{
-		is_allowed();
-		$data = [
-			'username' => $this->input->post('username')
-		];
-
-		$password = $this->input->post('password');
-		if (!empty($password)) {
-			$data['password'] = password_hash($password, PASSWORD_DEFAULT);
-		}
-
-		$id = $this->input->post('id_user');
-
-		$before = $this->db->select('id_user, username, building_id')->get_where('user', ['id_user' => (int) $id])->row_array();
-		$this->Users->update_user($id, $data);
-		// Password tidak pernah dicatat, hanya tanda bahwa password direset
-		$changes = Audit::diff($before ?: [], ['username' => $data['username']]);
-		if (!empty($password)) {
-			$changes['password_direset'] = ['old' => null, 'new' => 'ya'];
-		}
-		$this->audit->log('user.update', 'Ubah akun ' . ($before['username'] ?? '#' . (int) $id) . (!empty($password) ? ' (termasuk reset password)' : ''), [
-			'entity_type' => 'user', 'entity_id' => (int) $id, 'entity_label' => $data['username'],
-			'building_id' => $before['building_id'] ?? null,
-			'changes'     => $changes,
-		]);
-		$this->session->set_flashdata('message', 'editUser');
-		redirect('admin/list_user');
 	}
 
 	public function add_building_location()
