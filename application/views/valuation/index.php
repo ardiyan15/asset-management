@@ -161,7 +161,7 @@ $pct_book = $totals['cost'] > 0 ? round($totals['book_value'] / $totals['cost'] 
                         <?php $d = $row['depreciation']; ?>
                         <tr>
                             <td>
-                                <b><?= html_escape($row['asset_name']); ?></b> <span class="text-muted small"><?= html_escape($row['merk']); ?></span>
+                                <a href="<?= base_url('asset/detail/' . (int) $row['id_asset']); ?>" class="font-weight-bold"><?= html_escape($row['asset_name']); ?></a> <span class="text-muted small"><?= html_escape($row['merk']); ?></span>
                                 <div><code class="small"><?= html_escape($row['serial_number']); ?></code></div>
                             </td>
                             <td><?= html_escape($row['category_name'] ?? '-'); ?></td>

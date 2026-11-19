@@ -208,6 +208,6 @@ class Photo extends CI_Controller
 
         $this->session->set_flashdata('photo_result', ['status' => $status, 'message' => $message, 'errors' => $errors]);
         $back = (string) $this->input->post('back');
-        redirect(preg_match('#^(asset/update/\d+|scan/[A-Za-z0-9%_\-]+)$#', $back) ? $back : 'asset');
+        redirect(preg_match('#^(asset/(update|detail)/\d+(\#[a-z\-]+)?|scan/[A-Za-z0-9%_\-]+)$#', $back) ? $back : 'asset');
     }
 }

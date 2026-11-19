@@ -94,5 +94,11 @@
             $('#record_asset').prop('required', !isSchedule).val(d.asset || '').trigger('change');
             $('#recordModal').modal('show');
         });
+
+        // ?record=<asset_id> (dari halaman detail aset): langsung buka form perbaikan untuk aset itu
+        const recordAsset = new URLSearchParams(location.search).get('record');
+        if (recordAsset && /^\d+$/.test(recordAsset) && $('#record_asset option[value="' + recordAsset + '"]').length) {
+            $('<button type="button" class="js-record d-none" data-mode="repair">').attr('data-asset', recordAsset).appendTo('body').trigger('click').remove();
+        }
     });
 </script>
