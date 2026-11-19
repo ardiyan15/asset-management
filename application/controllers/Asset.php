@@ -232,6 +232,18 @@ class Asset extends CI_Controller
       return;
     }
 
+    // Aset yang sudah punya riwayat resmi tidak dihapus permanen (riwayat & BAST bisa rusak),
+    // arahkan ke menu Penghapusan Aset yang menyimpan datanya.
+    $blockers = $this->Assets->deletion_blockers($id);
+    if (!empty($blockers)) {
+      echo json_encode([
+        'status'  => 409,
+        'message' => 'Aset ini sudah punya riwayat ' . implode(', ', $blockers)
+          . '. Hapus permanen akan merusak riwayat tersebut, gunakan menu Penghapusan Aset.',
+      ]);
+      return;
+    }
+
     $before = $this->Assets->get_asset_by_id($id);
     $result = $this->Assets->delete_ast_model($id);
 

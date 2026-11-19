@@ -28,14 +28,4 @@ class TO extends CI_Controller
         $this->load->view('templates/footer');
     }
 
-    public function print_page()
-    {
-
-        $data = $this->input->post('sndAst');
-
-        $header['title'] = "Receipt Form";
-        $result['asset'] = $this->Assets->print_model($data);
-        $this->load->view('templates/header', $header);
-        $this->load->view('TO/print', $result);
-    }
 }

@@ -131,26 +131,6 @@ class Assets_model extends CI_Model
         $this->db->update('user');
     }
 
-    public function take_out_model($id, $data, $dtlPrces)
-    {
-        $this->db->set('asset_location', 'In Shipping');
-        $this->db->set('status', 0);
-        $this->db->where('id_asset', $id);
-        $this->db->update('asset');
-        $this->db->insert('detail_process', $dtlPrces);
-        return $this->db->affected_rows();
-    }
-
-    public function print_model($location)
-    {
-        $this->db->select('*');
-        $this->db->from('detail_process');
-        $this->db->join('asset', 'asset.id_asset = detail_process.asset_id');
-        $this->db->where('deleted', 0);
-        $this->db->where_in('id_detail_process', $location);
-        return $this->db->get()->result_array();
-    }
-
     public function add_asset_model($data)
     {
         // true if array is multidimensional
@@ -162,18 +142,64 @@ class Assets_model extends CI_Model
         return $this->db->affected_rows();
     }
 
+    /**
+     * Alasan aset tidak boleh dihapus permanen: sudah tercatat di dokumen / riwayat resmi
+     * (transaksi pindah & BAST, peminjaman, stock opname, penghapusan, riwayat servis).
+     * Aset seperti itu harus lewat menu Penghapusan Aset supaya riwayatnya tetap utuh.
+     *
+     * @return string[] label riwayat yang ditemukan; kosong = boleh dihapus permanen
+     */
+    public function deletion_blockers($id)
+    {
+        $checks = [
+            'transaction_details'    => 'transaksi pindah',
+            'asset_loans'            => 'peminjaman',
+            'stock_opname_details'   => 'stock opname',
+            'asset_disposal_details' => 'pengajuan penghapusan',
+            'maintenance_logs'       => 'riwayat servis',
+        ];
+        $found = [];
+        foreach ($checks as $table => $label) {
+            if ($this->db->where('asset_id', (int) $id)->count_all_results($table) > 0) {
+                $found[] = $label;
+            }
+        }
+        return $found;
+    }
+
+    /**
+     * Hapus permanen aset yang belum punya riwayat resmi (mis. salah input / salah import),
+     * beserta data pendukungnya: log kondisi & jadwal maintenance. Foto dihapus oleh controller.
+     * Pemanggil wajib cek deletion_blockers() dulu; di sini dicek ulang di dalam DB transaction.
+     *
+     * @return int 1 = terhapus, 0 = gagal / punya riwayat
+     */
     public function delete_ast_model($id)
     {
-        $check_ti = $this->db->get_where('detail_process', ['id_detail_process' => $id])->row_array();
-        if ($check_ti) {
-            $this->db->where('id_detail_process', $id);
-            $this->db->where('deleted', 0);
-            $this->db->delete('detail_process');
-        }
+        $id = (int) $id;
 
-        $this->db->where('id_asset', $id);
-        $this->db->delete('asset');
-        return $this->db->affected_rows();
+        $this->db->trans_begin();
+        try {
+            if (!empty($this->deletion_blockers($id))) {
+                $this->db->trans_rollback();
+                return 0;
+            }
+
+            $this->db->where('asset_id', $id)->delete('asset_condition_logs');
+            $this->db->where('asset_id', $id)->delete('maintenance_schedules');
+            $this->db->where('id_asset', $id)->delete('asset');
+            $deleted = $this->db->affected_rows();
+
+            if ($this->db->trans_status() === FALSE || $deleted < 1) {
+                throw new Exception('Hapus aset gagal');
+            }
+            $this->db->trans_commit();
+            return 1;
+        } catch (\Throwable $e) {
+            $this->db->trans_rollback();
+            log_message('error', 'delete_ast_model #' . $id . ': ' . $e->getMessage());
+            return 0;
+        }
     }
 
     public function update_asset_by_id($data, $id)
@@ -215,46 +241,6 @@ class Assets_model extends CI_Model
         }
     }
 
-    public function get_total_row($role, $room_id)
-    {
-        if ($role == '1') {
-            $this->db->select('*');
-            $this->db->from('asset');
-            $this->db->join('rooms', 'rooms.id = asset.room_id');
-            $this->db->where('asset.is_disposed', 0);
-            return $this->db->get()->num_rows();
-        } else {
-            return $this->db->get_where('asset', ['room_id' => $room_id, 'is_disposed' => 0])->num_rows();
-        }
-    }
-
-    public function get_data_history_asset_out($location)
-    {
-        $this->db->select('*');
-        $this->db->from('detail_process');
-        $this->db->join('asset', 'asset.id_asset = detail_process.asset_id');
-        $this->db->where('source', $location);
-        $this->db->where('deleted', 1);
-        return $this->db->get()->result_array();
-    }
-
-    public function get_data_history_asset_in($location)
-    {
-        $this->db->select('*');
-        $this->db->from('detail_process');
-        $this->db->join('asset', 'asset.id_asset = detail_process.asset_id');
-        $this->db->where('destination', $location);
-        $this->db->where('deleted', 1);
-        return $this->db->get()->result_array();
-    }
-
-    public function get_report_model()
-    {
-        $this->db->where('is_disposed', 0);
-        $this->db->order_by('asset_location', 'ASC');
-        return $this->db->get('asset')->result_array();
-    }
-
     public function filter_asset_by_room_id($role_id, $room_id, $building_id)
     {
         // when user running the filter by room name
@@ -286,30 +272,10 @@ class Assets_model extends CI_Model
         return $this->db->affected_rows();
     }
 
-    public function get_all_store_location()
-    {
-        $this->db->order_by('store_code', 'ASC');
-        return $this->db->get('store_location')->result_array();
-    }
-
-    public function addStrLocationMdl($data)
-    {
-        $this->db->insert('store_location', $data);
-        return $this->db->affected_rows();
-    }
-
     public function editStrLocationMdl($data, $id)
     {
         $this->db->where('id_location', $id);
         $this->db->update('store_location', $data);
-        return $this->db->affected_rows();
-    }
-
-    public function deactivate_store($id)
-    {
-        $this->db->set('status_location', 0);
-        $this->db->where('id_location', $id);
-        $this->db->update('store_location');
         return $this->db->affected_rows();
     }
 
@@ -321,42 +287,12 @@ class Assets_model extends CI_Model
         return $this->db->affected_rows();
     }
 
-    public function get_total_asset()
-    {
-        return $this->db->where('is_disposed', 0)->count_all_results('asset');
-    }
-
-    public function get_total_user_row()
-    {
-        return $this->db->count_all_results('user');
-    }
-
-    public function search_data_user()
-    {
-        $keyword = $this->input->post('keyword', true);
-        $this->db->like('user_code', $keyword);
-        $this->db->or_like('fullname', $keyword);
-        $this->db->or_like('email', $keyword);
-        return $this->db->get('user')->result_array();
-    }
-
     public function get_name_location($room_id)
     {
         $this->db->select('rooms.name');
         $this->db->from('rooms');
         $this->db->where('id', $room_id);
         return $this->db->get()->row_array();
-    }
-
-    public function get_code_location($location)
-    {
-        $this->db->select('buildings.name');
-        $this->db->from('rooms');
-        $this->db->join('floors', 'rooms.floor_id = floors.id');
-        $this->db->join('buildings', 'floors.building_id = buildings.id');
-        $this->db->where('rooms.name', $location);
-        // $this->db->order_by('buildings.id', 'DESC');
-        return $this->db->get()->result_array();
     }
 
     public function get_last_asset_serial_number()
