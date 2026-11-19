@@ -69,7 +69,9 @@ class Activity extends CI_Controller
                 'action'      => html_escape($log['action']),
                 'module'      => html_escape(Audit_model::MODULES[$log['module']] ?? $log['module']),
                 'description' => html_escape($log['description']),
-                'entity'      => html_escape(trim(($log['entity_type'] ?? '') . ' ' . ($log['entity_label'] ?? ''))),
+                'entity'      => $log['entity_type'] === 'asset' && $log['entity_id'] && $log['action'] !== 'asset.delete'
+                    ? '<a href="' . site_url('asset/detail/' . (int) $log['entity_id']) . '">' . html_escape(trim('asset ' . ($log['entity_label'] ?? ''))) . '</a>'
+                    : html_escape(trim(($log['entity_type'] ?? '') . ' ' . ($log['entity_label'] ?? ''))),
                 'building'    => html_escape($log['building_name'] ?? ''),
                 'ip'          => html_escape($log['ip_address'] ?? ''),
                 'agent'       => html_escape($log['user_agent'] ?? ''),

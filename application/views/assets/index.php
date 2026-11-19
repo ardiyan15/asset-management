@@ -39,7 +39,7 @@
                             <?php foreach ($assets as $asset) : ?>
                                 <tr>
                                     <td scope="row"> <?= $i; ?></td>
-                                    <td scope="row"><?= $asset['asset_name']; ?></td>
+                                    <td scope="row"><a href="<?= base_url('asset/detail/' . (int) $asset['id_asset']); ?>"><?= html_escape($asset['asset_name']); ?></a></td>
                                     <td scope="row"><?= $asset['merk']; ?></td>
                                     <td scope="row">
                                         <a href="<?= base_url('scan/' . rawurlencode($asset['serial_number'])) ?>" target="_blank" title="Lihat halaman scan QR"><i class="fas fa-qrcode mr-1"></i><?= $asset['serial_number']; ?></a>

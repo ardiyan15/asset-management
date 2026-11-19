@@ -480,10 +480,21 @@ class Assets_model extends CI_Model
      */
     public function get_asset_detail_by_serial($serial_number)
     {
+        return $this->_asset_detail('asset.serial_number', $serial_number);
+    }
+
+    /** Detail aset lengkap berdasarkan id (halaman detail aset). */
+    public function get_asset_detail($asset_id)
+    {
+        return $this->_asset_detail('asset.id_asset', (int) $asset_id);
+    }
+
+    private function _asset_detail($field, $value)
+    {
         $this->db->select('asset.id_asset, asset.asset_name, asset.merk, asset.serial_number,
             asset.placement_status, asset.asset_condition, asset.is_disposed, asset.disposed_at, asset.created,
-            asset.purchase_date, asset.purchase_price, asset.vendor, asset.warranty_until,
-            categories.name AS category_name, categories.useful_life_years, categories.residual_percent,
+            asset.purchase_date, asset.purchase_price, asset.vendor, asset.warranty_until, asset.category_id,
+            categories.code AS category_code, categories.name AS category_name, categories.useful_life_years, categories.residual_percent,
             rooms.id AS room_id, rooms.name AS room_name, rooms.description AS room_description,
             floors.name AS floor_name, buildings.id AS building_id, buildings.name AS building_name');
         $this->db->from('asset');
@@ -491,7 +502,7 @@ class Assets_model extends CI_Model
         $this->db->join('rooms', 'rooms.id = asset.room_id');
         $this->db->join('floors', 'floors.id = rooms.floor_id');
         $this->db->join('buildings', 'buildings.id = floors.building_id');
-        $this->db->where('asset.serial_number', $serial_number);
+        $this->db->where($field, $value);
         $this->db->limit(1);
         return $this->db->get()->row_array();
     }

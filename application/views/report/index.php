@@ -180,7 +180,7 @@ $show_disposed_col = $filters['status'] !== 'active';
                         <?php $d = $row['depreciation']; ?>
                         <tr>
                             <td>
-                                <b><?= html_escape($row['asset_name']); ?></b> <span class="small text-muted"><?= html_escape($row['merk']); ?></span>
+                                <a href="<?= base_url('asset/detail/' . (int) $row['id_asset']); ?>" class="font-weight-bold"><?= html_escape($row['asset_name']); ?></a> <span class="small text-muted"><?= html_escape($row['merk']); ?></span>
                                 <div><a href="<?= base_url('scan/' . rawurlencode($row['serial_number'])); ?>" target="_blank"><code class="small"><?= html_escape($row['serial_number']); ?></code></a></div>
                             </td>
                             <td><?= html_escape($row['category_name'] ?? '-'); ?></td>

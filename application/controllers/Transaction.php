@@ -83,7 +83,9 @@ class Transaction extends CI_Controller
     );
 
     $this->session->set_flashdata('message', $count > 0 ? 'take out' : 'move_failed');
-    redirect('transaction');
+    // Dari halaman detail aset: kembali ke sana (hanya path internal yang dikenal)
+    $back = (string) $this->input->post('back');
+    redirect(preg_match('#^asset/detail/\d+$#', $back) ? $back : 'transaction');
   }
 
   public function bulk_transaction()

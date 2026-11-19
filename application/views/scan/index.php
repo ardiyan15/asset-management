@@ -459,6 +459,9 @@
                 <a href="<?= base_url('asset/location/' . $asset['room_id']); ?>" class="btn btn-outline-primary btn-block mb-3">
                     <i class="fas fa-door-open mr-1"></i> Buka ruangan <?= html_escape($asset['room_name']); ?>
                 </a>
+                <a href="<?= base_url('asset/detail/' . (int) $asset['id_asset']); ?>" class="btn btn-primary btn-block mb-3">
+                    <i class="fas fa-desktop mr-1"></i> Buka detail lengkap di aplikasi
+                </a>
             <?php endif; ?>
         <?php endif; ?>
 

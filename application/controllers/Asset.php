@@ -53,7 +53,7 @@ class Asset extends CI_Controller
       $row[] = ($thumb
         ? '<img src="' . Photo_model::url($thumb['asset_id'], $thumb['thumb_name']) . '" alt="" loading="lazy" class="rounded mr-2" style="width:36px;height:36px;object-fit:cover;vertical-align:middle;">'
         : '<span class="d-inline-flex align-items-center justify-content-center rounded bg-light text-gray-400 mr-2" style="width:36px;height:36px;vertical-align:middle;"><i class="fas fa-image"></i></span>')
-        . html_escape($field->asset_name);
+        . '<a href="' . site_url('asset/detail/' . $field->id_asset) . '" class="font-weight-bold">' . html_escape($field->asset_name) . '</a>';
       $row[] = $field->merk;
       $row[] = $field->serial_number;
       $row[] = $field->name;
@@ -62,7 +62,8 @@ class Asset extends CI_Controller
           ? ' <a href="' . site_url('disposal/create?asset=' . $field->id_asset) . '" class="badge badge-light text-danger" title="Ajukan penghapusan aset ini"><i class="fas fa-recycle"></i> Ajukan hapus</a>'
           : '');
       $row[] = $field->created;
-      $row[] = '<a href="javascript:;" class="btn btn-warning btn-sm rounded mr-1 js-condition" title="Ubah kondisi"'
+      $row[] = '<a href="' . site_url('asset/detail/' . $field->id_asset) . '" class="btn btn-primary btn-sm rounded mr-1" title="Detail aset"><i class="fas fa-eye"></i></a>'
+        . '<a href="javascript:;" class="btn btn-warning btn-sm rounded mr-1 js-condition" title="Ubah kondisi"'
         . ' data-id="' . $field->id_asset . '" data-condition="' . (int) $field->asset_condition . '"'
         . ' data-name="' . html_escape($field->asset_name . ' (' . $field->serial_number . ')') . '"><i class="fas fa-heartbeat"></i></a>'
         . '<a href="' . site_url('scan/' . rawurlencode($field->serial_number)) . '" target="_blank" class="btn btn-secondary btn-sm rounded mr-1" title="Halaman scan QR"><i class="fas fa-qrcode"></i></a>'
@@ -248,6 +249,89 @@ class Asset extends CI_Controller
     } else {
       echo json_encode(500);
     }
+  }
+
+  /**
+   * Halaman detail aset (hanya lihat): ringkasan, riwayat gabungan, foto, maintenance & peminjaman,
+   * plus tombol aksi sesuai status aset. Admin semua gedung; user hanya aset di gedungnya.
+   */
+  public function detail($id = null)
+  {
+    $user  = $this->Auth->get_active_user($this->session->userdata('username'));
+    $asset = $this->Assets->get_asset_detail((int) $id);
+
+    if (!$asset || ($user['role_id'] !== '1' && (string) $user['building_id'] !== (string) $asset['building_id'])) {
+      $this->session->set_flashdata('message', 'failed ');
+      redirect('asset');
+    }
+
+    $this->load->model('Photo_model', 'Photos');
+    $this->load->model('Asset_history_model', 'History');
+    $this->load->model('Loan_model', 'Loan');
+    $this->load->model('Maintenance_model', 'Maintenance');
+    $this->load->model('Disposal_model', 'Disposal');
+    $this->load->helper(['loan', 'maintenance']);
+    $this->load->library('qr');
+
+    $asset_id    = (int) $asset['id_asset'];
+    $is_disposed = (int) $asset['is_disposed'] === 1;
+
+    $open_loan = $this->Loan->open_loan_for_asset($asset_id);
+    if ($open_loan) {
+      $open_loan['state'] = loan_status($open_loan);
+    }
+    $disposal = $this->Disposal->get_latest_for_asset($asset_id);
+    $disposal_pending = $disposal && (int) $disposal['status'] === Disposal_model::STATUS_PENDING;
+
+    // Kiriman yang sedang menunggu diterima (aset berstatus "sedang dipindahkan")
+    $pending_transfer = (int) $asset['placement_status'] !== 1
+      ? $this->db->select('dst.name AS dest_name, t.transaction_id AS code')
+        ->from('transaction_details AS td')
+        ->join('transaction AS t', 't.id = td.transaction_id', 'left')
+        ->join('rooms AS dst', 'dst.id = td.room_id', 'left')
+        ->where(['td.asset_id' => $asset_id, 'td.status' => 0])
+        ->order_by('td.id', 'DESC')->limit(1)->get()->row_array()
+      : null;
+
+    $schedules = $this->Maintenance->schedules_for_asset($asset_id);
+    foreach ($schedules as &$s) {
+      $s['due'] = maintenance_due_status($s['next_due_date'], $s['remind_days_before'], $s['is_active']);
+    }
+    unset($s);
+
+    $data = [
+      'title'            => 'Detail Aset',
+      'user'             => $user,
+      'asset'            => $asset,
+      'is_disposed'      => $is_disposed,
+      'qr_image'         => $this->qr->png_data_uri($this->qr->asset_url($asset['serial_number']), 4),
+      'depreciation'     => asset_depreciation($asset['purchase_price'], $asset['purchase_date'], $asset['useful_life_years'], $asset['residual_percent'] ?? 0),
+      'warranty'         => warranty_status($asset['warranty_until']),
+      'photos'           => $this->Photos->for_asset($asset_id),
+      'timeline'         => $this->History->timeline($asset),
+      'timeline_types'   => Asset_history_model::TYPES,
+      'open_loan'        => $open_loan,
+      'loan_history'     => $this->Loan->history_for_asset($asset_id, 20),
+      'disposal'         => $disposal,
+      'pending_transfer' => $pending_transfer,
+      'schedules'        => $schedules,
+      'maintenance_logs' => $this->Maintenance->logs_for_asset($asset_id, 20),
+      'maintenance_cost' => $this->Maintenance->total_cost_for_asset($asset_id),
+      'rooms'            => $this->Rooms->get_all_rooms(),
+      // Aksi yang boleh tampil sesuai status aset
+      'can'              => [
+        'edit'    => !$is_disposed,
+        'move'    => !$is_disposed && (int) $asset['placement_status'] === 1 && !$open_loan && !$disposal_pending,
+        'lend'    => !$is_disposed && (bool) $this->Loan->available_assets($user['role_id'], $user['building_id'], $asset_id),
+        'dispose' => !$is_disposed && (bool) $this->Disposal->get_eligible_assets($user['role_id'], $user['building_id'], [$asset_id]),
+      ],
+    ];
+
+    $this->load->view('templates/header', $data);
+    $this->load->view('templates/sidebar', $data);
+    $this->load->view('templates/topbar', $data);
+    $this->load->view('assets/detail', $data);
+    $this->load->view('templates/footer');
   }
 
   public function update($id)
