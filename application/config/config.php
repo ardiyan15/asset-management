@@ -43,6 +43,16 @@ $config['qr_base_url'] = '';
 $config['maintenance_mail_from'] = '';
 
 /*
+| Notifikasi kiriman aset masuk (email ke petugas gedung tujuan).
+| transaction_mail_instant : TRUE = kirim langsung saat transaksi dibuat (request menunggu SMTP,
+|                            maks. smtp_timeout). FALSE = hanya lewat
+|                            `php index.php cron transaction_notifications` (jadwalkan tiap 5-15 menit).
+| notification_mail_from   : alamat pengirim; kosong = pakai maintenance_mail_from.
+*/
+$config['transaction_mail_instant'] = TRUE;
+$config['notification_mail_from']   = '';
+
+/*
 | Retensi audit log dalam hari. 0 = simpan selamanya (default).
 | Kalau diisi, `php index.php cron daily` menghapus log yang lebih lama dari N hari.
 */

@@ -3,6 +3,11 @@
 function is_logged_in() {
     $ci = get_instance();
     if (!$ci->session->userdata('username')) {
+        // Link dari email kiriman masuk: kembali ke halaman itu setelah login
+        $uri = $ci->uri->uri_string();
+        if ($ci->input->method() === 'get' && preg_match('#^ti(/detail/[A-Za-z0-9_-]+)?$#i', $uri)) {
+            $ci->session->set_userdata('redirect_after_login', $uri);
+        }
         redirect('auth');
     }
 }

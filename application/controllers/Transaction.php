@@ -116,7 +116,8 @@ class Transaction extends CI_Controller
     $user   = $this->Auth->get_active_user($this->session->userdata('username'));
     $assets = $this->Transactions->get_movable_assets($user['role_id'], $user['building_id'], $asset_ids, $room_id);
 
-    $code = $this->Transactions->create_transaction($assets, $room_id, $note);
+    $trx  = $this->Transactions->create_transaction($assets, $room_id, $note, $user['id_user'] ?? null);
+    $code = $trx ? $trx['code'] : false;
     if ($code) {
       $room    = $this->Rooms->get_single_room_by_id($room_id);
       $serials = array_column($this->db->select('serial_number')->where_in('id_asset', array_column($assets, 'id_asset'))->get('asset')->result_array(), 'serial_number');
@@ -130,6 +131,13 @@ class Transaction extends CI_Controller
           'catatan' => ['old' => null, 'new' => $note ?: null],
         ],
       ]);
+
+      // Email ke petugas gedung tujuan. Gagal kirim tidak menggagalkan pemindahan;
+      // yang belum terkirim dicoba ulang oleh `php index.php cron transaction_notifications`.
+      if ($this->config->item('transaction_mail_instant')) {
+        $this->load->library('transaction_notifier');
+        $this->transaction_notifier->send($trx['id']);
+      }
     }
     return $code ? count($assets) : 0;
   }
