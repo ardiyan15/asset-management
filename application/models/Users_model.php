@@ -4,9 +4,10 @@ class Users_model extends CI_Model
 {
     public function get_all_user()
     {
-        $this->db->select('*');
+        // LEFT JOIN: admin (building_id 0) & user dengan gedung yang sudah dihapus tetap tampil
+        $this->db->select('user.*, buildings.name');
         $this->db->from('user');
-        $this->db->join('buildings', 'buildings.id = user.building_id');
+        $this->db->join('buildings', 'buildings.id = user.building_id', 'left');
         $this->db->order_by('user.id_user', 'DESC');
         return $this->db->get()->result_array();
     }

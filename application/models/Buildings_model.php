@@ -14,6 +14,21 @@ class Buildings_model extends CI_Model
         }
     }
 
+    /**
+     * Gedung yang bisa dipilih untuk user: gedung aktif yang belum punya akun,
+     * ditambah gedung milik $user_id sendiri (form ubah user).
+     */
+    public function get_assignable_buildings($user_id = null)
+    {
+        $this->db->select('buildings.id, buildings.name');
+        $this->db->from('buildings');
+        $this->db->where('buildings.status', 1);
+        $this->db->where('NOT EXISTS (SELECT 1 FROM user u WHERE u.building_id = buildings.id'
+            . ($user_id ? ' AND u.id_user <> ' . (int) $user_id : '') . ')', null, false);
+        $this->db->order_by('buildings.id', 'DESC');
+        return $this->db->get()->result_array();
+    }
+
     public function get_all_buildings()
     {
         $this->db->select('buildings.id, buildings.name');
