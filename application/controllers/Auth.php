@@ -61,7 +61,7 @@ class Auth extends CI_Controller
                     // Kembali ke halaman scan QR kalau login dipicu dari sana
                     $redirect = (string) $this->session->userdata('redirect_after_login');
                     $this->session->unset_userdata('redirect_after_login');
-                    if (strpos($redirect, 'scan/') === 0) {
+                    if (strpos($redirect, 'scan/') === 0 || preg_match('#^ti(/detail/[A-Za-z0-9_-]+)?$#i', $redirect)) {
                         redirect($redirect);
                     }
                     redirect('admin');

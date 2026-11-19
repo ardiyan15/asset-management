@@ -39,9 +39,10 @@ class Transactions_model extends CI_Model
      * sedang dipindahkan. Dipakai untuk pindah satuan maupun massal.
      *
      * @param array $assets  hasil get_movable_assets(): [['id_asset' => .., 'room_id' => ..], ...]
-     * @return string|false  kode transaksi (TRX/AST/...) atau false jika gagal
+     * @param int|null $created_by  id_user pembuat (tidak ikut dikirimi notifikasi)
+     * @return array|false  ['id' => id header, 'code' => TRX/AST/...] atau false jika gagal
      */
-    public function create_transaction(array $assets, $dest_room_id, $notes = null)
+    public function create_transaction(array $assets, $dest_room_id, $notes = null, $created_by = null)
     {
         if (empty($assets)) {
             return false;
@@ -59,6 +60,7 @@ class Transactions_model extends CI_Model
                 'created_at'     => $now,
                 'updated_at'     => $now,
                 'notes'          => ($notes !== null && trim($notes) !== '') ? trim($notes) : null,
+                'created_by'     => $created_by ? (int) $created_by : null,
             ]);
             $header_id = $this->db->insert_id();
 
@@ -85,7 +87,7 @@ class Transactions_model extends CI_Model
             }
 
             $this->db->trans_commit();
-            return $code;
+            return ['id' => (int) $header_id, 'code' => $code];
         } catch (\Throwable $e) {
             $this->db->trans_rollback();
             log_message('error', 'create_transaction: ' . $e->getMessage());
@@ -312,5 +314,142 @@ class Transactions_model extends CI_Model
         $this->db->order_by('transaction_details.id', 'DESC');
         return $this->db->get()->result_array();
     }
-}
 
+    /**
+     * Jumlah aset kiriman yang menunggu diterima di gedung user (admin: semua gedung).
+     * Dipakai badge sidebar & lonceng topbar.
+     */
+    public function count_pending_incoming($role_id, $building_id)
+    {
+        $this->db->from('transaction_details');
+        $this->db->where('transaction_details.status', 0);
+        if ($role_id !== '1') {
+            $this->db->join('rooms', 'rooms.id = transaction_details.room_id');
+            $this->db->join('floors', 'floors.id = rooms.floor_id');
+            $this->db->where('floors.building_id', $building_id);
+        }
+        return (int) $this->db->count_all_results();
+    }
+
+    /**
+     * Kiriman masuk yang menunggu diterima, dikelompokkan per transaksi (terbaru dulu).
+     * Kolom: id, code, created_at, notes, sender, room_name, building_name, item_count.
+     */
+    public function pending_incoming_summary($role_id, $building_id, $limit = 5)
+    {
+        $this->db->select('transaction.id, transaction.transaction_id AS code, transaction.created_at, transaction.notes,
+            sender.username AS sender, rooms.name AS room_name, buildings.name AS building_name,
+            COUNT(transaction_details.id) AS item_count', false);
+        $this->db->from('transaction_details');
+        $this->db->join('transaction', 'transaction.id = transaction_details.transaction_id');
+        $this->db->join('user AS sender', 'sender.id_user = transaction.created_by', 'left');
+        $this->db->join('rooms', 'rooms.id = transaction_details.room_id', 'left');
+        $this->db->join('floors', 'floors.id = rooms.floor_id', 'left');
+        $this->db->join('buildings', 'buildings.id = floors.building_id', 'left');
+        $this->db->where('transaction_details.status', 0);
+        if ($role_id !== '1') {
+            $this->db->where('floors.building_id', $building_id);
+        }
+        $this->db->group_by('transaction.id, transaction.transaction_id, transaction.created_at, transaction.notes, sender.username, rooms.name, buildings.name');
+        $this->db->order_by('transaction.id', 'DESC');
+        $this->db->limit((int) $limit);
+        return $this->db->get()->result_array();
+    }
+
+    /**
+     * Transaksi yang email notifikasinya belum terkirim, masih punya aset menunggu diterima,
+     * dan dibuat dalam $days hari terakhir (supaya data lama tidak ikut dikirim).
+     */
+    public function pending_notifications($days = 7)
+    {
+        return $this->db->select('transaction.id')
+            ->from('transaction')
+            ->where('transaction.notified_at IS NULL', null, false)
+            ->where('transaction.created_at >=', date('Y-m-d H:i:s', strtotime('-' . (int) $days . ' days')))
+            ->where('EXISTS (SELECT 1 FROM transaction_details td WHERE td.transaction_id = transaction.id AND td.status = 0)', null, false)
+            ->order_by('transaction.id', 'ASC')
+            ->get()->result_array();
+    }
+
+    /**
+     * Data satu transaksi untuk email notifikasi: header + tujuan + pengirim + aset yang masih menunggu.
+     *
+     * @return array|null  header dengan key 'items'; null kalau tidak ada / tidak ada aset yang menunggu
+     */
+    public function notification_payload($header_id)
+    {
+        $header = $this->db->select('transaction.id, transaction.transaction_id AS code, transaction.created_at, transaction.notes,
+                transaction.created_by, transaction.notified_at, sender.username AS sender')
+            ->from('transaction')
+            ->join('user AS sender', 'sender.id_user = transaction.created_by', 'left')
+            ->where('transaction.id', (int) $header_id)
+            ->get()->row_array();
+        if (!$header) {
+            return null;
+        }
+
+        $items = $this->db->select('asset.id_asset, asset.asset_name, asset.merk, asset.serial_number,
+                source.name AS source_room, src_bld.name AS source_building,
+                rooms.name AS room_name, floors.name AS floor_name, buildings.id AS building_id, buildings.name AS building_name')
+            ->from('transaction_details')
+            ->join('asset', 'asset.id_asset = transaction_details.asset_id', 'left')
+            ->join('rooms AS source', 'source.id = transaction_details.source_id', 'left')
+            ->join('floors AS src_flr', 'src_flr.id = source.floor_id', 'left')
+            ->join('buildings AS src_bld', 'src_bld.id = src_flr.building_id', 'left')
+            ->join('rooms', 'rooms.id = transaction_details.room_id', 'left')
+            ->join('floors', 'floors.id = rooms.floor_id', 'left')
+            ->join('buildings', 'buildings.id = floors.building_id', 'left')
+            ->where('transaction_details.transaction_id', (int) $header_id)
+            ->where('transaction_details.status', 0)
+            ->order_by('transaction_details.id', 'ASC')
+            ->get()->result_array();
+        if (empty($items)) {
+            return null;
+        }
+
+        // satu transaksi selalu ke satu ruangan tujuan
+        $header['room_name']     = $items[0]['room_name'];
+        $header['floor_name']    = $items[0]['floor_name'];
+        $header['building_id']   = $items[0]['building_id'];
+        $header['building_name'] = $items[0]['building_name'];
+        $header['items']         = $items;
+        return $header;
+    }
+
+    /**
+     * Penerima email kiriman masuk: user aktif ber-email di gedung tujuan (selain pembuat transaksi).
+     * Kalau gedung tujuan belum punya user ber-email, kirim ke admin supaya kiriman tidak terlewat.
+     */
+    public function notification_recipients($building_id, $exclude_user_id = null)
+    {
+        $users = $this->_recipient_query($exclude_user_id)
+            ->where('building_id', $building_id)
+            ->where('role_id', 2)
+            ->get()->result_array();
+        if (!empty($users)) {
+            return $users;
+        }
+
+        return $this->_recipient_query($exclude_user_id)
+            ->where('role_id', 1)
+            ->get()->result_array();
+    }
+
+    private function _recipient_query($exclude_user_id)
+    {
+        $this->db->select('id_user, username, email, role_id, building_id')
+            ->from('user')
+            ->where('is_active', 1)
+            ->where('email IS NOT NULL', null, false)
+            ->where('email <>', '');
+        if ($exclude_user_id) {
+            $this->db->where('id_user !=', (int) $exclude_user_id);
+        }
+        return $this->db;
+    }
+
+    public function mark_notified($header_id)
+    {
+        $this->db->where('id', (int) $header_id)->update('transaction', ['notified_at' => date('Y-m-d H:i:s')]);
+    }
+}

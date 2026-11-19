@@ -65,10 +65,21 @@
             <span> Transaksi Keluar </span>
         </a>
     </li>
-    <li class="nav-item <?= is_active('TI');  ?>">
+    <?php
+    // Badge aset kiriman yang menunggu diterima (per gedung tujuan untuk user).
+    // load->vars supaya lonceng di topbar memakai angka yang sama tanpa query ulang.
+    $ci_ti = &get_instance();
+    $ci_ti->load->model('Transactions_model', 'IncomingBadge');
+    $incoming_pending = $ci_ti->IncomingBadge->count_pending_incoming($user['role_id'], $user['building_id']);
+    $ci_ti->load->vars(['incoming_pending' => $incoming_pending]);
+    ?>
+    <li class="nav-item <?= is_active('TI') ?: is_active('TI', 'detail'); ?>">
         <a class="nav-link" href="<?= base_url('TI') ?>">
             <i class="fas fa-fw fa-plus"></i>
             <span> Transaksi Masuk </span>
+            <?php if ($incoming_pending > 0) : ?>
+                <span class="badge badge-info badge-counter ml-1" style="position: static;" title="Aset menunggu diterima"><?= $incoming_pending; ?></span>
+            <?php endif; ?>
         </a>
     </li>
     <?php

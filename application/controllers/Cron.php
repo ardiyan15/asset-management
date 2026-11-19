@@ -6,6 +6,7 @@ defined('BASEPATH') or exit('No direct script access allowed');
  *
  *   php index.php cron maintenance_reminders        kirim email pengingat jatuh tempo
  *   php index.php cron maintenance_reminders dry    tampilkan isi email tanpa mengirim / menandai
+ *   php index.php cron transaction_notifications    kirim ulang email kiriman masuk yang belum terkirim
  *
  * Penerima: user aktif yang mengisi email di Edit Profil. Admin menerima semua gedung,
  * user lain hanya jadwal di gedungnya. Satu jadwal hanya diingatkan sekali per hari.
@@ -20,6 +21,7 @@ class Cron extends CI_Controller
             show_404();
         }
         $this->load->model('Maintenance_model', 'Maintenance');
+        $this->load->model('Transactions_model', 'Transactions');
         $this->load->helper('maintenance');
     }
 
@@ -162,11 +164,64 @@ class Cron extends CI_Controller
     }
 
     /**
+     * Kirim (ulang) email kiriman masuk yang belum terkirim, mis. karena SMTP sempat gagal
+     * atau transaction_mail_instant = FALSE. Hanya transaksi 7 hari terakhir yang masih menunggu diterima.
+     *   php index.php cron transaction_notifications [dry]
+     * Jadwalkan tiap 5-15 menit kalau mode instan dimatikan.
+     */
+    public function transaction_notifications($mode = '')
+    {
+        $this->load->library('transaction_notifier');
+        $dry_run = $mode === 'dry';
+        $pending = $this->Transactions->pending_notifications(7);
+
+        if (empty($pending)) {
+            $this->_out('Tidak ada notifikasi kiriman masuk yang perlu dikirim.');
+            return;
+        }
+
+        $count = ['sent' => 0, 'partial' => 0, 'failed' => 0, 'no_recipient' => 0, 'nothing' => 0];
+        foreach ($pending as $row) {
+            $r = $this->transaction_notifier->send($row['id'], $dry_run);
+            $count[$r['status']]++;
+
+            if ($dry_run && $r['status'] === 'sent') {
+                $this->_out('--- [DRY RUN] ' . $r['subject']);
+                $this->_out('Ke: ' . implode(', ', $r['recipients']));
+                foreach ($r['items'] as $item) {
+                    $this->_out('  - ' . $item['asset_name'] . ' (' . $item['serial_number'] . ') dari ' . $item['source_room']);
+                }
+                continue;
+            }
+
+            switch ($r['status']) {
+                case 'sent':
+                case 'partial':
+                    $this->_out($r['code'] . ': terkirim ke ' . implode(', ', $r['recipients'])
+                        . ($r['failed'] ? ' | GAGAL: ' . implode(', ', $r['failed']) : ''));
+                    break;
+                case 'failed':
+                    $this->_out($r['code'] . ': GAGAL kirim. Cek pengaturan SMTP di application/config/email.php.');
+                    break;
+                case 'no_recipient':
+                    $this->_out($r['code'] . ': belum ada penerima. Isi email user gedung tujuan (atau admin) di Edit Profil.');
+                    break;
+            }
+        }
+
+        $this->_out(sprintf('Selesai: %d transaksi, %d terkirim, %d sebagian, %d gagal, %d tanpa penerima.%s',
+            count($pending), $count['sent'], $count['partial'], $count['failed'], $count['no_recipient'],
+            $dry_run ? ' (dry run, tidak ada yang dikirim)' : ''));
+    }
+
+    /**
      * Jalankan semua pengingat harian sekaligus (untuk satu entri Task Scheduler).
      *   php index.php cron daily [dry]
      */
     public function daily($mode = '')
     {
+        $this->_out('== Kiriman masuk ==');
+        $this->transaction_notifications($mode);
         $this->_out('== Maintenance ==');
         $this->maintenance_reminders($mode);
         $this->_out('== Peminjaman ==');
