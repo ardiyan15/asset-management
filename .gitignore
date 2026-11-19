@@ -38,3 +38,10 @@ user_guide_src/cilexer/pycilexer.egg-info/*
 # Foto aset hasil upload (folder & pengaman tetap di-commit)
 /uploads/assets/*
 !/uploads/assets/index.html
+
+# graphify
+/graphify-out/*
+/graphify-out/cache/*
+
+# claude
+CLAUDE.md

@@ -297,9 +297,15 @@
                                 window.location.reload()
                             })
                         } else {
+                            // 409 = aset punya riwayat, server mengirim alasannya
+                            let message = 'Gagal hapus data';
+                            try {
+                                const res = typeof response === 'string' ? JSON.parse(response) : response;
+                                if (res && res.message) message = res.message;
+                            } catch (e) {}
                             Swal.fire(
                                 'Gagal',
-                                'Gagal hapus data',
+                                message,
                                 'error'
                             )
                         }
