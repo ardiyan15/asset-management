@@ -1,6 +1,6 @@
 <?php
 $conditions  = asset_condition_options();
-$cond_colors = [1 => '#1cc88a', 2 => '#f6c23e', 3 => '#e74a3b'];
+$cond_colors = [1 => '#2e7d4f', 2 => '#c98a1b', 3 => '#b4321f'];
 $show_disposed_col = $filters['status'] !== 'active';
 ?>
 <div class="container-fluid">

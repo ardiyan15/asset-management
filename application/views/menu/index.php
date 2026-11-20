@@ -1,23 +1,25 @@
 <div class="container-fluid">
-    <div class="card rounded p-3">
-        <div class="row">
-            <div class="col-sm">
-                <div class="row">
-                    <div class="col-md-6">
-                        <h1 class="h3 text-gray-800"><?= $title; ?></h1>
-                        <?php if ($user['role_id'] == 1) :  ?>
-                            <button type="button" class="btn btn-success btn-sm mb-3" data-toggle="modal" data-target="#addAsset">
-                                <i class="fas fa-plus mr-1"></i> Tambah Asset Baru
-                            </button>
-                            <button type="button" class="btn btn-warning btn-sm mb-3" data-toggle="modal" data-target="#import"><i class="fas fa-file-import"></i> Import File CSV</button>
-                            <a href="<?= base_url('asset/download') ?>" class="btn btn-primary btn-sm rounded mb-3"><i class="fa fa-download" aria-hidden="true"></i> Download Format CSV</a>
-                        <?php endif; ?>
-                    </div>
-                </div>
-                <!-- Untuk Menampilkan pop up sweetalert -->
-                <div class="flash-data" data-flashdata="<?= $this->session->flashdata('message'); ?>"></div>
+    <div class="page-head">
+        <div>
+            <div class="eyebrow">Data master</div>
+            <h1><?= $title; ?></h1>
+            <p class="lede">Semua aset aktif beserta ruangan tempatnya sekarang. Klik nama aset untuk melihat riwayat lengkapnya.</p>
+        </div>
+        <?php if ($user['role_id'] == 1) :  ?>
+            <div class="actions">
+                <a href="<?= base_url('asset/download') ?>" class="btn btn-secondary"><i class="fa fa-download" aria-hidden="true"></i> Format CSV</a>
+                <button type="button" class="btn btn-secondary" data-toggle="modal" data-target="#import"><i class="fas fa-file-import" aria-hidden="true"></i> Import CSV</button>
+                <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#addAsset"><i class="fas fa-plus" aria-hidden="true"></i> Tambah Aset</button>
+            </div>
+        <?php endif; ?>
+    </div>
+    <!-- Untuk Menampilkan pop up sweetalert -->
+    <div class="flash-data" data-flashdata="<?= $this->session->flashdata('message'); ?>"></div>
+    <div class="card">
+        <div class="card-body">
+            <div>
                 <div class="form-inline mb-2">
-                    <label for="filterCondition" class="small text-muted mr-2">Kondisi</label>
+                    <label for="filterCondition" class="small text-muted mr-2 mb-0">Kondisi</label>
                     <select id="filterCondition" class="form-control form-control-sm">
                         <option value="">Semua</option>
                         <?php foreach (asset_condition_options() as $value => $label) : ?>
@@ -25,7 +27,7 @@
                         <?php endforeach; ?>
                     </select>
                 </div>
-                <table class="mt-3 table table-border table-sm table-hover table-striped" id="mytable">
+                <table class="mt-3 table table-hover" id="mytable" style="width:100%">
                     <thead>
                         <tr>
                             <th>No</th>
@@ -214,18 +216,10 @@
                 },
             ],
             "order": [],
-            "oLanguage": {
-                "sLengthMenu": "_MENU_",
-                "sSearch": "Cari",
-                "sInfo": "Jumlah data: <b> _TOTAL_ </b>",
-                "sInfoEmpty": "Tidak ada data",
-                "sProcessing": "loading..."
-            },
+            // Kata kunci dari kotak cari di topbar (?q=...)
+            "search": { "search": <?= json_encode((string) $this->input->get('q')); ?> },
             "language": {
-                "paginate": {
-                    "previous": "Sebelumnya",
-                    "next": "Selanjutnya"
-                }
+                "info": "_TOTAL_ aset"
             }
         });
 

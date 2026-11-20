@@ -92,25 +92,25 @@ $photo_cell = function ($d) use ($is_open, $photo_counts) {
 
     <div class="row">
         <div class="col-6 col-lg-3 mb-3">
-            <div class="card opn-stat p-3 h-100" style="border-left-color:#4e73df">
+            <div class="card opn-stat p-3 h-100" style="border-left-color:#0f5f73">
                 <div class="lbl text-primary">Terdaftar</div>
                 <div class="num text-gray-800" data-stat="expected"><?= $total; ?></div>
             </div>
         </div>
         <div class="col-6 col-lg-3 mb-3">
-            <div class="card opn-stat p-3 h-100" style="border-left-color:#1cc88a">
+            <div class="card opn-stat p-3 h-100" style="border-left-color:#2e7d4f">
                 <div class="lbl text-success">Ditemukan</div>
                 <div class="num text-gray-800" data-stat="found"><?= $found; ?></div>
             </div>
         </div>
         <div class="col-6 col-lg-3 mb-3">
-            <div class="card opn-stat p-3 h-100" style="border-left-color:#e74a3b">
+            <div class="card opn-stat p-3 h-100" style="border-left-color:#b4321f">
                 <div class="lbl text-danger"><?= $is_open ? 'Belum dicek' : 'Tidak ditemukan'; ?></div>
                 <div class="num text-gray-800" data-stat="missing"><?= (int) $opname['total_missing']; ?></div>
             </div>
         </div>
         <div class="col-6 col-lg-3 mb-3">
-            <div class="card opn-stat p-3 h-100" style="border-left-color:#f6c23e">
+            <div class="card opn-stat p-3 h-100" style="border-left-color:#c98a1b">
                 <div class="lbl text-warning">Salah ruangan</div>
                 <div class="num text-gray-800" data-stat="wrong_room"><?= (int) $opname['total_wrong_room']; ?></div>
             </div>
@@ -492,7 +492,7 @@ $photo_cell = function ($d) use ($is_open, $photo_counts) {
                     title: 'Batalkan opname?',
                     text: 'Semua hasil scan di sesi ini akan dihapus.',
                     showCancelButton: true,
-                    confirmButtonColor: '#e74a3b',
+                    confirmButtonColor: '#b4321f',
                     confirmButtonText: 'Ya, batalkan',
                     cancelButtonText: 'Kembali'
                 }).then(function(r) {

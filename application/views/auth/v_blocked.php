@@ -1,33 +1,26 @@
 <!DOCTYPE html>
-<html lang="en">
-    <head>
-        <meta charset="utf-8">
-        <meta http-equiv="X-UA-Compatible" content="IE=edge">
-        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-        <meta name="description" content="">
-        <meta name="author" content="">
-        <title>Access Blocked</title>
-        <link href="<?= base_url('assets/'); ?>vendor/fontawesome-free/css/all.min.css" rel="stylesheet" type="text/css">
-        <link href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i" rel="stylesheet">
-        <link href="<?= base_url('assets/'); ?>css/sb-admin-2.min.css" rel="stylesheet">
-    </head>
-    <body id="page-top">
-        <div id="wrapper">
-            <div id="content-wrapper" class="d-flex flex-column">
-                <div id="content">
-                    <div class="container-fluid mt-5">
-                        <div class="text-center">
-                            <div class="error mx-auto" data-text="403">403</div>
-                            <p class="lead text-gray-800 mb-5">Akses Ditolak</p>
-                            <p class="text-gray-500 mb-0">Anda Tidak Memiliki Hak Akses Untuk Melihat Halaman Ini</p>
-                            <a href="<?= base_url('admin'); ?>">&larr; Kembali ke Dashboard</a>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <a class="scroll-to-top rounded" href="#page-top">
-            <i class="fas fa-angle-up"></i>
-        </a>
-    </body>
+<html lang="id">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="theme-color" content="#111517">
+    <title>Akses ditolak · SIMANIS</title>
+    <link rel="icon" type="image/png" href="<?= base_url('assets/img/logo_raharja.png') ?>">
+    <link href="<?= base_url('assets/'); ?>vendor/fontawesome-free/css/all.min.css" rel="stylesheet" type="text/css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <link href="<?= base_url('assets/'); ?>css/sb-admin-2.min.css" rel="stylesheet">
+    <link href="<?= base_url('assets/'); ?>css/simanis.css?v=<?= @filemtime(FCPATH . 'assets/css/simanis.css'); ?>" rel="stylesheet">
+</head>
+<body class="auth-body">
+    <main class="auth-single">
+        <section class="auth-card blocked-card enter" aria-labelledby="blockedTitle">
+            <span class="blocked-code">403</span>
+            <h1 id="blockedTitle" class="auth-title">Halaman ini khusus admin</h1>
+            <p class="auth-lede">Akun Anda tidak punya hak akses ke halaman tersebut. Percobaan ini tercatat di audit log.</p>
+            <a class="btn btn-primary btn-block btn-lg" href="<?= base_url('admin'); ?>"><i class="fas fa-arrow-left" aria-hidden="true"></i> Kembali ke dashboard</a>
+        </section>
+    </main>
+</body>
 </html>

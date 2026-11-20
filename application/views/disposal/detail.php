@@ -167,7 +167,7 @@ $can_review     = $is_admin && $pending_count > 0;
                     input: 'text',
                     inputPlaceholder: 'Catatan (opsional)',
                     showCancelButton: true,
-                    confirmButtonColor: '#1cc88a',
+                    confirmButtonColor: '#2e7d4f',
                     confirmButtonText: 'Setujui',
                     cancelButtonText: 'Batal'
                 }).then(function(r) {
@@ -183,7 +183,7 @@ $can_review     = $is_admin && $pending_count > 0;
                     input: 'text',
                     inputPlaceholder: 'Catatan (opsional)',
                     showCancelButton: true,
-                    confirmButtonColor: '#e74a3b',
+                    confirmButtonColor: '#b4321f',
                     confirmButtonText: 'Setujui semua',
                     cancelButtonText: 'Batal'
                 }).then(function(r) {

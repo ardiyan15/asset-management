@@ -8,29 +8,30 @@
     <title><?= html_escape($asset ? $asset['asset_name'] . ' - ' . $asset['serial_number'] : 'Aset tidak ditemukan'); ?></title>
     <link rel="icon" type="image/png" href="<?= base_url('assets/img/logo_raharja.png') ?>">
     <link href="<?= base_url('assets/vendor/fontawesome-free/css/all.min.css'); ?>" rel="stylesheet" type="text/css">
-    <link href="https://fonts.googleapis.com/css?family=Nunito:400,600,700,800" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500;600&display=swap" rel="stylesheet">
     <link href="<?= base_url('assets/css/sb-admin-2.min.css'); ?>" rel="stylesheet">
+    <link href="<?= base_url('assets/css/simanis.css'); ?>?v=<?= @filemtime(FCPATH . 'assets/css/simanis.css'); ?>" rel="stylesheet">
     <style>
-        body { background: #f3f5fb; }
+        body { background: #f4f3ee; }
         .scan-wrap { max-width: 560px; margin: 0 auto; padding: 16px; }
         .scan-brand { font-size: .8rem; letter-spacing: .08em; text-transform: uppercase; color: #fff; opacity: .85; }
-        .scan-hero { background: linear-gradient(135deg, #4e73df 0%, #224abe 100%); color: #fff; border-radius: 1rem; padding: 1.25rem; }
+        .scan-hero { background: linear-gradient(135deg, #0f5f73 0%, #0a4757 100%); color: #fff; border-radius: 1rem; padding: 1.25rem; }
         .scan-hero h1 { font-size: 1.5rem; font-weight: 800; margin: .25rem 0; color: #fff; word-break: break-word; }
-        .scan-serial { font-family: SFMono-Regular, Menlo, Consolas, monospace; font-size: .95rem; background: rgba(255,255,255,.15); border-radius: .4rem; padding: .15rem .5rem; display: inline-block; }
+        .scan-serial { font-family: var(--mono); font-size: .95rem; background: rgba(255,255,255,.15); border-radius: .4rem; padding: .15rem .5rem; display: inline-block; }
         .scan-qr { background: #fff; border-radius: .5rem; padding: 4px; width: 84px; height: 84px; }
         .scan-card { border: 0; border-radius: 1rem; box-shadow: 0 .15rem 1rem rgba(58,59,69,.08); }
-        .scan-label { font-size: .72rem; text-transform: uppercase; letter-spacing: .06em; color: #858796; margin-bottom: .1rem; }
-        .scan-value { font-weight: 700; color: #3a3b45; }
+        .scan-label { font-size: .72rem; text-transform: uppercase; letter-spacing: .06em; color: #9a9da3; margin-bottom: .1rem; }
+        .scan-value { font-weight: 700; color: #17191c; }
         .loc-path { display: flex; flex-wrap: wrap; align-items: center; gap: .35rem; }
-        .loc-path .chip { background: #eaecf4; border-radius: 2rem; padding: .25rem .75rem; font-weight: 600; color: #3a3b45; font-size: .9rem; }
-        .loc-path .chip.current { background: #4e73df; color: #fff; }
+        .loc-path .chip { background: #efede6; border-radius: 2rem; padding: .25rem .75rem; font-weight: 600; color: #17191c; font-size: .9rem; }
+        .loc-path .chip.current { background: #0f5f73; color: #fff; }
         .timeline { list-style: none; padding: 0; margin: 0; }
-        .timeline li { position: relative; padding: 0 0 1rem 1.5rem; border-left: 2px solid #e3e6f0; margin-left: .4rem; }
+        .timeline li { position: relative; padding: 0 0 1rem 1.5rem; border-left: 2px solid #e4e1d8; margin-left: .4rem; }
         .timeline li:last-child { border-left-color: transparent; padding-bottom: 0; }
-        .timeline li::before { content: ""; position: absolute; left: -7px; top: 3px; width: 12px; height: 12px; border-radius: 50%; background: #4e73df; }
-        .timeline li.st-0::before { background: #f6c23e; }
-        .timeline li.st-2::before { background: #e74a3b; }
-        .timeline .when { font-size: .8rem; color: #858796; }
+        .timeline li::before { content: ""; position: absolute; left: -7px; top: 3px; width: 12px; height: 12px; border-radius: 50%; background: #0f5f73; }
+        .timeline li.st-0::before { background: #c98a1b; }
+        .timeline li.st-2::before { background: #b4321f; }
+        .timeline .when { font-size: .8rem; color: #9a9da3; }
     </style>
 </head>
 
@@ -44,7 +45,7 @@
         <?php endif; ?>
 
         <?php if (!empty($opname) && $asset) : ?>
-            <div class="card scan-card mb-3 border-left-warning" style="border-left: .3rem solid #f6c23e !important;">
+            <div class="card scan-card mb-3 border-left-warning" style="border-left: .3rem solid #c98a1b !important;">
                 <div class="card-body py-3">
                     <div class="scan-label mb-1"><i class="fas fa-clipboard-check mr-1"></i> Stock opname berjalan</div>
                     <div class="font-weight-bold text-gray-800 mb-2">
@@ -115,7 +116,7 @@
                     <div class="small mt-1"><?= html_escape($disposal['code']); ?> · menunggu persetujuan admin. Aset tidak bisa dipindahkan sementara.</div>
                 </div>
             <?php elseif ($can_history && (int) $asset['asset_condition'] === 3) : ?>
-                <div class="card scan-card mb-3" style="border-left: .3rem solid #e74a3b !important;">
+                <div class="card scan-card mb-3" style="border-left: .3rem solid #b4321f !important;">
                     <div class="card-body py-3">
                         <div class="font-weight-bold text-gray-800 mb-1">Aset rusak berat</div>
                         <div class="small text-muted mb-2">
@@ -132,7 +133,7 @@
 
             <?php if (!empty($loan)) : ?>
                 <?php $overdue = $loan['state']['key'] === 'overdue'; ?>
-                <div class="card scan-card mb-3" style="border-left: .3rem solid <?= $overdue ? '#e74a3b' : '#36b9cc'; ?> !important;">
+                <div class="card scan-card mb-3" style="border-left: .3rem solid <?= $overdue ? '#b4321f' : '#3d6596'; ?> !important;">
                     <div class="card-body py-3">
                         <div class="d-flex justify-content-between align-items-start">
                             <div class="font-weight-bold text-gray-800"><i class="fas fa-hand-holding mr-1"></i> Sedang dipinjam</div>
