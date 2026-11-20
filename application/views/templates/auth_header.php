@@ -10,7 +10,7 @@
     <meta name="theme-color" content="#111517">
 
     <title><?= html_escape($title); ?> · SIMANIS</title>
-    <link rel="icon" type="image/png" href="<?= base_url('assets/img/logo_raharja.png') ?>">
+    <link rel="icon" type="image/png" href="<?= base_url('assets/img/logo_simanis.png') ?>">
 
     <link href="<?= base_url(); ?>assets/vendor/fontawesome-free/css/all.min.css" rel="stylesheet" type="text/css">
     <link rel="preconnect" href="https://fonts.googleapis.com">

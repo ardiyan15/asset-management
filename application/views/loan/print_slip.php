@@ -30,7 +30,7 @@
 
 <body>
     <div class="header">
-        <img src="assets/img/logo_bast.png" class="logo">
+        <img src="assets/img/logo_simanis.png" class="logo">
         <div class="code">
             No. <b><?= html_escape($loan['code']); ?></b><br>
             <?php if ($returned) : ?>

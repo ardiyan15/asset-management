@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <meta name="theme-color" content="#111517">
     <title>Akses ditolak · SIMANIS</title>
-    <link rel="icon" type="image/png" href="<?= base_url('assets/img/logo_raharja.png') ?>">
+    <link rel="icon" type="image/png" href="<?= base_url('assets/img/logo_simanis.png') ?>">
     <link href="<?= base_url('assets/'); ?>vendor/fontawesome-free/css/all.min.css" rel="stylesheet" type="text/css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>

@@ -32,8 +32,8 @@ $show_disposed_col = $filters['status'] !== 'active';
 
 <body>
     <div class="header">
-        <img src="assets/img/logo_bast.png" class="logo-left">
-        <img src="assets/img/logo_bast.png" class="logo-right">
+        <img src="assets/img/logo_simanis.png" class="logo-left">
+        <img src="assets/img/logo_simanis.png" class="logo-right">
         <div class="header-text">ASSET MANAGEMENT SYSTEM</div>
         <div class="clear"></div>
     </div>

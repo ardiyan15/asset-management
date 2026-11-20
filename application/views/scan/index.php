@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <meta name="robots" content="noindex, nofollow">
     <title><?= html_escape($asset ? $asset['asset_name'] . ' - ' . $asset['serial_number'] : 'Aset tidak ditemukan'); ?></title>
-    <link rel="icon" type="image/png" href="<?= base_url('assets/img/logo_raharja.png') ?>">
+    <link rel="icon" type="image/png" href="<?= base_url('assets/img/logo_simanis.png') ?>">
     <link href="<?= base_url('assets/vendor/fontawesome-free/css/all.min.css'); ?>" rel="stylesheet" type="text/css">
     <link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500;600&display=swap" rel="stylesheet">
     <link href="<?= base_url('assets/css/sb-admin-2.min.css'); ?>" rel="stylesheet">

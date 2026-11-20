@@ -20,8 +20,7 @@ $building = $val('building', $edit['building_id'] ?? '');
             <h1 class="h3 mb-3 text-gray-800"><?= $title; ?></h1>
         </div>
         <div class="text-right col-md-6">
-            <img class="mr-2" src="<?= base_url('assets/img/logo_raharja.png') ?>" width="50">
-            <img src="<?= base_url('assets/img/kampus_merdeka.png') ?>" width="50">
+            <img class="mr-2" src="<?= base_url('assets/img/logo_simanis.png') ?>" width="50">
         </div>
     </div>
     <?php if (!empty($error)) : ?>

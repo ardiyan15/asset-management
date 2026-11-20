@@ -1,7 +1,7 @@
 <main class="auth-single">
     <section class="auth-card enter" aria-labelledby="changeTitle">
         <a class="auth-brand" href="<?= base_url('auth'); ?>">
-            <span class="auth-brand-mark"><img src="<?= base_url('assets/img/logo_raharja.png'); ?>" alt="" width="26" height="26"></span>
+            <span class="auth-brand-mark"><img src="<?= base_url('assets/img/logo_simanis.png'); ?>" alt="" width="26" height="26"></span>
             <span class="auth-brand-text">
                 <strong>SIMANIS</strong>
                 <span>Manajemen Aset</span>

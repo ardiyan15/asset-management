@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" width="256" height="256" role="img" aria-label="SIMANIS">
+  <title>SIMANIS — Sistem Informasi Manajemen Inventaris</title>
+  <rect width="256" height="256" rx="58" fill="#0f5f73"/>
+  <g stroke="#0f5f73" stroke-width="7" stroke-linejoin="round">
+    <!-- sisi atas -->
+    <polygon points="128,46 206,90 128,134 50,90" fill="#7fd3e0"/>
+    <!-- sisi kiri -->
+    <polygon points="50,90 128,134 128,216 50,172" fill="#ffffff"/>
+    <!-- sisi kanan -->
+    <polygon points="128,134 206,90 206,172 128,216" fill="#d3e9ee"/>
+  </g>
+  <!-- lakban di tutup kardus -->
+  <polygon points="80,63 98,53 176,97 158,107" fill="#0f5f73" opacity=".55"/>
+  <!-- label inventaris -->
+  <g fill="#0f5f73">
+    <polygon points="66,128 106,150 106,170 66,148"/>
+  </g>
+  <g stroke="#ffffff" stroke-width="4" stroke-linecap="round">
+    <line x1="74" y1="141" x2="98" y2="154"/>
+    <line x1="74" y1="151" x2="90" y2="160"/>
+  </g>
+</svg>

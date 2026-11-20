@@ -10,7 +10,7 @@
     <meta name="theme-color" content="#111517">
 
     <title><?= html_escape($title); ?> · SIMANIS</title>
-    <link rel="icon" type="image/png" href="<?= base_url('assets/img/logo_raharja.png') ?>">
+    <link rel="icon" type="image/png" href="<?= base_url('assets/img/logo_simanis.png') ?>">
 
     <script src="<?= base_url('assets/'); ?>vendor/jquery/jquery.min.js"></script>
 

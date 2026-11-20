@@ -1,6 +1,10 @@
-# SIMANIS — Sistem Manajemen Aset
+<p align="center">
+  <img src="assets/img/logo_simanis.svg" alt="Logo SIMANIS" width="96">
+</p>
 
-SIMANIS adalah aplikasi web untuk mengelola aset inventaris di banyak gedung. Aplikasi ini mencatat **di mana setiap aset berada** (gedung → lantai → ruangan), **bagaimana kondisinya**, dan **semua yang pernah terjadi padanya**: perpindahan, peminjaman, servis, stock opname, sampai penghapusan.
+# SIMANIS — Sistem Informasi Manajemen Inventaris
+
+**SIMANIS** (singkatan dari **Sistem Informasi Manajemen Inventaris**) adalah aplikasi web untuk mengelola aset inventaris di banyak gedung. Aplikasi ini mencatat **di mana setiap aset berada** (gedung → lantai → ruangan), **bagaimana kondisinya**, dan **semua yang pernah terjadi padanya**: perpindahan, peminjaman, servis, stock opname, sampai penghapusan.
 
 ---
 

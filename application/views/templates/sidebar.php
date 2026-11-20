@@ -38,7 +38,7 @@ if ($user['role_id'] == '1') {
     <!-- Merek -->
     <a class="sidebar-brand d-flex align-items-center" href="<?= base_url('admin') ?>" aria-label="SIMANIS, ke dashboard">
         <div class="sidebar-brand-icon">
-            <img src="<?= base_url('assets/img/logo_raharja.png'); ?>" alt="" width="26" height="26">
+            <img src="<?= base_url('assets/img/logo_simanis.png'); ?>" alt="" width="26" height="26">
         </div>
         <div class="sidebar-brand-text">
             <span class="brand-name">SIMANIS</span>
