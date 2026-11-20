@@ -1,42 +1,27 @@
-<div class="container animated fadeIn">
+<main class="auth-single">
+    <section class="auth-card enter" aria-labelledby="forgotTitle">
+        <a class="auth-brand" href="<?= base_url('auth'); ?>">
+            <span class="auth-brand-mark"><img src="<?= base_url('assets/img/logo_raharja.png'); ?>" alt="" width="26" height="26"></span>
+            <span class="auth-brand-text">
+                <strong>SIMANIS</strong>
+                <span>Manajemen Aset</span>
+            </span>
+        </a>
+        <h1 id="forgotTitle" class="auth-title">Atur ulang password</h1>
+        <p class="auth-lede">Masukkan email akun Anda. Kami kirim tautan untuk membuat password baru.</p>
 
-    <!-- Outer Row -->
-    <div class="row justify-content-center">
+        <?php if ($this->session->flashdata('message')) : ?>
+            <div class="auth-flash" role="alert"><?= $this->session->flashdata('message'); ?></div>
+        <?php endif; ?>
 
-        <div class="col-lg-7">
-
-            <div class="card o-hidden border-0 shadow-lg my-5">
-                <div class="card-body p-0">
-                    <!-- Nested Row within Card Body -->
-                    <div class="row">
-                        <div class="col-lg">
-                            <div class="p-5">
-                                <div class="text-center">
-                                    <h1 class="h4 text-gray-900 mb-4">Forgot your password ?</h1>
-                                </div>
-                                <?= $this->session->flashdata('message'); ?>
-                                <form action="<?= base_url('auth/forgotpassword'); ?>" method="post" class="user">
-                                    <div class="form-group">
-                                        <input type="text" class="form-control form-control-user" id="email" name="email" placeholder="Enter Email Address..." value="<?= set_value('email'); ?>">
-                                        <?= form_error('email', '<small class="text-danger pl-3">', '</small>'); ?>
-                                    </div>
-
-                                    <button type="submit" class="btn btn-primary btn-user btn-block">
-                                        Reset Password
-                                    </button>
-                                </form>
-                                <hr>
-                                <div class="text-center">
-                                    <a class="small" href="<?= base_url('auth') ?>">Back to login</a>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+        <form action="<?= base_url('auth/forgotpassword'); ?>" method="post" class="auth-form">
+            <div class="form-group">
+                <label for="email">Email</label>
+                <input type="email" class="form-control" id="email" name="email" value="<?= set_value('email'); ?>" autocomplete="email" required>
+                <?= form_error('email', '<small class="field-error">', '</small>'); ?>
             </div>
-
-        </div>
-
-    </div>
-
-</div>
+            <button type="submit" class="btn btn-primary btn-block btn-lg">Kirim tautan reset</button>
+        </form>
+        <p class="auth-help"><a href="<?= base_url('auth') ?>"><i class="fas fa-arrow-left" aria-hidden="true"></i> Kembali ke halaman masuk</a></p>
+    </section>
+</main>

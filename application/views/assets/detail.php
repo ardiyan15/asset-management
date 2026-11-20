@@ -8,20 +8,20 @@ $counts   = array_count_values(array_column($timeline, 'type'));
 $transfers = $counts['transfer'] ?? 0;
 ?>
 <style>
-    .ad-photo { width: 168px; height: 168px; object-fit: cover; border-radius: .75rem; background: #eaecf4; }
-    .ad-photo-empty { width: 168px; height: 168px; border-radius: .75rem; background: #eaecf4; color: #b7b9cc; display: flex; align-items: center; justify-content: center; font-size: 2.5rem; }
-    .ad-qr { width: 88px; height: 88px; border: 1px solid #e3e6f0; border-radius: .5rem; padding: 3px; background: #fff; }
+    .ad-photo { width: 168px; height: 168px; object-fit: cover; border-radius: .75rem; background: #efede6; }
+    .ad-photo-empty { width: 168px; height: 168px; border-radius: .75rem; background: #efede6; color: #b7b9cc; display: flex; align-items: center; justify-content: center; font-size: 2.5rem; }
+    .ad-qr { width: 88px; height: 88px; border: 1px solid #e4e1d8; border-radius: .5rem; padding: 3px; background: #fff; }
     .ad-serial { font-family: SFMono-Regular, Menlo, Consolas, monospace; background: #eef1fb; padding: .1rem .5rem; border-radius: .35rem; }
     .ad-actions .btn { margin: 0 .25rem .4rem 0; }
-    .ad-dl dt { font-weight: 600; color: #858796; font-size: .78rem; text-transform: uppercase; letter-spacing: .03em; }
-    .ad-dl dd { color: #3a3b45; margin-bottom: .75rem; }
-    .ad-stat { border-left: .25rem solid #4e73df; border-radius: .5rem; }
+    .ad-dl dt { font-weight: 600; color: #9a9da3; font-size: .78rem; text-transform: uppercase; letter-spacing: .03em; }
+    .ad-dl dd { color: #17191c; margin-bottom: .75rem; }
+    .ad-stat { border-left: .25rem solid #0f5f73; border-radius: .5rem; }
     .ad-timeline { list-style: none; padding: 0; margin: 0; }
     .ad-timeline li { position: relative; padding: 0 0 1.1rem 2.4rem; }
-    .ad-timeline li::before { content: ""; position: absolute; left: .95rem; top: 1.6rem; bottom: 0; width: 2px; background: #e3e6f0; }
+    .ad-timeline li::before { content: ""; position: absolute; left: .95rem; top: 1.6rem; bottom: 0; width: 2px; background: #e4e1d8; }
     .ad-timeline li:last-child::before { display: none; }
     .ad-timeline .ad-dot { position: absolute; left: 0; top: 0; width: 2rem; height: 2rem; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #fff; font-size: .8rem; }
-    .ad-timeline .ad-when { font-size: .78rem; color: #858796; }
+    .ad-timeline .ad-when { font-size: .78rem; color: #9a9da3; }
     .ad-filter .btn { margin: 0 .25rem .4rem 0; }
 </style>
 
@@ -182,14 +182,14 @@ $transfers = $counts['transfer'] ?? 0;
                     </div>
                 </div>
                 <div class="col-md-4 mb-3">
-                    <div class="card ad-stat p-3 h-100" style="border-left-color: #f6c23e;">
+                    <div class="card ad-stat p-3 h-100" style="border-left-color: #c98a1b;">
                         <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">Biaya maintenance</div>
                         <div class="h5 font-weight-bold text-gray-800 mb-1"><?= rupiah($maintenance_cost); ?></div>
                         <div class="small text-muted"><?= count($maintenance_logs); ?> pekerjaan · <?= count(array_filter($schedules, function ($s) { return (int) $s['is_active'] === 1; })); ?> jadwal aktif</div>
                     </div>
                 </div>
                 <div class="col-md-4 mb-3">
-                    <div class="card ad-stat p-3 h-100" style="border-left-color: #36b9cc;">
+                    <div class="card ad-stat p-3 h-100" style="border-left-color: #3d6596;">
                         <div class="text-xs font-weight-bold text-info text-uppercase mb-1">Peminjaman</div>
                         <div class="h5 font-weight-bold text-gray-800 mb-1"><?= count($loan_history); ?> <span class="small text-muted font-weight-normal">kali</span></div>
                         <div class="small text-muted"><?= $open_loan ? 'Sedang dipinjam' : 'Tersedia di ruangan'; ?></div>

@@ -1,23 +1,23 @@
 </div>
 </div>
-<a class="scroll-to-top rounded" href="#page-top">
-    <i class="fas fa-angle-up"></i>
+<a class="scroll-to-top" href="#page-top" aria-label="Kembali ke atas">
+    <i class="fas fa-arrow-up"></i>
 </a>
 
 <!-- Logout Modal-->
-<div class="modal fade" id="logoutModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-    <div class="modal-dialog" role="document">
+<div class="modal fade" id="logoutModal" tabindex="-1" role="dialog" aria-labelledby="logoutModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-sm" role="document">
         <div class="modal-content">
-            <div class="modal-header">`
-                <h5 class="modal-title" id="exampleModalLabel">Logout?</h5>
-                <button class="close" type="button" data-dismiss="modal" aria-label="Close">
+            <div class="modal-header">
+                <h5 class="modal-title" id="logoutModalLabel">Keluar dari SIMANIS?</h5>
+                <button class="close" type="button" data-dismiss="modal" aria-label="Tutup">
                     <span aria-hidden="true">×</span>
                 </button>
             </div>
-            <div class="modal-body">Pilih logout apabila anda ingin keluar dari aplikasi.</div>
+            <div class="modal-body">Sesi Anda akan diakhiri di perangkat ini. Data yang belum disimpan akan hilang.</div>
             <div class="modal-footer">
                 <button class="btn btn-secondary btn-sm" type="button" data-dismiss="modal">Batal</button>
-                <a class="btn btn-primary btn-sm" href="<?= base_url('auth/logout'); ?>">Logout</a>
+                <a class="btn btn-dark btn-sm" href="<?= base_url('auth/logout'); ?>">Keluar</a>
             </div>
         </div>
     </div>
@@ -40,10 +40,62 @@
         let fileName = $(this).val().split('\\').pop();
         $(this).next('.custom-file-label').addClass("selected").html(fileName);
     });
+
+    // Kerangka SIMANIS: laci menu mobile, mode rel desktop, pintasan "/" ke pencarian
+    (function($) {
+        var $side = $('#accordionSidebar');
+        var isDesktop = function() { return window.innerWidth >= 768; };
+
+        $('#sidebarBackdrop').on('click', function() {
+            $('body').removeClass('sidebar-toggled');
+            $side.removeClass('toggled');
+        });
+
+        $('#sidebarToggle').on('click', function() {
+            if (!isDesktop()) return;
+            try { localStorage.setItem('simanis.sidebar', $side.hasClass('toggled') ? 'rail' : 'full'); } catch (e) {}
+        });
+
+        $('#sidebarToggleTop').on('click', function() {
+            $(this).attr('aria-expanded', $side.hasClass('toggled') ? 'true' : 'false');
+        });
+
+        $(document).on('keydown', function(e) {
+            if (e.key === 'Escape' && !isDesktop() && $side.hasClass('toggled')) {
+                $('#sidebarBackdrop').trigger('click');
+            }
+            var tag = (e.target.tagName || '').toLowerCase();
+            if (e.key === '/' && tag !== 'input' && tag !== 'textarea' && tag !== 'select' && !e.target.isContentEditable) {
+                var box = document.getElementById('topbarSearch');
+                if (box && box.offsetParent !== null) {
+                    e.preventDefault();
+                    box.focus();
+                }
+            }
+        });
+    })(jQuery);
 </script>
 
 <script src="https://cdn.datatables.net/1.10.24/js/jquery.dataTables.min.js"></script>
 <script src="https://cdn.datatables.net/1.10.24/js/dataTables.bootstrap4.min.js"></script>
+<script>
+    // Teks DataTables dalam Bahasa Indonesia untuk semua tabel
+    $.extend(true, $.fn.dataTable.defaults, {
+        language: {
+            search: '',
+            searchPlaceholder: 'Cari di tabel…',
+            lengthMenu: 'Tampilkan _MENU_',
+            info: '_START_–_END_ dari _TOTAL_ data',
+            infoEmpty: 'Tidak ada data',
+            infoFiltered: '(disaring dari _MAX_)',
+            zeroRecords: 'Tidak ada data yang cocok',
+            emptyTable: 'Belum ada data',
+            processing: 'Memuat data…',
+            loadingRecords: 'Memuat…',
+            paginate: { first: 'Awal', last: 'Akhir', next: '›', previous: '‹' }
+        }
+    });
+</script>
 <script src="<?= base_url('assets/') ?>js/sweetalert2.all.min.js"></script>
 <script src="<?= base_url('assets/') ?>js/ajax.js"></script>
 <script src="<?= base_url('assets/') ?>js/myscript1.js?v=<?= time(); ?>"></script>

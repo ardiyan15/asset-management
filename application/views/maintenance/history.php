@@ -136,7 +136,7 @@
                     labels: labels,
                     datasets: [{
                         label: 'Biaya',
-                        backgroundColor: '#4e73df',
+                        backgroundColor: '#0f5f73',
                         data: costs
                     }]
                 },

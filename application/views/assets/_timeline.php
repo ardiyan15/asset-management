@@ -5,14 +5,14 @@
  * @var array $types  Asset_history_model::TYPES
  */
 $tones = [
-    'primary' => '#4e73df', 'success' => '#1cc88a', 'info' => '#36b9cc', 'warning' => '#f6c23e',
-    'danger' => '#e74a3b', 'secondary' => '#858796', 'dark' => '#5a5c69',
+    'primary' => '#0f5f73', 'success' => '#2e7d4f', 'info' => '#3d6596', 'warning' => '#c98a1b',
+    'danger' => '#b4321f', 'secondary' => '#9a9da3', 'dark' => '#5a5c69',
 ];
 ?>
 <ul class="ad-timeline">
     <?php foreach ($events as $e) : ?>
         <li data-type="<?= $e['type']; ?>">
-            <span class="ad-dot" style="background: <?= $tones[$e['tone']] ?? '#858796'; ?>;" title="<?= html_escape($types[$e['type']]['label'] ?? $e['type']); ?>">
+            <span class="ad-dot" style="background: <?= $tones[$e['tone']] ?? '#9a9da3'; ?>;" title="<?= html_escape($types[$e['type']]['label'] ?? $e['type']); ?>">
                 <i class="fas <?= $types[$e['type']]['icon'] ?? 'fa-circle'; ?>"></i>
             </span>
             <div class="font-weight-bold text-gray-800"><?= html_escape($e['title']); ?></div>

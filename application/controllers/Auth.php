@@ -20,7 +20,7 @@ class Auth extends CI_Controller
         $this->form_validation->set_rules('username', 'Username', 'required|trim');
         $this->form_validation->set_rules('password', 'Password', 'required|trim');
         if ($this->form_validation->run() == false) {
-            $data['title'] = 'Login Page';
+            $data['title'] = 'Masuk';
             $this->load->view('templates/auth_header', $data);
             $this->load->view('auth/v_login');
             $this->load->view('templates/auth_footer');
